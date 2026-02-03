@@ -39,11 +39,11 @@ function checkEnv() {
   if (!process.env.ANTHROPIC_API_KEY && !process.env.GEMINI_API_KEY) {
     log(
       "⚠️  ADVERTENCIA: No se detectaron API KEYS (ANTHROPIC_API_KEY o GEMINI_API_KEY).",
-      colors.yellow
+      colors.yellow,
     );
     log(
       "   La migración AI necesitará estas claves. Asegúrate de tenerlas en tu .env",
-      colors.yellow
+      colors.yellow,
     );
   } else {
     log("✅ API Keys detectadas.", colors.green);
@@ -55,28 +55,38 @@ function checkEnv() {
 
   // 0. Check Environment
   checkEnv();
-  
+
   // Obtener argumentos (path del proyecto opcional)
   const targetProject = process.argv[2];
   if (targetProject) {
-      log(`🎯 Proyecto objetivo detectado: ${targetProject}`, colors.blue);
-      // Podríamos inyectar esto en el environment para que los subscripts lo usen si fuera necesario
-      process.env.TARGET_PROJECT_PATH = targetProject;
+    log(`🎯 Proyecto objetivo detectado: ${targetProject}`, colors.blue);
+    // Podríamos inyectar esto en el environment para que los subscripts lo usen si fuera necesario
+    process.env.TARGET_PROJECT_PATH = targetProject;
   }
 
   // 1. Inspect
-  if (!runStep("npm run migrate:inspect", "Inspección del Proyecto (Supabase/SQL)")) return;
+  if (
+    !runStep(
+      "npm run migrate:inspect",
+      "Inspección del Proyecto (Supabase/SQL)",
+    )
+  )
+    return;
 
   // 2. Schema Migration
-  if (!runStep("npm run migrate:schema", "Migración de Schema (Prisma)")) return;
+  if (!runStep("npm run migrate:schema", "Migración de Schema (Prisma)"))
+    return;
 
   // 3. Validation
   // Validamos el schema generado antes de seguir
   if (!runStep("npx prisma validate", "Validación de Schema")) {
-      log("⚠️  El schema generado tiene errores. Por favor revísalo en prisma/schema.prisma antes de continuar.", colors.red);
-      process.exit(1);
+    log(
+      "⚠️  El schema generado tiene errores. Por favor revísalo en prisma/schema.prisma antes de continuar.",
+      colors.red,
+    );
+    process.exit(1);
   }
-  
+
   // 4. Generate Prisma Client
   // Necesario para que el backend compile
   runStep("npx prisma generate", "Generación de Cliente Prisma");
@@ -86,10 +96,19 @@ function checkEnv() {
   // runStep("npm run migrate:auth", "Configuración de Auth");
 
   // 6. Routes & Controllers
-  if (!runStep("npm run migrate:routes", "Generación de Rutas y Controladores (Fastify)")) return;
+  if (
+    !runStep(
+      "npm run migrate:routes",
+      "Generación de Rutas y Controladores (Fastify)",
+    )
+  )
+    return;
 
   // 7. Edge Functions Logic
-  runStep("npm run migrate:functions", "Migración de Edge Functions (Business Logic)");
+  runStep(
+    "npm run migrate:functions",
+    "Migración de Edge Functions (Business Logic)",
+  );
 
   // 8. Hooks & Frontend Utils
   // Esto genera versiones refactorizadas de los hooks
@@ -101,10 +120,21 @@ function checkEnv() {
 
   header("🎉 MIGRACIÓN AUTOMATIZADA COMPLETADA");
   log("Siguientes pasos recomendados:", colors.bright);
-  log("1. Revisa `prisma/schema.prisma` y ajusta tipos si es necesario.", colors.cyan);
-  log("2. Revisa `src/routes` para asegurar la lógica de negocio.", colors.cyan);
-  log("3. Ejecuta `npm run docker:up` para levantar la base de datos local.", colors.cyan);
-  log("4. Ejecuta `npx prisma migrate dev` para aplicar el schema a la DB.", colors.cyan);
+  log(
+    "1. Revisa `prisma/schema.prisma` y ajusta tipos si es necesario.",
+    colors.cyan,
+  );
+  log(
+    "2. Revisa `src/routes` para asegurar la lógica de negocio.",
+    colors.cyan,
+  );
+  log(
+    "3. Ejecuta `npm run docker:up` para levantar la base de datos local.",
+    colors.cyan,
+  );
+  log(
+    "4. Ejecuta `npx prisma migrate dev` para aplicar el schema a la DB.",
+    colors.cyan,
+  );
   log("5. Inicia el servidor con `npm run dev`.", colors.cyan);
-
 })();
