@@ -359,17 +359,27 @@ function extractSQLEnums(content: string): string[] {
 }
 
 // CLI usage
-if (import.meta.url === `file://${process.argv[1]}`) {
-  const projectPath = process.argv[2] || "../project-lovable";
-  const outputPath = process.argv[3] || "./inspection.json";
+(async () => {
+    const isMainModule = import.meta.url === `file://${process.argv[1]}`;
+    if (isMainModule) {
+      const projectPath = process.argv[2] || process.cwd();
+      const outputPath = process.argv[3] || "./migration/output/inspection.json";
+  
+      try {
+        const inspection = await inspectLovableProject(projectPath);
+        // Ensure directory exists
+        const fs = await import("fs");
+        const path = await import("path");
+        const dir = path.dirname(outputPath);
+        if (!fs.existsSync(dir)) {
+          fs.mkdirSync(dir, { recursive: true });
+        }
 
-  inspectLovableProject(projectPath)
-    .then((inspection) => {
-      fs.writeFileSync(outputPath, JSON.stringify(inspection, null, 2));
-      console.log(`\n✅ Inspection guardada en: ${outputPath}`);
-    })
-    .catch((error) => {
-      console.error("❌ Error:", error);
-      process.exit(1);
-    });
-}
+        fs.writeFileSync(outputPath, JSON.stringify(inspection, null, 2));
+        console.log(`\n✅ Inspection guardada en: ${outputPath}`);
+      } catch (error) {
+        console.error("❌ Error:", error);
+        process.exit(1);
+      }
+    }
+  })();

@@ -168,33 +168,36 @@ Has Auth: ${inspection.hasAuth}
 }
 
 // CLI usage
-if (import.meta.url === `file://${process.argv[1]}`) {
-  const inspectionPath = process.argv[2] || "./migration/inspection.json";
-  const outputPath = process.argv[3] || "./prisma/schema.prisma";
+(async () => {
+  const isMainModule = import.meta.url === `file://${process.argv[1]}`;
+  if (isMainModule) {
+    const inspectionPath = process.argv[2] || "./migration/output/inspection.json";
+    const outputPath = process.argv[3] || "./prisma/schema.prisma";
 
-  if (!fs.existsSync(inspectionPath)) {
-    console.error(`❌ No se encontró inspection.json en: ${inspectionPath}`);
-    console.error(`   Ejecuta primero: npm run migrate:inspect`);
-    process.exit(1);
-  }
+    if (!fs.existsSync(inspectionPath)) {
+      console.error(`❌ No se encontró inspection.json en: ${inspectionPath}`);
+      console.error(`   Ejecuta primero: npm run migrate:inspect`);
+      process.exit(1);
+    }
 
-  const inspection: ProjectInspection = JSON.parse(
-    fs.readFileSync(inspectionPath, "utf-8"),
-  );
+    const inspection: ProjectInspection = JSON.parse(
+      fs.readFileSync(inspectionPath, "utf-8"),
+    );
 
-  migrateSchemWithAI({
-    inspection,
-    outputPath,
-    dryRun: process.argv.includes("--dry-run"),
-  })
-    .then((schema) => {
+    try {
+      const schema = await migrateSchemWithAI({
+        inspection,
+        outputPath,
+        dryRun: process.argv.includes("--dry-run"),
+      });
+
       if (process.argv.includes("--dry-run")) {
         console.log("\n--- PREVIEW ---\n");
         console.log(schema.slice(0, 500) + "\n...\n");
       }
-    })
-    .catch((error) => {
-      console.error("❌ Error:", error.message);
+    } catch (error: any) {
+      console.error("❌ Error:", error.message || error);
       process.exit(1);
-    });
-}
+    }
+  }
+})();
