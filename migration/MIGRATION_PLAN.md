@@ -1442,6 +1442,7 @@ For in-depth technical details, please refer to [REFERENCE.md](REFERENCE.md), wh
 ### Pre-Migration Checklist
 
 **Week -2: Planning**
+
 - [ ] Stakeholder approval obtained
 - [ ] Migration timeline communicated
 - [ ] Backup strategy defined
@@ -1449,6 +1450,7 @@ For in-depth technical details, please refer to [REFERENCE.md](REFERENCE.md), wh
 - [ ] Success criteria defined
 
 **Week -1: Preparation**
+
 - [ ] Full Supabase backup taken
 - [ ] Infrastructure provisioned (servers, Docker)
 - [ ] Dependencies installed
@@ -1467,11 +1469,13 @@ For in-depth technical details, please refer to [REFERENCE.md](REFERENCE.md), wh
 ### Post-Migration Checklist
 
 **Week +1: Stabilization**
+
 - [ ] Monitor error rates
 - [ ] Optimize slow queries
 - [ ] Fix reported bugs
 
 **Week +2: Optimization**
+
 - [ ] Implement caching
 - [ ] Add missing features
 
@@ -1480,12 +1484,14 @@ For in-depth technical details, please refer to [REFERENCE.md](REFERENCE.md), wh
 ## Project-Agnostic Validation
 
 This Migration Kit is **project-agnostic** and works for any Lovable project (E-commerce, SaaS, CMS, etc.) containing:
+
 - Supabase types structure
 - SQL migrations
 - Deno Edge Functions
 - standard React hooks
 
 **Project-Specific Work**:
+
 - Business logic (preserved)
 - UI/UX (preserved)
 - Data model (extracted)
@@ -1496,7 +1502,6 @@ This Migration Kit is **project-agnostic** and works for any Lovable project (E-
 1. **Review [REFERENCE.md](REFERENCE.md)** for architectural context.
 2. **Run `npm run migrate:inspect`** to begin Phase 1.
 3. **Follow the detailed steps** above.
-
 
 For issues or questions:
 
