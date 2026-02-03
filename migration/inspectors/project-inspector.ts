@@ -360,7 +360,7 @@ function extractSQLEnums(content: string): string[] {
 
 // CLI usage
 if (import.meta.url === `file://${process.argv[1]}`) {
-  const projectPath = process.argv[2] || "../aurea-1mb";
+  const projectPath = process.argv[2] || "../project-lovable";
   const outputPath = process.argv[3] || "./inspection.json";
 
   inspectLovableProject(projectPath)

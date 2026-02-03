@@ -23,7 +23,7 @@ export class FunctionMigrator extends BaseMigrator {
   async migrate(options: FunctionMigrationOptions = {}): Promise<void> {
     const {
       inspectionPath = "migration/inspection.json",
-      sourceFunctionsDir = "../aurea-1mb/supabase/functions",
+      sourceFunctionsDir = "../project-lovable/supabase/functions",
       outputDir = "src/routes/ai-functions",
       aiProvider = "ollama",
     } = options;

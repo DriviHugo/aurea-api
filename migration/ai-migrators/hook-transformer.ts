@@ -23,7 +23,7 @@ export class HookTransformer extends BaseMigrator {
   async transform(options: HookTransformOptions = {}): Promise<void> {
     const {
       inspectionPath = "migration/inspection.json",
-      sourceHooksDir = "../aurea-1mb/src/hooks",
+      sourceHooksDir = "../project-lovable/src/hooks",
       outputDir = "src/hooks/generated",
       useTanStackQuery = true,
     } = options;

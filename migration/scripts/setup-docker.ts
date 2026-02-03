@@ -33,17 +33,17 @@ export async function setupDocker(
 
   // Generate docker-compose.yml
   const services: string[] = [
-    `# Docker Compose - AUREA On-Premise Stack
+    `# Docker Compose - On-Premise Stack
 version: '3.8'
 
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: aurea-postgres
+    container_name: app-postgres
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: aurea
+      POSTGRES_DB: app_db
     ports:
       - "5432:5432"
     volumes:
@@ -56,7 +56,7 @@ services:
 
   redis:
     image: redis:7-alpine
-    container_name: aurea-redis
+    container_name: app-redis
     ports:
       - "6379:6379"
     volumes:
@@ -72,7 +72,7 @@ services:
     services.push(`
   minio:
     image: minio/minio:latest
-    container_name: aurea-minio
+    container_name: app-minio
     command: server /data --console-address ":9001"
     environment:
       MINIO_ROOT_USER: minioadmin
@@ -93,7 +93,7 @@ services:
     services.push(`
   mailpit:
     image: axllent/mailpit:latest
-    container_name: aurea-mailpit
+    container_name: app-mailpit
     ports:
       - "1025:1025"
       - "8025:8025"
@@ -106,7 +106,7 @@ services:
     services.push(`
   keycloak:
     image: quay.io/keycloak/keycloak:23.0
-    container_name: aurea-keycloak
+    container_name: app-keycloak
     command: start-dev
     environment:
       KEYCLOAK_ADMIN: admin
@@ -126,7 +126,7 @@ services:
     services.push(`
   prometheus:
     image: prom/prometheus:latest
-    container_name: aurea-prometheus
+    container_name: app-prometheus
     ports:
       - "9090:9090"
     volumes:
@@ -137,7 +137,7 @@ services:
 
   grafana:
     image: grafana/grafana:latest
-    container_name: aurea-grafana
+    container_name: app-grafana
     ports:
       - "3001:3000"
     environment:
@@ -168,7 +168,7 @@ volumes:
   scrape_interval: 15s
 
 scrape_configs:
-  - job_name: 'aurea-api'
+  - job_name: 'app-api'
     static_configs:
       - targets: ['host.docker.internal:3000']
 `;

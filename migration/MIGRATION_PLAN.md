@@ -34,7 +34,7 @@ This plan addresses all required phases for Vibe Coding → On-Premise migration
 
 ### Reusability Validation
 
-**✅ Project-Agnostic**: Works for ANY Lovable project, not just AUREA
+**✅ Project-Agnostic**: Works for ANY Lovable project, not just REFERENCE_PROJECT
 
 - E-commerce, SaaS, CMS, CRM, Task Managers
 - Only business logic is project-specific
@@ -453,14 +453,14 @@ AUTH_PROVIDER=jwt
 JWT_SECRET=your-secure-random-secret-change-in-production
 JWT_EXPIRES_IN=24h
 JWT_REFRESH_EXPIRES_IN=7d
-JWT_ISSUER=aurea-api
-JWT_AUDIENCE=aurea-client
+JWT_ISSUER=REFERENCE_PROJECT-api
+JWT_AUDIENCE=REFERENCE_PROJECT-client
 
 # For Keycloak
 AUTH_PROVIDER=keycloak
 KEYCLOAK_URL=https://keycloak.example.com/auth
-KEYCLOAK_REALM=aurea
-KEYCLOAK_CLIENT_ID=aurea-api
+KEYCLOAK_REALM=REFERENCE_PROJECT
+KEYCLOAK_CLIENT_ID=REFERENCE_PROJECT-api
 KEYCLOAK_CLIENT_SECRET=your-client-secret
 ```
 
@@ -566,9 +566,9 @@ sleep 30
 
 **Configure Keycloak Realm:**
 
-1. Create Realm: `aurea`
+1. Create Realm: `REFERENCE_PROJECT`
 2. Create Client:
-   - Client ID: `aurea-api`
+   - Client ID: `REFERENCE_PROJECT-api`
    - Client Protocol: `openid-connect`
    - Access Type: `confidential`
    - Valid Redirect URIs: `http://localhost:3000/*`
@@ -1887,7 +1887,7 @@ fastify.get("/health", async () => ({
 
 ## Project-Agnostic Validation
 
-This Migration Kit is **NOT** coupled to AUREA. It works for any Lovable project:
+This Migration Kit is **NOT** coupled to REFERENCE_PROJECT. It works for any Lovable project:
 
 ### Universal Inputs
 
@@ -2103,4 +2103,4 @@ For issues or questions:
 
 - Review `migration/CODING_GUIDELINES.md` for code standards
 - Check `migration/README.md` for toolkit documentation
-- Refer to `migration/examples/AUREA-MIGRATION.md` for real-world example
+- Refer to `migration/examples/REFERENCE_PROJECT-MIGRATION.md` for real-world example

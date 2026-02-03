@@ -215,13 +215,13 @@ AUTH_PROVIDER=jwt
 JWT_SECRET=change-this-to-a-secure-random-string-in-production
 JWT_EXPIRES_IN=24h
 JWT_REFRESH_EXPIRES_IN=7d
-JWT_ISSUER=aurea-api
-JWT_AUDIENCE=aurea-client
+JWT_ISSUER=app-api
+JWT_AUDIENCE=app-client
 
 # Keycloak Configuration (when AUTH_PROVIDER=keycloak)
 KEYCLOAK_URL=https://keycloak.example.com/auth
-KEYCLOAK_REALM=aurea
-KEYCLOAK_CLIENT_ID=aurea-api
+KEYCLOAK_REALM=app-realm
+KEYCLOAK_CLIENT_ID=app-api
 KEYCLOAK_CLIENT_SECRET=your-client-secret-here
 # KEYCLOAK_PUBLIC_KEY=optional-public-key-if-not-auto-fetched
 `;

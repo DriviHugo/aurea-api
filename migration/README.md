@@ -2,7 +2,7 @@
 
 **Boilerplate genérico** para migrar cualquier proyecto Lovable (Supabase + vibe-coding) a infraestructura on-premise con Fastify + Prisma + Docker.
 
-> **📚 Para el caso de uso específico de AUREA**, ver [examples/AUREA-MIGRATION.md](examples/AUREA-MIGRATION.md)
+> **📚 Para el caso de uso específico de AUREA**, ver [examples/EXAMPLE-MIGRATION.md](examples/EXAMPLE-MIGRATION.md)
 
 ---
 
@@ -477,7 +477,7 @@ export function generateCustomCode(data: InspectionData): string {
 
 ## 📚 Documentación Extendida
 
-- **Caso de Uso Real**: [examples/AUREA-MIGRATION.md](examples/AUREA-MIGRATION.md)
+- **Caso de Uso Real**: [examples/EXAMPLE-MIGRATION.md](examples/EXAMPLE-MIGRATION.md)
 - **Troubleshooting**: Errores comunes y soluciones
 - **Advanced**: Customización avanzada del kit
 
@@ -487,7 +487,7 @@ export function generateCustomCode(data: InspectionData): string {
 
 Este kit ha sido probado con:
 
-- **AUREA** (Guardia Civil): 30 tablas, 17 Edge Functions, 18 hooks → Ver [examples/AUREA-MIGRATION.md](examples/AUREA-MIGRATION.md)
+- **AUREA** (Guardia Civil): 30 tablas, 17 Edge Functions, 18 hooks → Ver [examples/EXAMPLE-MIGRATION.md](examples/EXAMPLE-MIGRATION.md)
 - Proyectos Lovable pequeños (~5-10 tablas)
 - Proyectos con AI intensiva (múltiples Edge Functions)
 

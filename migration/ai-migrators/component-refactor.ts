@@ -23,7 +23,7 @@ export class ComponentRefactorer extends BaseMigrator {
   }
 
   async refactor(options: ComponentRefactorOptions): Promise<void> {
-    const { componentPath, outputBaseDir = "../aurea-1mb/src/features" } =
+    const { componentPath, outputBaseDir = "../project-lovable/src/features" } =
       options;
 
     // Resolve files using glob
@@ -162,7 +162,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   const provider = process.env["ANTHROPIC_API_KEY"] ? "anthropic" : "gemini";
   const refactorer = new ComponentRefactorer({ provider, apiKey });
 
-  const target = process.argv[2] || "../aurea-1mb/src/pages/*.tsx";
+  const target = process.argv[2] || "../project-lovable/src/pages/*.tsx";
 
   refactorer.refactor({ componentPath: target }).catch(console.error);
 }

@@ -1,5 +1,5 @@
 {
-  "name": "boilerplate-api",
+  "name": "migration-boilerplate",
   "version": "1.0.0",
   "description": "Boilerplate for a Node.js API with Fastify, Prisma (MongoDB or PostgreSQL) and Redis",
   "private": true,
