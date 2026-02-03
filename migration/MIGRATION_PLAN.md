@@ -34,7 +34,7 @@ This plan addresses all required phases for Vibe Coding → On-Premise migration
 
 ### Reusability Validation
 
-**✅ Project-Agnostic**: Works for ANY Lovable project, not just REFERENCE_PROJECT
+**✅ Project-Agnostic**: Works for ANY Lovable project
 
 - E-commerce, SaaS, CMS, CRM, Task Managers
 - Only business logic is project-specific
@@ -453,14 +453,14 @@ AUTH_PROVIDER=jwt
 JWT_SECRET=your-secure-random-secret-change-in-production
 JWT_EXPIRES_IN=24h
 JWT_REFRESH_EXPIRES_IN=7d
-JWT_ISSUER=REFERENCE_PROJECT-api
-JWT_AUDIENCE=REFERENCE_PROJECT-client
+JWT_ISSUER=boilerplate-api
+JWT_AUDIENCE=boilerplate-client
 
 # For Keycloak
 AUTH_PROVIDER=keycloak
 KEYCLOAK_URL=https://keycloak.example.com/auth
-KEYCLOAK_REALM=REFERENCE_PROJECT
-KEYCLOAK_CLIENT_ID=REFERENCE_PROJECT-api
+KEYCLOAK_REALM=boilerplate
+KEYCLOAK_CLIENT_ID=boilerplate-api
 KEYCLOAK_CLIENT_SECRET=your-client-secret
 ```
 
@@ -566,9 +566,9 @@ sleep 30
 
 **Configure Keycloak Realm:**
 
-1. Create Realm: `REFERENCE_PROJECT`
+1. Create Realm: `boilerplate`
 2. Create Client:
-   - Client ID: `REFERENCE_PROJECT-api`
+   - Client ID: `boilerplate-api`
    - Client Protocol: `openid-connect`
    - Access Type: `confidential`
    - Valid Redirect URIs: `http://localhost:3000/*`
@@ -1429,376 +1429,19 @@ For a typical Lovable project (20-30 tables, 15-20 Edge Functions):
 
 ---
 
-## Lovable Migration Patterns
+## Detailed Reference
 
-### Common Patterns Across All Lovable Projects
+For in-depth technical details, please refer to [REFERENCE.md](REFERENCE.md), which covers:
 
-These patterns appear consistently and the Migration Kit handles them:
-
-#### 1. Database Patterns
-
-**Pattern**: Supabase types.ts structure
-
-```typescript
-export type Tables<T extends keyof Database["public"]["Tables"]> =
-  Database["public"]["Tables"][T]["Row"];
-```
-
-**Solution**: Inspector extracts via regex `(\w+):\s*\{\s*Row:`
-
----
-
-**Pattern**: RLS policies everywhere
-
-```sql
-CREATE POLICY "users_select_own" ON profiles
-  FOR SELECT USING (auth.uid() = id);
-```
-
-**Solution**: Convert to API-level authorization with `@authorize` decorator
-
----
-
-**Pattern**: JSONB fields for flexibility
-
-```sql
-metadata JSONB
-```
-
-**Solution**: Prisma `Json` type with TypeScript interfaces
-
----
-
-#### 2. Authentication Patterns
-
-**Pattern**: Supabase Auth everywhere
-
-```typescript
-const {
-  data: { user },
-} = await supabase.auth.getUser();
-```
-
-**Solution**: JWT/Keycloak provider with same interface
-
----
-
-**Pattern**: Email/password + magic links
-
-```typescript
-await supabase.auth.signInWithOtp({ email });
-```
-
-**Solution**: Email service + token generation
-
----
-
-#### 3. React Hooks Patterns
-
-**Pattern**: Direct Supabase queries in components
-
-```typescript
-const { data } = useQuery(["items"], async () => {
-  const { data } = await supabase.from("items").select("*");
-  return data;
-});
-```
-
-**Solution**: API client hooks
-
-```typescript
-const { data } = useQuery(["items"], () => fetchAPI("/api/items"));
-```
-
----
-
-**Pattern**: Realtime subscriptions
-
-```typescript
-supabase
-  .channel('table-changes')
-  .on('postgres_changes', { ... }, callback)
-  .subscribe();
-```
-
-**Solution**: WebSockets or Server-Sent Events
-
----
-
-#### 4. Edge Functions Patterns
-
-**Pattern**: Deno serve wrapper
-
-```typescript
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-
-serve(async (req) => { ... });
-```
-
-**Solution**: Fastify route handlers
-
----
-
-**Pattern**: Supabase client in functions
-
-```typescript
-const supabase = createClient(url, key, {
-  global: { headers: { Authorization: authHeader } },
-});
-```
-
-**Solution**: Prisma client + auth from request
-
----
-
-**Pattern**: AI API calls (OpenAI, Anthropic)
-
-```typescript
-const response = await fetch("https://api.openai.com/v1/chat/completions", {
-  method: "POST",
-  headers: { Authorization: `Bearer ${apiKey}` },
-  body: JSON.stringify(payload),
-});
-```
-
-**Solution**: AI Gateway with provider abstraction
-
----
-
-#### 5. Storage Patterns
-
-**Pattern**: Supabase Storage for files
-
-```typescript
-await supabase.storage.from("bucket").upload("path/file.pdf", file);
-```
-
-**Solution**: MinIO (S3-compatible) or local filesystem
-
----
-
-### Anti-Patterns to Avoid
-
-❌ **Mixing data layer in components**
-
-```typescript
-// BAD - in React component
-const { data } = await supabase.from("users").select("*");
-```
-
-✅ **Use hooks layer**
-
-```typescript
-// GOOD - in hook
-export function useUsers() {
-  return useQuery(["users"], () => fetchAPI("/api/users"));
-}
-```
-
----
-
-❌ **Hardcoded Supabase URLs**
-
-```typescript
-const SUPABASE_URL = "https://xxx.supabase.co";
-```
-
-✅ **Environment variables**
-
-```typescript
-const API_URL = import.meta.env.VITE_API_URL;
-```
-
----
-
-❌ **Business logic in Edge Functions**
-
-```typescript
-// BAD - complex logic in function
-serve(async (req) => {
-  // 200 lines of business logic
-});
-```
-
-✅ **Services + thin handlers**
-
-```typescript
-// GOOD - logic in service
-export class ContractService {
-  async analyze(data) { ... }
-}
-
-// Thin route handler
-fastify.post('/analyze', async (req, reply) => {
-  return contractService.analyze(req.body);
-});
-```
-
----
-
-## Design Principles for Future Migrations
-
-### 1. Provider Agnosticism
-
-**Principle**: Never couple to specific vendors
-
-**Implementation**:
-
-- Abstract interfaces for auth, storage, AI
-- Environment-driven configuration
-- Plugin architecture
-
-**Example**:
-
-```typescript
-interface IAuthProvider {
-  login(credentials): Promise<Token>;
-  validateToken(token): Promise<User>;
-}
-
-// Can switch: JWT, Keycloak, Auth0, Cognito
-```
-
----
-
-### 2. Clear Layer Separation
-
-**Principle**: Strict boundaries between layers
-
-**Layers**:
-
-1. **Routes** (HTTP/validation)
-2. **Services** (business logic)
-3. **Repositories** (data access)
-4. **Providers** (external systems)
-
-**Benefits**:
-
-- Easy testing
-- Reduced coupling
-- Clear dependencies
-
----
-
-### 3. Configuration Over Code
-
-**Principle**: Behavior controlled by env vars, not code changes
-
-**Examples**:
-
-- `AUTH_PROVIDER=jwt` vs `AUTH_PROVIDER=keycloak`
-- `AI_PROVIDER=ollama` vs `AI_PROVIDER=azure`
-- `STORAGE_PROVIDER=minio` vs `STORAGE_PROVIDER=s3`
-
----
-
-### 4. Database Flexibility
-
-**Principle**: Support multiple databases with same code
-
-**Implementation**:
-
-- Prisma abstracts PostgreSQL, MySQL, MongoDB
-- Environment-driven connection
-- Migrations version-controlled
-
-**Example**:
-
-```env
-# PostgreSQL
-DATABASE_URL="postgresql://user:pass@localhost:5432/db"
-
-# MySQL
-DATABASE_URL="mysql://user:pass@localhost:3306/db"
-```
-
----
-
-### 5. Graceful Degradation
-
-**Principle**: System works even if some services fail
-
-**Implementation**:
-
-- Fallbacks for AI services
-- Cached data when DB slow
-- Default values when config missing
-
-**Example**:
-
-```typescript
-async function analyzeWithAI(text: string) {
-  try {
-    return await aiService.analyze(text);
-  } catch (error) {
-    log.warn("AI service failed, using fallback");
-    return fallbackAnalysis(text);
-  }
-}
-```
-
----
-
-### 6. Observable Systems
-
-**Principle**: All systems must be monitorable
-
-**Implementation**:
-
-- Structured logging (JSON)
-- Health check endpoints
-- Metrics exposure (Prometheus)
-- Distributed tracing
-
-**Example**:
-
-```typescript
-fastify.get("/health", async () => ({
-  status: "ok",
-  timestamp: new Date().toISOString(),
-  services: {
-    database: await checkDB(),
-    redis: await checkRedis(),
-    ai: await checkAI(),
-  },
-}));
-```
-
----
-
-### 7. Security by Default
-
-**Principle**: Secure unless explicitly opened
-
-**Implementation**:
-
-- Authentication required by default
-- HTTPS enforced
-- Rate limiting enabled
-- Input validation mandatory
-- SQL injection prevention (Prisma)
-
----
-
-### 8. Documentation as Code
-
-**Principle**: Documentation lives with code
-
-**Implementation**:
-
-- OpenAPI/Swagger from TypeBox schemas
-- JSDoc comments
-- README in every major folder
-- Examples in code
-
----
+- **Lovable Migration Patterns**: Common patterns and anti-patterns.
+- **Design Principles**: Architecture guidelines.
+- **Technical Decisions**: Rationale behind Fastify, Prisma, Docker, etc.
 
 ## Reusable Migration Playbook
 
 ### Pre-Migration Checklist
 
 **Week -2: Planning**
-
 - [ ] Stakeholder approval obtained
 - [ ] Migration timeline communicated
 - [ ] Backup strategy defined
@@ -1806,298 +1449,54 @@ fastify.get("/health", async () => ({
 - [ ] Success criteria defined
 
 **Week -1: Preparation**
-
 - [ ] Full Supabase backup taken
 - [ ] Infrastructure provisioned (servers, Docker)
 - [ ] Dependencies installed
 - [ ] AI API keys obtained
 - [ ] Team trained on new tools
 
----
-
 ### Migration Execution (5-7 Days)
 
-**Day 1: Setup & Inspection**
-
-- [ ] Clone Lovable project
-- [ ] Create API repository
-- [ ] Configure workspace
-- [ ] Run project inspector
-- [ ] Review inspection.json
-
-**Day 2: Schema & Routes**
-
-- [ ] Generate Prisma schema
-- [ ] Validate schema
-- [ ] Generate CRUD routes
-- [ ] Review generated code
-
-**Day 3: Functions & Auth**
-
-- [ ] Migrate Edge Functions
-- [ ] Generate auth system
-- [ ] Configure auth provider
-- [ ] Migrate users
-
-**Day 4: Database & Testing**
-
-- [ ] Setup PostgreSQL
-- [ ] Run migrations
-- [ ] Seed data
-- [ ] Test CRUD operations
-- [ ] Test AI functions
-
-**Day 5-6: Frontend Migration**
-
-- [ ] Update API configuration
-- [ ] Migrate hooks
-- [ ] Update authentication
-- [ ] Test full user flows
-- [ ] Fix bugs
-
-**Day 7: Deployment & Verification**
-
-- [ ] Generate Docker config
-- [ ] Deploy containers
-- [ ] Run production tests
-- [ ] Monitor logs
-- [ ] Security checklist
-
----
+- **Day 1**: Setup & Inspection (Steps 1-7)
+- **Day 2**: Schema & Routes (Steps 8-10)
+- **Day 3**: Functions & Auth (Steps 11-13)
+- **Day 4**: Database & Testing (Steps 14-16)
+- **Day 5-6**: Frontend Migration & Refactoring (Step 21)
+- **Day 7**: Deployment & Verification (Steps 25-29)
 
 ### Post-Migration Checklist
 
 **Week +1: Stabilization**
-
 - [ ] Monitor error rates
 - [ ] Optimize slow queries
 - [ ] Fix reported bugs
-- [ ] Gather user feedback
-- [ ] Tune performance
 
 **Week +2: Optimization**
-
 - [ ] Implement caching
 - [ ] Add missing features
-- [ ] Improve documentation
-- [ ] CI/CD setup
-- [ ] Backup verification
 
 ---
 
 ## Project-Agnostic Validation
 
-This Migration Kit is **NOT** coupled to REFERENCE_PROJECT. It works for any Lovable project:
+This Migration Kit is **project-agnostic** and works for any Lovable project (E-commerce, SaaS, CMS, etc.) containing:
+- Supabase types structure
+- SQL migrations
+- Deno Edge Functions
+- standard React hooks
+
+**Project-Specific Work**:
+- Business logic (preserved)
+- UI/UX (preserved)
+- Data model (extracted)
+- Environment variables
+
+## Next Steps
+
+1. **Review [REFERENCE.md](REFERENCE.md)** for architectural context.
+2. **Run `npm run migrate:inspect`** to begin Phase 1.
+3. **Follow the detailed steps** above.
 
-### Universal Inputs
-
-✅ Any Supabase types.ts structure  
-✅ Any SQL migrations format  
-✅ Any Edge Functions (Deno)  
-✅ Any React hooks pattern
-
-### Configurable Outputs
-
-✅ PostgreSQL or MySQL via Prisma  
-✅ JWT or Keycloak auth  
-✅ Any AI provider (Ollama, Azure, OpenAI)  
-✅ Any deployment target (Docker, Kubernetes, VM)
-
-### Project-Specific Only
-
-⚠️ Business logic (preserved from original)  
-⚠️ UI/UX (kept from Lovable)  
-⚠️ Data model (extracted from types.ts)
-
-### Reusability Tests
-
-**Can migrate these Lovable projects with ZERO changes to kit:**
-
-- [ ] E-commerce with products/orders/payments
-- [ ] SaaS with workspaces/users/subscriptions
-- [ ] CMS with posts/pages/media
-- [ ] CRM with contacts/deals/activities
-- [ ] Task manager with projects/tasks/comments
-
-**Only project-specific work:**
-
-- Review generated code quality
-- Add custom business logic
-- Configure environment variables
-- Test domain-specific features
-
----
-
-## Technical Decisions Documentation
-
-### Decision 1: Why Fastify Over Express?
-
-**Decision**: Use Fastify as web framework
-
-**Rationale**:
-
-- 2x faster than Express
-- Built-in schema validation (TypeBox)
-- Native async/await support
-- Plugin architecture
-- Better TypeScript support
-- OpenAPI/Swagger generation
-
-**Alternatives Considered**:
-
-- Express: Too slow, lacks validation
-- NestJS: Over-engineered for most projects
-- Hapi: Less ecosystem support
-
-**Trade-offs**:
-
-- Learning curve for Express users
-- Fewer middlewares available
-- Different plugin system
-
----
-
-### Decision 2: Why Prisma Over TypeORM?
-
-**Decision**: Use Prisma as ORM
-
-**Rationale**:
-
-- Type-safe query builder
-- Excellent TypeScript support
-- Automatic migrations
-- Multi-database support
-- Better performance
-- Active development
-
-**Alternatives Considered**:
-
-- TypeORM: More complex, less type-safe
-- Sequelize: Dated API, poor TypeScript
-- Knex: Too low-level, no types
-
-**Trade-offs**:
-
-- Must learn Prisma schema language
-- Migration generation can be opinionated
-- No support for MongoDB relations
-
----
-
-### Decision 3: Why Docker Over VMs?
-
-**Decision**: Use Docker for deployment
-
-**Rationale**:
-
-- Consistent environments
-- Easy local development
-- Version-controlled infrastructure
-- Portable across cloud providers
-- Lower resource overhead than VMs
-
-**Alternatives Considered**:
-
-- VMs: Higher overhead, slower
-- Kubernetes: Overkill for most projects
-- Bare metal: Hard to replicate
-
-**Trade-offs**:
-
-- Docker learning curve
-- Windows compatibility issues
-- Resource limits management
-
----
-
-### Decision 4: Why JWT vs Sessions?
-
-**Decision**: Support both JWT and Keycloak
-
-**Rationale**:
-
-- JWT: Stateless, scales horizontally
-- Keycloak: Enterprise features (SSO, MFA, LDAP)
-- Plugin architecture allows choice
-- Environment-driven selection
-
-**Alternatives Considered**:
-
-- Sessions only: Doesn't scale
-- OAuth2 only: Over-complex
-- Passport.js: Too many strategies
-
-**Trade-offs**:
-
-- Must implement both providers
-- Different token formats
-- Refresh token complexity
-
----
-
-### Decision 5: Why Ollama for Production AI?
-
-**Decision**: Ollama as default AI provider
-
-**Rationale**:
-
-- Fully on-premise
-- No external API calls
-- Data privacy guaranteed
-- Llama 3.3 70B competitive quality
-- Cost-effective (no per-token pricing)
-
-**Alternatives Considered**:
-
-- OpenAI: Excellent but cloud-only
-- Azure OpenAI Gov: Good but expensive
-- Anthropic: Great but cloud-only
-
-**Trade-offs**:
-
-- Requires GPU hardware
-- Self-hosted maintenance
-- Model updates manual
-
----
-
-### Decision 6: Why PostgreSQL Over MySQL?
-
-**Decision**: PostgreSQL as default database
-
-**Rationale**:
-
-- JSON/JSONB support (critical for Supabase migrations)
-- Array types
-- Better performance for complex queries
-- ENUM support
-- Full-text search built-in
-
-**Alternatives Considered**:
-
-- MySQL: Less advanced features
-- MongoDB: No relations, poor for this use case
-- SQLite: Not production-ready
-
-**Trade-offs**:
-
-- Slightly more complex to manage
-- Larger resource footprint
-- Windows support less mature
-
----
-
-## Next Steps After Migration
-
-1. **CI/CD Setup**: Configure automated testing and deployment
-2. **Monitoring**: Set up application monitoring (Prometheus, Grafana)
-3. **Backups**: Implement automated database backups
-4. **Security Audit**: Review security configurations
-5. **Load Testing**: Test under production-like load
-6. **Documentation**: Complete API and deployment documentation
-7. **Training**: Train team on new architecture
-
-## Support
 
 For issues or questions:
 
