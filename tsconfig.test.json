@@ -1,0 +1,15 @@
+{
+    "extends": "./tsconfig.options.json",
+    "compilerOptions": {
+        "module": "CommonJS",
+        "noEmit": true,
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "isolatedModules": true
+    },
+    "include": [
+        "test",
+        "test/**/*.ts",
+        "jest.config.ts",
+    ]
+}

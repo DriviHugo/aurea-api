@@ -1,0 +1,49 @@
+# This is initial skeleton for production. Needs traefik, nginx and better configurations.
+
+name: boilerplate-api
+
+services:
+  redis:
+    image: redis:7.4-alpine
+    ports:
+      - 34302:6379
+    volumes:
+      - ./redis/volumes/data:/data
+    restart: unless-stopped
+    networks:
+      - net
+
+  mongo:
+    image: mongo:8
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: mongo
+      MONGO_INITDB_ROOT_PASSWORD: mongo
+      MONGO_INITDB_DATABASE: boilerplate-api
+    ports:
+      - 25943:27017
+    volumes:
+      - ./mongo/volumes/data:/data/db
+    restart: unless-stopped
+    networks:
+      - net
+
+  postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: boilerplate-api
+    ports:
+      - "54320:5432"
+    volumes:
+      - ./postgres/volumes/data:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks:
+      - net
+
+volumes:
+  dbgate-data:
+
+networks:
+  net:
+    driver: bridge
