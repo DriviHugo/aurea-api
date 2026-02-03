@@ -171,7 +171,8 @@ Has Auth: ${inspection.hasAuth}
 (async () => {
   const isMainModule = import.meta.url === `file://${process.argv[1]}`;
   if (isMainModule) {
-    const inspectionPath = process.argv[2] || "./migration/output/inspection.json";
+    const inspectionPath =
+      process.argv[2] || "./migration/output/inspection.json";
     const outputPath = process.argv[3] || "./prisma/schema.prisma";
 
     if (!fs.existsSync(inspectionPath)) {

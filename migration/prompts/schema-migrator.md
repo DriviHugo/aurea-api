@@ -81,18 +81,18 @@ model Expediente {
 
 ### Data Types Mapping
 
-| PostgreSQL  | Prisma                       |
-| ----------- | ---------------------------- |
-| UUID        | String @id @default(uuid())  |
-| TEXT        | String                       |
-| INTEGER     | Int                          |
-| BIGINT      | BigInt                       |
-| BOOLEAN     | Boolean                      |
-| TIMESTAMPTZ | DateTime                     |
-| JSONB       | Json                         |
-| TEXT[]      | String[]                     |
-| INTEGER[]   | Int[]                        |
-| NUMERIC     | Decimal                      |
+| PostgreSQL  | Prisma                      |
+| ----------- | --------------------------- |
+| UUID        | String @id @default(uuid()) |
+| TEXT        | String                      |
+| INTEGER     | Int                         |
+| BIGINT      | BigInt                      |
+| BOOLEAN     | Boolean                     |
+| TIMESTAMPTZ | DateTime                    |
+| JSONB       | Json                        |
+| TEXT[]      | String[]                    |
+| INTEGER[]   | Int[]                       |
+| NUMERIC     | Decimal                     |
 
 ### Foreign Keys
 
