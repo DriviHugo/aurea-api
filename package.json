@@ -39,7 +39,8 @@
     "migrate:frontend": "tsx migration/ai-migrators/component-refactor.ts",
     "migrate:types": "tsx migration/scripts/generate-types.ts",
     "migrate:docker": "tsx migration/scripts/setup-docker.ts",
-    "prepare": "husky"
+    "prepare": "husky",
+    "migrate:auto": "tsx migration/migrate.ts"
   },
   "engines": {
     "node": ">=22"
