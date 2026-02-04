@@ -152,20 +152,27 @@ Generate complete, production-ready code with NO placeholders or "... existing c
   }
 }
 
-// CLI execution
-if (import.meta.url === `file://${process.argv[1]}`) {
-  const config = BaseMigrator.loadConfig();
-  const generator = new RouteGenerator(config);
+// CLI execution - Immediate IIFE for ESM compatibility
+(async () => {
+  // Check if this is the main module
+  const isMainModule = process.argv[1] && import.meta.url.endsWith(process.argv[1].replace(/\\/g, '/'));
+  
+  if (!isMainModule) return;
 
-  const args = process.argv.slice(2);
-  const options: RouteGenerationOptions = {
-    includeAuth: !args.includes("--no-auth"),
-    includeValidation: !args.includes("--no-validation"),
-    includeSwagger: !args.includes("--no-swagger"),
-  };
+  try {
+    const config = BaseMigrator.loadConfig();
+    const generator = new RouteGenerator(config);
 
-  generator.generateRoutes(options).catch((error) => {
-    console.error("❌ Route generation error:", error.message);
+    const args = process.argv.slice(2);
+    const options: RouteGenerationOptions = {
+      includeAuth: !args.includes("--no-auth"),
+      includeValidation: !args.includes("--no-validation"),
+      includeSwagger: !args.includes("--no-swagger"),
+    };
+
+    await generator.generateRoutes(options);
+  } catch (error) {
+    console.error("❌ Route generation error:", error instanceof Error ? error.message : String(error));
     process.exit(1);
-  });
-}
+  }
+})();

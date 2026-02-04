@@ -129,6 +129,7 @@ model Expediente {
 -- SQL Input:
 CREATE INDEX idx_expediente_codigo ON public.expedientes(codigo);
 CREATE INDEX idx_expediente_estado ON public.expedientes(estado);
+CREATE INDEX idx_created_at_desc ON public.logs(created_at DESC);
 CREATE UNIQUE INDEX idx_user_email ON public.users(email);
 ```
 
@@ -144,6 +145,15 @@ model Expediente {
   @@map("expedientes")
 }
 
+model Log {
+  id        String   @id @default(uuid()) @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // For descending index, use this syntax:
+  @@index([createdAt(sort: Desc)], name: "idx_created_at_desc")
+  @@map("logs")
+}
+
 model User {
   id    String @id @default(uuid()) @db.Uuid
   email String @unique
@@ -151,6 +161,11 @@ model User {
   @@map("users")
 }
 ```
+
+**Important Index Syntax:**
+- For sorted indexes: `@@index([field(sort: Desc)])` or `@@index([field(sort: Asc)])`
+- Never use: `@@index([field], sort: Desc)` (INVALID SYNTAX)
+- The sort parameter MUST be inside the field array parentheses
 
 ### Composite Keys
 
@@ -232,8 +247,22 @@ model Expediente {
    - Use descriptive relation names
    - Include `onDelete` behavior when specified
    - No comments for reverse relations
+   - **CRITICAL**: Each foreign key can only reference ONE parent model
+   - **CRITICAL**: Never create multiple relations using the same foreign key field
+   - **CRITICAL**: If a table references multiple parents, it must have separate foreign key fields for each
 
-8. **Language:**
+8. **Indexes:**
+   - **CRITICAL**: Never duplicate index definitions (e.g., `@@index([codigo])` should appear only once)
+   - Each index must have a unique name within the schema
+   - Use `name:` parameter to explicitly name indexes when needed
+   - Check for duplicate indexes before adding new ones
+
+9. **Constraint Naming:**
+   - When multiple relations exist from one model, use explicit `map:` parameter for foreign keys
+   - Example: `@relation(fields: [docId], references: [id], map: "fk_table_doc")`
+   - Ensures unique constraint names in the database
+
+10. **Language:**
    - All identifiers MUST be in English
    - Never use Spanish or other languages for model, field, or enum names
 
