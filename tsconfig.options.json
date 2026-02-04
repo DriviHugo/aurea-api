@@ -1,0 +1,41 @@
+{
+    "extends": "fastify-tsconfig",
+    "compilerOptions": {
+        /* Module system aligned with Node 22 ESM */
+        "module": "NodeNext",
+        "moduleResolution": "NodeNext",
+        "target": "ES2023",
+        "lib": [
+            "ES2023"
+        ],
+        /* Output layout */
+        "outDir": "dist",
+        "sourceMap": true,
+        "inlineSources": true,
+        "declaration": true,
+        "declarationMap": true,
+        /* Strictness & quality */
+        "strict": true,
+        "strictNullChecks": true,
+        "noImplicitOverride": true,
+        "noPropertyAccessFromIndexSignature": true,
+        "exactOptionalPropertyTypes": true,
+        "noUncheckedIndexedAccess": true,
+        "useUnknownInCatchVariables": true,
+        "noFallthroughCasesInSwitch": true,
+        /* Interop and DX */
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "resolveJsonModule": true,
+        "forceConsistentCasingInFileNames": true,
+        /* Modern TS 5: keep import type semantics intact */
+        "verbatimModuleSyntax": true,
+        "baseUrl": ".",
+        /* Path aliases: mirror them in package.json#imports */
+        "paths": {
+            "#app/*": [
+                "./src/*"
+            ]
+        }
+    }
+}

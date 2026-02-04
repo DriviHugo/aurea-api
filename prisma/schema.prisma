@@ -1,0 +1,63 @@
+// This is a minimal Prisma schema example. Adjust the datasource and models as needed.
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Config for PostgreSQL / MongoDB
+datasource db {
+    provider = "postgresql"
+}
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+// Model example (User)
+model UserEntity {
+    // id    String @id @default(auto()) @map("_id") @db.ObjectId // MongoDB specific
+    id            String          @id @default(cuid(2))
+    email         String          @unique
+    name          String
+    password      String
+    imageUrl      String?
+    isAdmin       Boolean         @default(false)
+    isActive      Boolean         @default(false)
+    validatedAt   DateTime?
+    createdAt     DateTime        @default(now())
+    updatedAt     DateTime        @updatedAt
+    SessionEntity SessionEntity[]
+
+    @@map("users") // Maps to the "users" table in the database
+}
+
+model SessionEntity {
+    sessionId    String   @id @unique @db.Char(64)
+    userId       String
+    refreshToken String   @unique @db.Char(128)
+    fingerprint  String
+    ip           String
+    userAgent    String
+    expiresAt    DateTime
+    revoked      Boolean  @default(false)
+    createdAt    DateTime @default(now())
+    updatedAt    DateTime @updatedAt
+
+    User UserEntity @relation(fields: [userId], references: [id])
+
+    @@unique([userId, fingerprint]) // Ensures a user can only have one session per fingerprint    
+    @@index([refreshToken], name: "idx_refresh_token") // Index for faster lookups by refreshToken
+    @@map("sessions") // Maps to the "sessions" table in the database
+}
+
+model ApiKeyEntity {
+    keyId          String    @id @default(cuid(2))
+    name           String
+    keyHash        String    @unique
+    scopes         String[]
+    isActive       Boolean   @default(true)
+    allowedIps     String[]  @default([])
+    allowedDomains String[]  @default([])
+    lastUsedAt     DateTime?
+    createdAt      DateTime  @default(now())
+    updatedAt      DateTime  @updatedAt
+
+    @@map("api_keys") // Maps to the "api_keys" table in the database
+}
