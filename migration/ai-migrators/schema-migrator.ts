@@ -173,7 +173,10 @@ Has Auth: ${inspection.hasAuth}
 
 // CLI usage
 (async () => {
-  const isMainModule = import.meta.url === `file://${process.argv[1]}`;
+  // Windows-compatible module detection
+  const isMainModule = import.meta.url.endsWith(
+    process.argv[1].replace(/\\/g, "/"),
+  );
   if (isMainModule) {
     const inspectionPath =
       process.argv[2] || "./migration/output/inspection.json";
