@@ -1,0 +1,819 @@
+{
+  "projectName": "aurea-1mb",
+  "projectPath": "..\\aurea-1mb",
+  "timestamp": "2026-02-05T11:35:50.910Z",
+  "supabaseTables": [
+    {
+      "name": "ai_function_logs",
+      "columns": [],
+      "relations": []
+    },
+    {
+      "name": "ai_function_versions",
+      "columns": [],
+      "relations": []
+    },
+    {
+      "name": "ai_functions",
+      "columns": [],
+      "relations": []
+    },
+    {
+      "name": "ai_providers",
+      "columns": [],
+      "relations": []
+    },
+    {
+      "name": "alternativas_procedimiento",
+      "columns": [],
+      "relations": []
+    },
+    {
+      "name": "audit_log",
+      "columns": [],
+      "relations": []
+    },
+    {
+      "name": "comentarios",
+      "columns": [],
+      "relations": []
+    },
+    {
+      "name": "cpv_codigos",
+      "columns": [],
+      "relations": []
+    },
+    {
+      "name": "cpv_recomendados",
+      "columns": [],
+      "relations": []
+    },
+    {
+      "name": "documento_generaciones",
+      "columns": [],
+      "relations": []
+    },
+    {
+      "name": "documento_secciones",
+      "columns": [],
+      "relations": []
+    },
+    {
+      "name": "documento_versiones",
+      "columns": [],
+      "relations": []
+    },
+    {
+      "name": "documentos",
+      "columns": [],
+      "relations": []
+    },
+    {
+      "name": "documentos_evidencias",
+      "columns": [],
+      "relations": []
+    },
+    {
+      "name": "evidencias",
+      "columns": [],
+      "relations": []
+    },
+    {
+      "name": "expedientes",
+      "columns": [],
+      "relations": []
+    },
+    {
+      "name": "profiles",
+      "columns": [],
+      "relations": []
+    },
+    {
+      "name": "reglas",
+      "columns": [],
+      "relations": []
+    },
+    {
+      "name": "revisiones",
+      "columns": [],
+      "relations": []
+    },
+    {
+      "name": "user_roles",
+      "columns": [],
+      "relations": []
+    },
+    {
+      "name": "validaciones",
+      "columns": [],
+      "relations": []
+    },
+    {
+      "name": "validaciones_evidencias",
+      "columns": [],
+      "relations": []
+    }
+  ],
+  "edgeFunctions": [
+    {
+      "name": "admin-create-user",
+      "path": "..\\aurea-1mb\\supabase\\functions\\admin-create-user\\index.ts",
+      "hasAI": false,
+      "usesAI": false,
+      "aiProvider": "",
+      "dependencies": [
+        "https://deno.land/std@0.168.0/http/server.ts",
+        "https://esm.sh/@supabase/supabase-js@2"
+      ]
+    },
+    {
+      "name": "admin-delete-user",
+      "path": "..\\aurea-1mb\\supabase\\functions\\admin-delete-user\\index.ts",
+      "hasAI": false,
+      "usesAI": false,
+      "aiProvider": "",
+      "dependencies": [
+        "https://deno.land/std@0.168.0/http/server.ts",
+        "https://esm.sh/@supabase/supabase-js@2"
+      ]
+    },
+    {
+      "name": "admin-update-password",
+      "path": "..\\aurea-1mb\\supabase\\functions\\admin-update-password\\index.ts",
+      "hasAI": false,
+      "usesAI": false,
+      "aiProvider": "",
+      "dependencies": [
+        "https://deno.land/std@0.168.0/http/server.ts",
+        "https://esm.sh/@supabase/supabase-js@2"
+      ]
+    },
+    {
+      "name": "ai-analizar-centralizacion",
+      "path": "..\\aurea-1mb\\supabase\\functions\\ai-analizar-centralizacion\\index.ts",
+      "hasAI": false,
+      "usesAI": false,
+      "aiProvider": "",
+      "dependencies": [
+        "https://deno.land/std@0.168.0/http/server.ts",
+        "https://esm.sh/@supabase/supabase-js@2"
+      ]
+    },
+    {
+      "name": "ai-analizar-cpv",
+      "path": "..\\aurea-1mb\\supabase\\functions\\ai-analizar-cpv\\index.ts",
+      "hasAI": false,
+      "usesAI": false,
+      "aiProvider": "",
+      "dependencies": [
+        "https://deno.land/std@0.168.0/http/server.ts",
+        "https://esm.sh/@supabase/supabase-js@2"
+      ]
+    },
+    {
+      "name": "ai-analizar-emergencia",
+      "path": "..\\aurea-1mb\\supabase\\functions\\ai-analizar-emergencia\\index.ts",
+      "hasAI": false,
+      "usesAI": false,
+      "aiProvider": "",
+      "dependencies": [
+        "https://deno.land/std@0.168.0/http/server.ts",
+        "https://esm.sh/@supabase/supabase-js@2"
+      ]
+    },
+    {
+      "name": "ai-analizar-innovacion",
+      "path": "..\\aurea-1mb\\supabase\\functions\\ai-analizar-innovacion\\index.ts",
+      "hasAI": false,
+      "usesAI": false,
+      "aiProvider": "",
+      "dependencies": [
+        "https://deno.land/std@0.168.0/http/server.ts",
+        "https://esm.sh/@supabase/supabase-js@2"
+      ]
+    },
+    {
+      "name": "ai-analizar-medio-propio",
+      "path": "..\\aurea-1mb\\supabase\\functions\\ai-analizar-medio-propio\\index.ts",
+      "hasAI": false,
+      "usesAI": false,
+      "aiProvider": "",
+      "dependencies": [
+        "https://deno.land/std@0.168.0/http/server.ts",
+        "https://esm.sh/@supabase/supabase-js@2"
+      ]
+    },
+    {
+      "name": "ai-analizar-presupuesto",
+      "path": "..\\aurea-1mb\\supabase\\functions\\ai-analizar-presupuesto\\index.ts",
+      "hasAI": false,
+      "usesAI": false,
+      "aiProvider": "",
+      "dependencies": [
+        "https://deno.land/std@0.168.0/http/server.ts",
+        "https://esm.sh/@supabase/supabase-js@2"
+      ]
+    },
+    {
+      "name": "ai-analizar-subscripcion",
+      "path": "..\\aurea-1mb\\supabase\\functions\\ai-analizar-subscripcion\\index.ts",
+      "hasAI": false,
+      "usesAI": false,
+      "aiProvider": "",
+      "dependencies": [
+        "https://deno.land/std@0.168.0/http/server.ts",
+        "https://esm.sh/@supabase/supabase-js@2"
+      ]
+    },
+    {
+      "name": "ai-analizar-tipo",
+      "path": "..\\aurea-1mb\\supabase\\functions\\ai-analizar-tipo\\index.ts",
+      "hasAI": false,
+      "usesAI": false,
+      "aiProvider": "",
+      "dependencies": [
+        "https://deno.land/std@0.168.0/http/server.ts",
+        "https://esm.sh/@supabase/supabase-js@2"
+      ]
+    },
+    {
+      "name": "ai-contrato",
+      "path": "..\\aurea-1mb\\supabase\\functions\\ai-contrato\\index.ts",
+      "hasAI": false,
+      "usesAI": false,
+      "aiProvider": "",
+      "dependencies": [
+        "https://deno.land/std@0.168.0/http/server.ts",
+        "https://esm.sh/@supabase/supabase-js@2"
+      ]
+    },
+    {
+      "name": "ai-gateway",
+      "path": "..\\aurea-1mb\\supabase\\functions\\ai-gateway\\index.ts",
+      "hasAI": true,
+      "usesAI": true,
+      "aiProvider": "gemini",
+      "dependencies": [
+        "https://deno.land/std@0.168.0/http/server.ts",
+        "https://esm.sh/@supabase/supabase-js@2"
+      ]
+    },
+    {
+      "name": "ai-generar-documento",
+      "path": "..\\aurea-1mb\\supabase\\functions\\ai-generar-documento\\index.ts",
+      "hasAI": true,
+      "usesAI": true,
+      "aiProvider": "gemini",
+      "dependencies": [
+        "https://deno.land/std@0.168.0/http/server.ts",
+        "https://esm.sh/@supabase/supabase-js@2"
+      ]
+    },
+    {
+      "name": "ai-reescribir-seccion",
+      "path": "..\\aurea-1mb\\supabase\\functions\\ai-reescribir-seccion\\index.ts",
+      "hasAI": false,
+      "usesAI": false,
+      "aiProvider": "",
+      "dependencies": [
+        "https://deno.land/std@0.168.0/http/server.ts",
+        "https://esm.sh/@supabase/supabase-js@2"
+      ]
+    },
+    {
+      "name": "ai-wizard-help",
+      "path": "..\\aurea-1mb\\supabase\\functions\\ai-wizard-help\\index.ts",
+      "hasAI": false,
+      "usesAI": false,
+      "aiProvider": "",
+      "dependencies": [
+        "https://deno.land/std@0.168.0/http/server.ts",
+        "https://esm.sh/@supabase/supabase-js@2"
+      ]
+    },
+    {
+      "name": "cpv-search",
+      "path": "..\\aurea-1mb\\supabase\\functions\\cpv-search\\index.ts",
+      "hasAI": false,
+      "usesAI": false,
+      "aiProvider": "",
+      "dependencies": [
+        "https://esm.sh/@supabase/supabase-js@2"
+      ]
+    },
+    {
+      "name": "import-cpv-codes",
+      "path": "..\\aurea-1mb\\supabase\\functions\\import-cpv-codes\\index.ts",
+      "hasAI": false,
+      "usesAI": false,
+      "aiProvider": "",
+      "dependencies": [
+        "https://deno.land/std@0.168.0/http/server.ts",
+        "https://esm.sh/@supabase/supabase-js@2.49.1"
+      ]
+    },
+    {
+      "name": "send-welcome-email",
+      "path": "..\\aurea-1mb\\supabase\\functions\\send-welcome-email\\index.ts",
+      "hasAI": false,
+      "usesAI": false,
+      "aiProvider": "",
+      "dependencies": [
+        "https://deno.land/std@0.168.0/http/server.ts"
+      ]
+    }
+  ],
+  "hooks": [
+    {
+      "name": "useWizardState",
+      "path": "..\\aurea-1mb\\src\\hooks\\useWizardState.ts",
+      "file": "useWizardState.ts",
+      "operations": [],
+      "tables": [],
+      "usesAuth": false,
+      "usesStorage": false,
+      "usesRealtime": false
+    },
+    {
+      "name": "useWizardHelp",
+      "path": "..\\aurea-1mb\\src\\hooks\\useWizardHelp.ts",
+      "file": "useWizardHelp.ts",
+      "operations": [],
+      "tables": [],
+      "usesAuth": false,
+      "usesStorage": false,
+      "usesRealtime": false
+    },
+    {
+      "name": "useValidaciones",
+      "path": "..\\aurea-1mb\\src\\hooks\\useValidaciones.ts",
+      "file": "useValidaciones.ts",
+      "operations": [
+        "select",
+        "insert"
+      ],
+      "tables": [
+        "validaciones",
+        "reglas"
+      ],
+      "usesAuth": false,
+      "usesStorage": false,
+      "usesRealtime": false
+    },
+    {
+      "name": "useValidacionAutomatica",
+      "path": "..\\aurea-1mb\\src\\hooks\\useValidacionAutomatica.ts",
+      "file": "useValidacionAutomatica.ts",
+      "operations": [],
+      "tables": [],
+      "usesAuth": false,
+      "usesStorage": false,
+      "usesRealtime": false
+    },
+    {
+      "name": "useSeccionDocumento",
+      "path": "..\\aurea-1mb\\src\\hooks\\useSeccionDocumento.ts",
+      "file": "useSeccionDocumento.ts",
+      "operations": [
+        "select",
+        "update"
+      ],
+      "tables": [
+        "documento_secciones"
+      ],
+      "usesAuth": false,
+      "usesStorage": false,
+      "usesRealtime": false
+    },
+    {
+      "name": "useRevisiones",
+      "path": "..\\aurea-1mb\\src\\hooks\\useRevisiones.ts",
+      "file": "useRevisiones.ts",
+      "operations": [
+        "select",
+        "insert"
+      ],
+      "tables": [
+        "revisiones",
+        "comentarios"
+      ],
+      "usesAuth": false,
+      "usesStorage": false,
+      "usesRealtime": false
+    },
+    {
+      "name": "useProfile",
+      "path": "..\\aurea-1mb\\src\\hooks\\useProfile.ts",
+      "file": "useProfile.ts",
+      "operations": [
+        "select",
+        "update"
+      ],
+      "tables": [
+        "profiles"
+      ],
+      "usesAuth": false,
+      "usesStorage": false,
+      "usesRealtime": false
+    },
+    {
+      "name": "useMotorDecision",
+      "path": "..\\aurea-1mb\\src\\hooks\\useMotorDecision.ts",
+      "file": "useMotorDecision.ts",
+      "operations": [],
+      "tables": [],
+      "usesAuth": false,
+      "usesStorage": false,
+      "usesRealtime": false
+    },
+    {
+      "name": "useFraccionamiento",
+      "path": "..\\aurea-1mb\\src\\hooks\\useFraccionamiento.ts",
+      "file": "useFraccionamiento.ts",
+      "operations": [
+        "select"
+      ],
+      "tables": [
+        "expedientes"
+      ],
+      "usesAuth": false,
+      "usesStorage": false,
+      "usesRealtime": false
+    },
+    {
+      "name": "useExpedientes",
+      "path": "..\\aurea-1mb\\src\\hooks\\useExpedientes.ts",
+      "file": "useExpedientes.ts",
+      "operations": [
+        "select",
+        "insert",
+        "update",
+        "delete"
+      ],
+      "tables": [
+        "expedientes"
+      ],
+      "usesAuth": false,
+      "usesStorage": false,
+      "usesRealtime": false
+    },
+    {
+      "name": "useDocumentoVersiones",
+      "path": "..\\aurea-1mb\\src\\hooks\\useDocumentoVersiones.ts",
+      "file": "useDocumentoVersiones.ts",
+      "operations": [
+        "select",
+        "insert",
+        "update",
+        "delete"
+      ],
+      "tables": [
+        "documento_versiones",
+        "documentos",
+        "documento_secciones"
+      ],
+      "usesAuth": false,
+      "usesStorage": false,
+      "usesRealtime": false
+    },
+    {
+      "name": "useDocumentos",
+      "path": "..\\aurea-1mb\\src\\hooks\\useDocumentos.ts",
+      "file": "useDocumentos.ts",
+      "operations": [
+        "select",
+        "insert",
+        "update"
+      ],
+      "tables": [
+        "documentos"
+      ],
+      "usesAuth": false,
+      "usesStorage": false,
+      "usesRealtime": false
+    },
+    {
+      "name": "useDocumentoGeneracion",
+      "path": "..\\aurea-1mb\\src\\hooks\\useDocumentoGeneracion.ts",
+      "file": "useDocumentoGeneracion.ts",
+      "operations": [
+        "select",
+        "insert",
+        "update",
+        "delete"
+      ],
+      "tables": [
+        "documento_generaciones",
+        "documento_secciones",
+        "documentos"
+      ],
+      "usesAuth": false,
+      "usesStorage": false,
+      "usesRealtime": false
+    },
+    {
+      "name": "useDebounce",
+      "path": "..\\aurea-1mb\\src\\hooks\\useDebounce.ts",
+      "file": "useDebounce.ts",
+      "operations": [],
+      "tables": [],
+      "usesAuth": false,
+      "usesStorage": false,
+      "usesRealtime": false
+    },
+    {
+      "name": "useCPVSearch",
+      "path": "..\\aurea-1mb\\src\\hooks\\useCPVSearch.ts",
+      "file": "useCPVSearch.ts",
+      "operations": [],
+      "tables": [],
+      "usesAuth": false,
+      "usesStorage": false,
+      "usesRealtime": false
+    },
+    {
+      "name": "useCpvImport",
+      "path": "..\\aurea-1mb\\src\\hooks\\useCpvImport.ts",
+      "file": "useCpvImport.ts",
+      "operations": [],
+      "tables": [],
+      "usesAuth": false,
+      "usesStorage": false,
+      "usesRealtime": false
+    },
+    {
+      "name": "useCatalogoCentralizacion",
+      "path": "..\\aurea-1mb\\src\\hooks\\useCatalogoCentralizacion.ts",
+      "file": "useCatalogoCentralizacion.ts",
+      "operations": [],
+      "tables": [],
+      "usesAuth": false,
+      "usesStorage": false,
+      "usesRealtime": false
+    },
+    {
+      "name": "useAnalisisPresupuesto",
+      "path": "..\\aurea-1mb\\src\\hooks\\useAnalisisPresupuesto.ts",
+      "file": "useAnalisisPresupuesto.ts",
+      "operations": [],
+      "tables": [],
+      "usesAuth": false,
+      "usesStorage": false,
+      "usesRealtime": false
+    },
+    {
+      "name": "useAnalisisObjeto",
+      "path": "..\\aurea-1mb\\src\\hooks\\useAnalisisObjeto.ts",
+      "file": "useAnalisisObjeto.ts",
+      "operations": [],
+      "tables": [],
+      "usesAuth": false,
+      "usesStorage": false,
+      "usesRealtime": false
+    },
+    {
+      "name": "useAIContrato",
+      "path": "..\\aurea-1mb\\src\\hooks\\useAIContrato.ts",
+      "file": "useAIContrato.ts",
+      "operations": [],
+      "tables": [],
+      "usesAuth": false,
+      "usesStorage": false,
+      "usesRealtime": false
+    },
+    {
+      "name": "useAIConfig",
+      "path": "..\\aurea-1mb\\src\\hooks\\useAIConfig.ts",
+      "file": "useAIConfig.ts",
+      "operations": [
+        "select",
+        "insert",
+        "update",
+        "delete"
+      ],
+      "tables": [
+        "ai_providers",
+        "ai_functions",
+        "ai_function_versions"
+      ],
+      "usesAuth": false,
+      "usesStorage": false,
+      "usesRealtime": false
+    },
+    {
+      "name": "useAdmin",
+      "path": "..\\aurea-1mb\\src\\hooks\\useAdmin.ts",
+      "file": "useAdmin.ts",
+      "operations": [
+        "select",
+        "insert",
+        "update",
+        "delete"
+      ],
+      "tables": [
+        "profiles",
+        "user_roles",
+        "audit_log"
+      ],
+      "usesAuth": false,
+      "usesStorage": false,
+      "usesRealtime": false
+    },
+    {
+      "name": "use-toast",
+      "path": "..\\aurea-1mb\\src\\hooks\\use-toast.ts",
+      "file": "use-toast.ts",
+      "operations": [
+        "delete"
+      ],
+      "tables": [],
+      "usesAuth": false,
+      "usesStorage": false,
+      "usesRealtime": false
+    }
+  ],
+  "migrations": [
+    {
+      "filename": "20260128155157_740fda78-a77a-40ae-b513-0074e83c4249.sql",
+      "path": "..\\aurea-1mb\\supabase\\migrations\\20260128155157_740fda78-a77a-40ae-b513-0074e83c4249.sql",
+      "content": "-- Fix: Restrict ai_providers SELECT to admin-only\r\n-- Currently allows all authenticated users to view provider configuration\r\n-- This could expose API secret names and base URLs to attackers\r\n\r\n-- Drop existing permissive SELECT policy\r\nDROP POLICY IF EXISTS \"Usuarios pueden ver proveedores activos\" ON public.ai_providers;\r\n\r\n-- Create admin-only SELECT policy\r\nCREATE POLICY \"Solo admins pueden ver proveedores\"\r\nON public.ai_providers\r\nFOR SELECT\r\nUSING (has_role(auth.uid(), 'admin'::rol_usuario));",
+      "tables": [],
+      "enums": [],
+      "hasRLS": true
+    },
+    {
+      "filename": "20260128134546_4b939661-b161-4820-a8c0-ba39ce7ec2d6.sql",
+      "path": "..\\aurea-1mb\\supabase\\migrations\\20260128134546_4b939661-b161-4820-a8c0-ba39ce7ec2d6.sql",
+      "content": "-- Update RLS policy for audit_log to use auditor_app instead of auditor\r\nDROP POLICY IF EXISTS \"Solo supervisores y auditores pueden ver audit_log\" ON public.audit_log;\r\n\r\nCREATE POLICY \"Auditores aplicativos pueden ver audit_log\"\r\nON public.audit_log\r\nFOR SELECT\r\nUSING (has_role(auth.uid(), 'auditor_app'));\r\n\r\n-- Update RLS policy for ai_function_logs to use auditor_ia instead of auditor  \r\nDROP POLICY IF EXISTS \"Auditores pueden ver logs de IA\" ON public.ai_function_logs;\r\n\r\nCREATE POLICY \"Auditores IA pueden ver logs de IA\"\r\nON public.ai_function_logs\r\nFOR SELECT\r\nUSING (has_role(auth.uid(), 'auditor_ia'));",
+      "tables": [],
+      "enums": [],
+      "hasRLS": true
+    },
+    {
+      "filename": "20260128134340_23df79d4-946b-4f76-bbde-c88c9f3ab2ad.sql",
+      "path": "..\\aurea-1mb\\supabase\\migrations\\20260128134340_23df79d4-946b-4f76-bbde-c88c9f3ab2ad.sql",
+      "content": "-- Add new auditor roles to the enum\r\nALTER TYPE public.rol_usuario ADD VALUE IF NOT EXISTS 'auditor_app';\r\nALTER TYPE public.rol_usuario ADD VALUE IF NOT EXISTS 'auditor_ia';",
+      "tables": [],
+      "enums": [],
+      "hasRLS": false
+    },
+    {
+      "filename": "20260128114440_4fd100bf-3a4e-4185-a1b3-5eb0e15f0dad.sql",
+      "path": "..\\aurea-1mb\\supabase\\migrations\\20260128114440_4fd100bf-3a4e-4185-a1b3-5eb0e15f0dad.sql",
+      "content": "-- Allow auditors to view AI function logs\r\nCREATE POLICY \"Auditores pueden ver logs de IA\"\r\nON public.ai_function_logs\r\nFOR SELECT\r\nUSING (has_role(auth.uid(), 'auditor'::rol_usuario));",
+      "tables": [],
+      "enums": [],
+      "hasRLS": true
+    },
+    {
+      "filename": "20260127002633_39138493-3e6e-4a60-acc8-0d4c4f2b3699.sql",
+      "path": "..\\aurea-1mb\\supabase\\migrations\\20260127002633_39138493-3e6e-4a60-acc8-0d4c4f2b3699.sql",
+      "content": "-- Create table for AI function call logs\r\nCREATE TABLE public.ai_function_logs (\r\n  id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,\r\n  function_code TEXT NOT NULL,\r\n  function_name TEXT,\r\n  provider_name TEXT,\r\n  modelo TEXT NOT NULL,\r\n  input_variables JSONB NOT NULL DEFAULT '{}'::jsonb,\r\n  system_prompt TEXT,\r\n  user_prompt TEXT,\r\n  response JSONB,\r\n  tokens_input INTEGER,\r\n  tokens_output INTEGER,\r\n  duration_ms INTEGER,\r\n  status TEXT NOT NULL DEFAULT 'success',\r\n  error_message TEXT,\r\n  usuario_id UUID,\r\n  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()\r\n);\r\n\r\n-- Enable RLS\r\nALTER TABLE public.ai_function_logs ENABLE ROW LEVEL SECURITY;\r\n\r\n-- Only admins can view logs\r\nCREATE POLICY \"Admins pueden ver logs de IA\"\r\nON public.ai_function_logs\r\nFOR SELECT\r\nUSING (has_role(auth.uid(), 'admin'::rol_usuario));\r\n\r\n-- Edge functions can insert logs (using service role)\r\nCREATE POLICY \"Sistema puede insertar logs\"\r\nON public.ai_function_logs\r\nFOR INSERT\r\nWITH CHECK (true);\r\n\r\n-- Create index for faster queries\r\nCREATE INDEX idx_ai_function_logs_created_at ON public.ai_function_logs(created_at DESC);\r\nCREATE INDEX idx_ai_function_logs_function_code ON public.ai_function_logs(function_code);",
+      "tables": [
+        "for",
+        "ai_function_logs"
+      ],
+      "enums": [],
+      "hasRLS": true
+    },
+    {
+      "filename": "20260126154452_65ce0fc2-775d-4bdf-b886-ce31b0ec007c.sql",
+      "path": "..\\aurea-1mb\\supabase\\migrations\\20260126154452_65ce0fc2-775d-4bdf-b886-ce31b0ec007c.sql",
+      "content": "-- =============================================================================\r\n-- FASE 1: Sistema de Configuración Dinámica de Funciones de IA\r\n-- =============================================================================\r\n\r\n-- 1.1 Enum para tipos de proveedor\r\nCREATE TYPE public.ai_provider_type AS ENUM ('lovable', 'openai', 'custom');\r\n\r\n-- 1.2 Tabla de Proveedores de IA\r\nCREATE TABLE public.ai_providers (\r\n  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\r\n  nombre TEXT NOT NULL,\r\n  tipo ai_provider_type NOT NULL DEFAULT 'custom',\r\n  base_url TEXT NOT NULL,\r\n  api_key_secret_name TEXT, -- Nombre del secret en Supabase (ej: 'NEXTBIT_API_KEY')\r\n  modelos_disponibles TEXT[] NOT NULL DEFAULT '{}',\r\n  parametros_defecto JSONB DEFAULT '{\"temperature\": 0.3}'::jsonb,\r\n  activo BOOLEAN DEFAULT true,\r\n  created_at TIMESTAMPTZ DEFAULT now(),\r\n  updated_at TIMESTAMPTZ DEFAULT now(),\r\n  UNIQUE(nombre)\r\n);\r\n\r\n-- 1.3 Tabla de Funciones de IA\r\nCREATE TABLE public.ai_functions (\r\n  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\r\n  codigo TEXT NOT NULL UNIQUE, -- 'ai-contrato:mejorar_objeto', 'ai-analizar-emergencia', etc.\r\n  nombre TEXT NOT NULL,\r\n  descripcion TEXT,\r\n  categoria TEXT NOT NULL, -- 'wizard', 'documentos', 'contrato'\r\n  provider_id UUID REFERENCES public.ai_providers(id),\r\n  modelo TEXT NOT NULL,\r\n  system_prompt TEXT NOT NULL,\r\n  user_prompt_template TEXT, -- Template con variables {{objeto}}, {{tipoContrato}}, etc.\r\n  tool_schema JSONB, -- Esquema de herramientas para tool calling\r\n  parametros JSONB DEFAULT '{\"temperature\": 0.3}'::jsonb,\r\n  activo BOOLEAN DEFAULT true,\r\n  version_actual INTEGER DEFAULT 1,\r\n  created_at TIMESTAMPTZ DEFAULT now(),\r\n  updated_at TIMESTAMPTZ DEFAULT now()\r\n);\r\n\r\n-- 1.4 Tabla de Historial de Versiones\r\nCREATE TABLE public.ai_function_versions (\r\n  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\r\n  function_id UUID NOT NULL REFERENCES public.ai_functions(id) ON DELETE CASCADE,\r\n  version INTEGER NOT NULL,\r\n  system_prompt TEXT NOT NULL,\r\n  user_prompt_template TEXT,\r\n  tool_schema JSONB,\r\n  parametros JSONB,\r\n  modelo TEXT NOT NULL,\r\n  provider_id UUID REFERENCES public.ai_providers(id),\r\n  motivo_cambio TEXT,\r\n  creado_por UUID,\r\n  created_at TIMESTAMPTZ DEFAULT now(),\r\n  UNIQUE(function_id, version)\r\n);\r\n\r\n-- =============================================================================\r\n-- 2. Habilitar RLS\r\n-- =============================================================================\r\n\r\nALTER TABLE public.ai_providers ENABLE ROW LEVEL SECURITY;\r\nALTER TABLE public.ai_functions ENABLE ROW LEVEL SECURITY;\r\nALTER TABLE public.ai_function_versions ENABLE ROW LEVEL SECURITY;\r\n\r\n-- =============================================================================\r\n-- 3. Políticas RLS\r\n-- =============================================================================\r\n\r\n-- ai_providers: Solo admins pueden gestionar, pero usuarios autenticados pueden leer\r\nCREATE POLICY \"Usuarios pueden ver proveedores activos\"\r\nON public.ai_providers FOR SELECT\r\nUSING (has_any_role(auth.uid()));\r\n\r\nCREATE POLICY \"Admins pueden insertar proveedores\"\r\nON public.ai_providers FOR INSERT\r\nWITH CHECK (has_role(auth.uid(), 'admin'));\r\n\r\nCREATE POLICY \"Admins pueden actualizar proveedores\"\r\nON public.ai_providers FOR UPDATE\r\nUSING (has_role(auth.uid(), 'admin'));\r\n\r\nCREATE POLICY \"Admins pueden eliminar proveedores\"\r\nON public.ai_providers FOR DELETE\r\nUSING (has_role(auth.uid(), 'admin'));\r\n\r\n-- ai_functions: Usuarios pueden leer, admins pueden gestionar\r\nCREATE POLICY \"Usuarios pueden ver funciones\"\r\nON public.ai_functions FOR SELECT\r\nUSING (has_any_role(auth.uid()));\r\n\r\nCREATE POLICY \"Admins pueden insertar funciones\"\r\nON public.ai_functions FOR INSERT\r\nWITH CHECK (has_role(auth.uid(), 'admin'));\r\n\r\nCREATE POLICY \"Admins pueden actualizar funciones\"\r\nON public.ai_functions FOR UPDATE\r\nUSING (has_role(auth.uid(), 'admin'));\r\n\r\nCREATE POLICY \"Admins pueden eliminar funciones\"\r\nON public.ai_functions FOR DELETE\r\nUSING (has_role(auth.uid(), 'admin'));\r\n\r\n-- ai_function_versions: Usuarios pueden ver, admins pueden crear\r\nCREATE POLICY \"Usuarios pueden ver versiones\"\r\nON public.ai_function_versions FOR SELECT\r\nUSING (has_any_role(auth.uid()));\r\n\r\nCREATE POLICY \"Admins pueden crear versiones\"\r\nON public.ai_function_versions FOR INSERT\r\nWITH CHECK (has_role(auth.uid(), 'admin'));\r\n\r\n-- =============================================================================\r\n-- 4. Trigger para updated_at\r\n-- =============================================================================\r\n\r\nCREATE TRIGGER update_ai_providers_updated_at\r\n  BEFORE UPDATE ON public.ai_providers\r\n  FOR EACH ROW\r\n  EXECUTE FUNCTION public.update_updated_at_column();\r\n\r\nCREATE TRIGGER update_ai_functions_updated_at\r\n  BEFORE UPDATE ON public.ai_functions\r\n  FOR EACH ROW\r\n  EXECUTE FUNCTION public.update_updated_at_column();\r\n\r\n-- =============================================================================\r\n-- 5. Insertar Lovable AI como proveedor por defecto\r\n-- =============================================================================\r\n\r\nINSERT INTO public.ai_providers (nombre, tipo, base_url, api_key_secret_name, modelos_disponibles, parametros_defecto)\r\nVALUES (\r\n  'AI hub',\r\n  'Ai hub',\r\n  'https://ai.gateway.lovable.dev/v1/chat/completions',\r\n  'LOVABLE_API_KEY',\r\n  ARRAY[\r\n    'google/gemini-3-flash-preview',\r\n    'google/gemini-3-pro-preview',\r\n    'google/gemini-2.5-flash',\r\n    'google/gemini-2.5-flash-lite',\r\n    'google/gemini-2.5-pro',\r\n    'openai/gpt-5',\r\n    'openai/gpt-5-mini',\r\n    'openai/gpt-5-nano',\r\n    'openai/gpt-5.2'\r\n  ],\r\n  '{\"temperature\": 0.3, \"max_tokens\": 4096}'::jsonb\r\n);",
+      "tables": [
+        "ai_providers",
+        "ai_functions",
+        "ai_function_versions"
+      ],
+      "enums": [
+        "ai_provider_type"
+      ],
+      "hasRLS": true
+    },
+    {
+      "filename": "20260124232630_94a772c8-1fa3-4735-98da-5a3f4a1eac43.sql",
+      "path": "..\\aurea-1mb\\supabase\\migrations\\20260124232630_94a772c8-1fa3-4735-98da-5a3f4a1eac43.sql",
+      "content": "-- Añadir preferencia de ayuda al wizard en profiles\r\nALTER TABLE public.profiles \r\nADD COLUMN mostrar_ayuda_wizard boolean NOT NULL DEFAULT true;",
+      "tables": [],
+      "enums": [],
+      "hasRLS": false
+    },
+    {
+      "filename": "20260123131522_aaf934c4-b354-4e24-bfeb-f1f62506a025.sql",
+      "path": "..\\aurea-1mb\\supabase\\migrations\\20260123131522_aaf934c4-b354-4e24-bfeb-f1f62506a025.sql",
+      "content": "-- Fix 1: Restrict profiles table SELECT to own profile or admin/supervisor roles\r\n-- Drop the overly permissive policy\r\nDROP POLICY IF EXISTS \"Perfiles visibles para usuarios autenticados\" ON public.profiles;\r\n\r\n-- Create a more restrictive policy: users can see their own profile\r\nCREATE POLICY \"Usuarios pueden ver su propio perfil\"\r\nON public.profiles\r\nFOR SELECT\r\nUSING (auth.uid() = id);\r\n\r\n-- Note: Admins already have a policy to see all profiles via \"Admins pueden ver todos los perfiles\"\r\n-- Add supervisor policy for viewing profiles (needed for user management)\r\nCREATE POLICY \"Supervisores pueden ver todos los perfiles\"\r\nON public.profiles\r\nFOR SELECT\r\nUSING (has_role(auth.uid(), 'supervisor'::rol_usuario));\r\n\r\n-- Fix 2: Restrict audit_log INSERT to service role only (system operations)\r\n-- Drop the current INSERT policy that allows any authenticated user with a role\r\nDROP POLICY IF EXISTS \"Usuarios con rol pueden insertar en audit_log\" ON public.profiles;\r\nDROP POLICY IF EXISTS \"Usuarios con rol pueden insertar en audit_log\" ON public.audit_log;\r\n\r\n-- Create a restrictive INSERT policy - only supervisors and admins can insert audit logs\r\n-- (In practice, most audit logs should be inserted by edge functions using service role)\r\nCREATE POLICY \"Solo admins y supervisores pueden insertar en audit_log\"\r\nON public.audit_log\r\nFOR INSERT\r\nWITH CHECK (\r\n  has_role(auth.uid(), 'admin'::rol_usuario) OR \r\n  has_role(auth.uid(), 'supervisor'::rol_usuario)\r\n);",
+      "tables": [],
+      "enums": [],
+      "hasRLS": true
+    },
+    {
+      "filename": "20260121095456_ecf8c0a4-c722-4519-9a8a-5b45d3ca73d3.sql",
+      "path": "..\\aurea-1mb\\supabase\\migrations\\20260121095456_ecf8c0a4-c722-4519-9a8a-5b45d3ca73d3.sql",
+      "content": "-- Crear tabla para códigos CPV oficiales de la UE\r\nCREATE TABLE public.cpv_codigos (\r\n  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),\r\n  codigo text UNIQUE NOT NULL,\r\n  descripcion text NOT NULL,\r\n  descripcion_en text,\r\n  nivel integer NOT NULL CHECK (nivel BETWEEN 1 AND 5), -- 1=División, 2=Grupo, 3=Clase, 4=Categoría, 5=Subcategoría\r\n  codigo_padre text,\r\n  activo boolean DEFAULT true,\r\n  created_at timestamptz DEFAULT now()\r\n);\r\n\r\n-- Índices para búsqueda eficiente\r\nCREATE INDEX idx_cpv_codigo ON public.cpv_codigos(codigo);\r\nCREATE INDEX idx_cpv_codigo_prefix ON public.cpv_codigos(codigo text_pattern_ops);\r\nCREATE INDEX idx_cpv_descripcion_gin ON public.cpv_codigos USING gin(to_tsvector('spanish', descripcion));\r\nCREATE INDEX idx_cpv_nivel ON public.cpv_codigos(nivel);\r\nCREATE INDEX idx_cpv_activo ON public.cpv_codigos(activo) WHERE activo = true;\r\n\r\n-- RLS: Lectura pública (datos de referencia)\r\nALTER TABLE public.cpv_codigos ENABLE ROW LEVEL SECURITY;\r\n\r\nCREATE POLICY \"CPV códigos son públicos para lectura\"\r\nON public.cpv_codigos\r\nFOR SELECT\r\nUSING (true);\r\n\r\n-- Solo admins pueden modificar\r\nCREATE POLICY \"Solo admins pueden insertar CPV\"\r\nON public.cpv_codigos\r\nFOR INSERT\r\nWITH CHECK (has_role(auth.uid(), 'admin'::rol_usuario));\r\n\r\nCREATE POLICY \"Solo admins pueden actualizar CPV\"\r\nON public.cpv_codigos\r\nFOR UPDATE\r\nUSING (has_role(auth.uid(), 'admin'::rol_usuario));\r\n\r\nCREATE POLICY \"Solo admins pueden eliminar CPV\"\r\nON public.cpv_codigos\r\nFOR DELETE\r\nUSING (has_role(auth.uid(), 'admin'::rol_usuario));\r\n\r\n-- Comentario de documentación\r\nCOMMENT ON TABLE public.cpv_codigos IS 'Vocabulario Común de Contratación Pública (CPV) oficial de la UE';\r\nCOMMENT ON COLUMN public.cpv_codigos.nivel IS '1=División, 2=Grupo, 3=Clase, 4=Categoría, 5=Subcategoría';",
+      "tables": [
+        "cpv_codigos"
+      ],
+      "enums": [],
+      "hasRLS": true
+    },
+    {
+      "filename": "20260115133429_e08e41ab-2b62-4dda-a707-5a5c026eec4a.sql",
+      "path": "..\\aurea-1mb\\supabase\\migrations\\20260115133429_e08e41ab-2b62-4dda-a707-5a5c026eec4a.sql",
+      "content": "-- Create storage bucket for document images\r\nINSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)\r\nVALUES (\r\n  'documento-imagenes', \r\n  'documento-imagenes', \r\n  true,\r\n  5242880, -- 5MB limit\r\n  ARRAY['image/jpeg', 'image/png', 'image/gif', 'image/webp']\r\n)\r\nON CONFLICT (id) DO NOTHING;\r\n\r\n-- Allow authenticated users to upload images\r\nCREATE POLICY \"Users can upload document images\"\r\nON storage.objects FOR INSERT\r\nTO authenticated\r\nWITH CHECK (bucket_id = 'documento-imagenes');\r\n\r\n-- Allow public read access to document images\r\nCREATE POLICY \"Document images are publicly accessible\"\r\nON storage.objects FOR SELECT\r\nTO public\r\nUSING (bucket_id = 'documento-imagenes');\r\n\r\n-- Allow users to delete their own uploaded images\r\nCREATE POLICY \"Users can delete own document images\"\r\nON storage.objects FOR DELETE\r\nTO authenticated\r\nUSING (bucket_id = 'documento-imagenes' AND auth.uid()::text = (storage.foldername(name))[1]);",
+      "tables": [],
+      "enums": [],
+      "hasRLS": true
+    },
+    {
+      "filename": "20260114235415_22bf5fda-9640-4db9-a73f-560cecc1ded4.sql",
+      "path": "..\\aurea-1mb\\supabase\\migrations\\20260114235415_22bf5fda-9640-4db9-a73f-560cecc1ded4.sql",
+      "content": "-- Tabla para secciones de documentos (generación incremental)\r\nCREATE TABLE public.documento_secciones (\r\n  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\r\n  documento_id UUID NOT NULL REFERENCES public.documentos(id) ON DELETE CASCADE,\r\n  orden INTEGER NOT NULL,\r\n  titulo TEXT NOT NULL,\r\n  descripcion TEXT,\r\n  contenido TEXT,\r\n  estado TEXT NOT NULL DEFAULT 'pendiente' CHECK (estado IN ('pendiente', 'generando', 'generado', 'editado', 'aprobado', 'error')),\r\n  tokens_usados INTEGER,\r\n  tiempo_generacion_ms INTEGER,\r\n  articulos_lcsp TEXT[],\r\n  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),\r\n  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),\r\n  UNIQUE(documento_id, orden)\r\n);\r\n\r\n-- Tabla para registro de generaciones del agente\r\nCREATE TABLE public.documento_generaciones (\r\n  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\r\n  documento_id UUID NOT NULL REFERENCES public.documentos(id) ON DELETE CASCADE,\r\n  version INTEGER NOT NULL DEFAULT 1,\r\n  plan JSONB NOT NULL DEFAULT '{}',\r\n  estado TEXT NOT NULL DEFAULT 'planificando' CHECK (estado IN ('planificando', 'generando', 'revisando', 'completado', 'error', 'cancelado')),\r\n  seccion_actual INTEGER DEFAULT 0,\r\n  total_secciones INTEGER,\r\n  revision_global JSONB,\r\n  errores JSONB,\r\n  usuario_id UUID NOT NULL,\r\n  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),\r\n  completed_at TIMESTAMPTZ\r\n);\r\n\r\n-- Tabla para versiones de documentos\r\nCREATE TABLE public.documento_versiones (\r\n  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\r\n  documento_id UUID NOT NULL REFERENCES public.documentos(id) ON DELETE CASCADE,\r\n  version INTEGER NOT NULL,\r\n  contenido_snapshot JSONB NOT NULL,\r\n  secciones_snapshot JSONB,\r\n  descripcion_cambio TEXT,\r\n  usuario_id UUID NOT NULL,\r\n  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),\r\n  UNIQUE(documento_id, version)\r\n);\r\n\r\n-- Índices para rendimiento\r\nCREATE INDEX idx_documento_secciones_documento ON public.documento_secciones(documento_id);\r\nCREATE INDEX idx_documento_secciones_estado ON public.documento_secciones(estado);\r\nCREATE INDEX idx_documento_generaciones_documento ON public.documento_generaciones(documento_id);\r\nCREATE INDEX idx_documento_generaciones_estado ON public.documento_generaciones(estado);\r\nCREATE INDEX idx_documento_versiones_documento ON public.documento_versiones(documento_id);\r\n\r\n-- Trigger para updated_at en secciones\r\nCREATE TRIGGER update_documento_secciones_updated_at\r\n  BEFORE UPDATE ON public.documento_secciones\r\n  FOR EACH ROW\r\n  EXECUTE FUNCTION public.update_updated_at_column();\r\n\r\n-- Enable RLS\r\nALTER TABLE public.documento_secciones ENABLE ROW LEVEL SECURITY;\r\nALTER TABLE public.documento_generaciones ENABLE ROW LEVEL SECURITY;\r\nALTER TABLE public.documento_versiones ENABLE ROW LEVEL SECURITY;\r\n\r\n-- RLS Policies para documento_secciones\r\nCREATE POLICY \"Usuarios pueden ver secciones de documentos\"\r\n  ON public.documento_secciones FOR SELECT\r\n  USING (has_any_role(auth.uid()));\r\n\r\nCREATE POLICY \"Usuarios pueden crear secciones\"\r\n  ON public.documento_secciones FOR INSERT\r\n  WITH CHECK (has_any_role(auth.uid()));\r\n\r\nCREATE POLICY \"Usuarios pueden actualizar secciones\"\r\n  ON public.documento_secciones FOR UPDATE\r\n  USING (has_any_role(auth.uid()));\r\n\r\nCREATE POLICY \"Usuarios pueden eliminar secciones\"\r\n  ON public.documento_secciones FOR DELETE\r\n  USING (has_any_role(auth.uid()));\r\n\r\n-- RLS Policies para documento_generaciones\r\nCREATE POLICY \"Usuarios pueden ver generaciones\"\r\n  ON public.documento_generaciones FOR SELECT\r\n  USING (has_any_role(auth.uid()));\r\n\r\nCREATE POLICY \"Usuarios pueden crear generaciones\"\r\n  ON public.documento_generaciones FOR INSERT\r\n  WITH CHECK (has_any_role(auth.uid()));\r\n\r\nCREATE POLICY \"Usuarios pueden actualizar generaciones\"\r\n  ON public.documento_generaciones FOR UPDATE\r\n  USING (has_any_role(auth.uid()));\r\n\r\n-- RLS Policies para documento_versiones\r\nCREATE POLICY \"Usuarios pueden ver versiones\"\r\n  ON public.documento_versiones FOR SELECT\r\n  USING (has_any_role(auth.uid()));\r\n\r\nCREATE POLICY \"Usuarios pueden crear versiones\"\r\n  ON public.documento_versiones FOR INSERT\r\n  WITH CHECK (has_any_role(auth.uid()));",
+      "tables": [
+        "documento_secciones",
+        "documento_generaciones",
+        "documento_versiones"
+      ],
+      "enums": [],
+      "hasRLS": true
+    },
+    {
+      "filename": "20260114161149_8aa1ca7f-b868-4d2f-80fe-17f47f49f727.sql",
+      "path": "..\\aurea-1mb\\supabase\\migrations\\20260114161149_8aa1ca7f-b868-4d2f-80fe-17f47f49f727.sql",
+      "content": "-- Crear enum para nivel de riesgo\r\nCREATE TYPE nivel_riesgo AS ENUM ('verde', 'ambar', 'rojo');\r\n\r\n-- Añadir nuevos campos a expedientes\r\nALTER TABLE public.expedientes \r\nADD COLUMN porcentaje_completitud integer DEFAULT 0,\r\nADD COLUMN nivel_riesgo nivel_riesgo DEFAULT 'verde',\r\nADD COLUMN ultima_accion_pendiente text,\r\nADD COLUMN fecha_vencimiento timestamp with time zone;",
+      "tables": [],
+      "enums": [
+        "nivel_riesgo"
+      ],
+      "hasRLS": false
+    },
+    {
+      "filename": "20260114154937_3b18aaab-80c7-4a4c-80e0-0957646fe7b8.sql",
+      "path": "..\\aurea-1mb\\supabase\\migrations\\20260114154937_3b18aaab-80c7-4a4c-80e0-0957646fe7b8.sql",
+      "content": "-- Mapear los estados antiguos a los nuevos\r\nUPDATE public.expedientes SET estado = 'borrador' WHERE estado = 'ingesta';\r\nUPDATE public.expedientes SET estado = 'en_redaccion' WHERE estado = 'alternativas';\r\nUPDATE public.expedientes SET estado = 'cerrado' WHERE estado = 'aprobado';\r\nUPDATE public.expedientes SET estado = 'con_observaciones' WHERE estado = 'revision';\r\nUPDATE public.expedientes SET estado = 'con_observaciones' WHERE estado = 'incidencia';\r\n\r\n-- Actualizar el valor por defecto\r\nALTER TABLE public.expedientes \r\nALTER COLUMN estado SET DEFAULT 'borrador'::estado_expediente;",
+      "tables": [],
+      "enums": [],
+      "hasRLS": false
+    },
+    {
+      "filename": "20260114154825_e2fc2c74-f52a-472c-bb0a-d0301225cd9f.sql",
+      "path": "..\\aurea-1mb\\supabase\\migrations\\20260114154825_e2fc2c74-f52a-472c-bb0a-d0301225cd9f.sql",
+      "content": "-- Paso 1: Añadir los nuevos valores al enum existente\r\nALTER TYPE estado_expediente ADD VALUE IF NOT EXISTS 'en_redaccion';\r\nALTER TYPE estado_expediente ADD VALUE IF NOT EXISTS 'con_observaciones';\r\nALTER TYPE estado_expediente ADD VALUE IF NOT EXISTS 'listo_validacion';\r\nALTER TYPE estado_expediente ADD VALUE IF NOT EXISTS 'en_intervencion';\r\nALTER TYPE estado_expediente ADD VALUE IF NOT EXISTS 'cerrado';",
+      "tables": [],
+      "enums": [],
+      "hasRLS": false
+    },
+    {
+      "filename": "20260114120014_fd8ce111-1448-4a6a-b6d6-6f42a7e7e2d7.sql",
+      "path": "..\\aurea-1mb\\supabase\\migrations\\20260114120014_fd8ce111-1448-4a6a-b6d6-6f42a7e7e2d7.sql",
+      "content": "-- Crear función para que admins puedan ver todos los roles\r\nDROP POLICY IF EXISTS \"Admins pueden ver todos los roles\" ON public.user_roles;\r\nCREATE POLICY \"Admins pueden ver todos los roles\" \r\nON public.user_roles \r\nFOR SELECT \r\nUSING (has_role(auth.uid(), 'admin'));\r\n\r\n-- Admins pueden asignar roles\r\nDROP POLICY IF EXISTS \"Admins pueden asignar roles\" ON public.user_roles;\r\nCREATE POLICY \"Admins pueden asignar roles\" \r\nON public.user_roles \r\nFOR INSERT \r\nWITH CHECK (has_role(auth.uid(), 'admin'));\r\n\r\n-- Admins pueden eliminar roles\r\nDROP POLICY IF EXISTS \"Admins pueden eliminar roles\" ON public.user_roles;\r\nCREATE POLICY \"Admins pueden eliminar roles\" \r\nON public.user_roles \r\nFOR DELETE \r\nUSING (has_role(auth.uid(), 'admin'));\r\n\r\n-- Admins pueden actualizar roles\r\nDROP POLICY IF EXISTS \"Admins pueden actualizar roles\" ON public.user_roles;\r\nCREATE POLICY \"Admins pueden actualizar roles\" \r\nON public.user_roles \r\nFOR UPDATE \r\nUSING (has_role(auth.uid(), 'admin'));\r\n\r\n-- Admins pueden ver todos los perfiles\r\nDROP POLICY IF EXISTS \"Admins pueden ver todos los perfiles\" ON public.profiles;\r\nCREATE POLICY \"Admins pueden ver todos los perfiles\" \r\nON public.profiles \r\nFOR SELECT \r\nUSING (has_role(auth.uid(), 'admin'));\r\n\r\n-- Admins pueden actualizar cualquier perfil\r\nDROP POLICY IF EXISTS \"Admins pueden actualizar cualquier perfil\" ON public.profiles;\r\nCREATE POLICY \"Admins pueden actualizar cualquier perfil\" \r\nON public.profiles \r\nFOR UPDATE \r\nUSING (has_role(auth.uid(), 'admin'));\r\n\r\n-- Admins pueden ver todo el audit_log\r\nDROP POLICY IF EXISTS \"Admins pueden ver audit_log\" ON public.audit_log;\r\nCREATE POLICY \"Admins pueden ver audit_log\" \r\nON public.audit_log \r\nFOR SELECT \r\nUSING (has_role(auth.uid(), 'admin'));",
+      "tables": [],
+      "enums": [],
+      "hasRLS": true
+    },
+    {
+      "filename": "20260114115942_97bb92b7-1183-4d44-ba38-ecc6df18739d.sql",
+      "path": "..\\aurea-1mb\\supabase\\migrations\\20260114115942_97bb92b7-1183-4d44-ba38-ecc6df18739d.sql",
+      "content": "-- Añadir rol 'admin' al enum rol_usuario\r\nALTER TYPE public.rol_usuario ADD VALUE 'admin';",
+      "tables": [],
+      "enums": [],
+      "hasRLS": false
+    },
+    {
+      "filename": "20260113153118_53084f12-4ec0-4ce4-9eb9-f4cc6960d470.sql",
+      "path": "..\\aurea-1mb\\supabase\\migrations\\20260113153118_53084f12-4ec0-4ce4-9eb9-f4cc6960d470.sql",
+      "content": "\r\n-- ============================================\r\n-- AUREA - ESQUEMA DE BASE DE DATOS\r\n-- Sistema de Gestión de Expedientes de Contratación Pública\r\n-- ============================================\r\n\r\n-- ============================================\r\n-- 1. TIPOS ENUMERADOS\r\n-- ============================================\r\n\r\n-- Estados del expediente\r\nCREATE TYPE public.estado_expediente AS ENUM (\r\n  'ingesta',\r\n  'borrador',\r\n  'alternativas',\r\n  'validado',\r\n  'aprobado',\r\n  'revision',\r\n  'incidencia'\r\n);\r\n\r\n-- Tipos de contrato según LCSP\r\nCREATE TYPE public.tipo_contrato AS ENUM (\r\n  'obras',\r\n  'servicios',\r\n  'suministros',\r\n  'concesion_obras',\r\n  'concesion_servicios',\r\n  'mixto'\r\n);\r\n\r\n-- Tipos de procedimiento\r\nCREATE TYPE public.tipo_procedimiento AS ENUM (\r\n  'abierto',\r\n  'abierto_simplificado',\r\n  'abierto_supersimplificado',\r\n  'restringido',\r\n  'negociado_sin_publicidad',\r\n  'negociado_con_publicidad',\r\n  'dialogo_competitivo',\r\n  'asociacion_innovacion',\r\n  'menor'\r\n);\r\n\r\n-- Severidad de reglas\r\nCREATE TYPE public.severidad_regla AS ENUM (\r\n  'bloqueo',\r\n  'aviso',\r\n  'recomendacion'\r\n);\r\n\r\n-- Estados de revisión\r\nCREATE TYPE public.estado_revision AS ENUM (\r\n  'pendiente',\r\n  'en_revision',\r\n  'aprobado',\r\n  'rechazado',\r\n  'corregir'\r\n);\r\n\r\n-- Roles del sistema\r\nCREATE TYPE public.rol_usuario AS ENUM (\r\n  'tramitador',\r\n  'juridico',\r\n  'interventor',\r\n  'supervisor',\r\n  'auditor'\r\n);\r\n\r\n-- Tipos de documento\r\nCREATE TYPE public.tipo_documento AS ENUM (\r\n  'memoria',\r\n  'ppt',\r\n  'pcap',\r\n  'anexo_tecnico',\r\n  'anexo_economico',\r\n  'informe_necesidad',\r\n  'justificacion_procedimiento'\r\n);\r\n\r\n-- Tipos de fuente de evidencia\r\nCREATE TYPE public.tipo_fuente AS ENUM (\r\n  'boe',\r\n  'pcsp',\r\n  'doctrina',\r\n  'alfil',\r\n  'plantilla',\r\n  'tribunal_cuentas'\r\n);\r\n\r\n-- Decisiones de revisión\r\nCREATE TYPE public.decision_revision AS ENUM (\r\n  'conforme',\r\n  'corregir',\r\n  'rechazar'\r\n);\r\n\r\n-- ============================================\r\n-- 2. TABLA DE PERFILES DE USUARIO\r\n-- ============================================\r\n\r\nCREATE TABLE public.profiles (\r\n  id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,\r\n  email TEXT,\r\n  nombre TEXT NOT NULL,\r\n  apellidos TEXT,\r\n  unidad TEXT,\r\n  activo BOOLEAN DEFAULT true,\r\n  created_at TIMESTAMPTZ DEFAULT now() NOT NULL,\r\n  updated_at TIMESTAMPTZ DEFAULT now() NOT NULL\r\n);\r\n\r\nALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;\r\n\r\n-- ============================================\r\n-- 3. TABLA DE ROLES DE USUARIO (SEPARADA)\r\n-- ============================================\r\n\r\nCREATE TABLE public.user_roles (\r\n  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\r\n  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,\r\n  role rol_usuario NOT NULL,\r\n  created_at TIMESTAMPTZ DEFAULT now() NOT NULL,\r\n  UNIQUE(user_id, role)\r\n);\r\n\r\nALTER TABLE public.user_roles ENABLE ROW LEVEL SECURITY;\r\n\r\n-- ============================================\r\n-- 4. FUNCIÓN DE SEGURIDAD PARA VERIFICAR ROLES\r\n-- ============================================\r\n\r\nCREATE OR REPLACE FUNCTION public.has_role(_user_id UUID, _role rol_usuario)\r\nRETURNS BOOLEAN\r\nLANGUAGE sql\r\nSTABLE\r\nSECURITY DEFINER\r\nSET search_path = public\r\nAS $$\r\n  SELECT EXISTS (\r\n    SELECT 1 FROM public.user_roles\r\n    WHERE user_id = _user_id AND role = _role\r\n  )\r\n$$;\r\n\r\n-- Función para verificar si tiene algún rol\r\nCREATE OR REPLACE FUNCTION public.has_any_role(_user_id UUID)\r\nRETURNS BOOLEAN\r\nLANGUAGE sql\r\nSTABLE\r\nSECURITY DEFINER\r\nSET search_path = public\r\nAS $$\r\n  SELECT EXISTS (\r\n    SELECT 1 FROM public.user_roles WHERE user_id = _user_id\r\n  )\r\n$$;\r\n\r\n-- Función para obtener roles del usuario\r\nCREATE OR REPLACE FUNCTION public.get_user_roles(_user_id UUID)\r\nRETURNS SETOF rol_usuario\r\nLANGUAGE sql\r\nSTABLE\r\nSECURITY DEFINER\r\nSET search_path = public\r\nAS $$\r\n  SELECT role FROM public.user_roles WHERE user_id = _user_id\r\n$$;\r\n\r\n-- ============================================\r\n-- 5. TABLA DE EXPEDIENTES\r\n-- ============================================\r\n\r\nCREATE TABLE public.expedientes (\r\n  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\r\n  codigo TEXT UNIQUE NOT NULL,\r\n  unidad TEXT NOT NULL,\r\n  organo TEXT NOT NULL,\r\n  creador_id UUID NOT NULL REFERENCES auth.users(id),\r\n  estado estado_expediente DEFAULT 'ingesta' NOT NULL,\r\n  \r\n  -- Datos del contrato\r\n  tipo_contrato tipo_contrato NOT NULL,\r\n  objeto TEXT NOT NULL,\r\n  descripcion TEXT,\r\n  \r\n  -- Importes\r\n  valor_estimado_contrato DECIMAL(15,2),\r\n  presupuesto_base_licitacion DECIMAL(15,2),\r\n  iva DECIMAL(15,2),\r\n  importe_prorrogas DECIMAL(15,2),\r\n  importe_modificados DECIMAL(15,2),\r\n  \r\n  -- Procedimiento\r\n  procedimiento_propuesto tipo_procedimiento,\r\n  procedimiento_seleccionado tipo_procedimiento,\r\n  \r\n  -- CPV\r\n  cpv_elegido TEXT,\r\n  \r\n  -- Lotes\r\n  tiene_lotes BOOLEAN DEFAULT false,\r\n  justificacion_lotes TEXT,\r\n  num_lotes INTEGER,\r\n  \r\n  -- Urgencia\r\n  es_urgente BOOLEAN DEFAULT false,\r\n  es_emergencia BOOLEAN DEFAULT false,\r\n  justificacion_urgencia TEXT,\r\n  \r\n  -- Metadatos\r\n  metadatos JSONB DEFAULT '{}',\r\n  \r\n  -- Timestamps\r\n  created_at TIMESTAMPTZ DEFAULT now() NOT NULL,\r\n  updated_at TIMESTAMPTZ DEFAULT now() NOT NULL\r\n);\r\n\r\nALTER TABLE public.expedientes ENABLE ROW LEVEL SECURITY;\r\n\r\n-- ============================================\r\n-- 6. TABLA DE ALTERNATIVAS DE PROCEDIMIENTO\r\n-- ============================================\r\n\r\nCREATE TABLE public.alternativas_procedimiento (\r\n  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\r\n  expediente_id UUID NOT NULL REFERENCES public.expedientes(id) ON DELETE CASCADE,\r\n  procedimiento tipo_procedimiento NOT NULL,\r\n  puntuacion INTEGER CHECK (puntuacion >= 0 AND puntuacion <= 100),\r\n  justificacion TEXT NOT NULL,\r\n  created_at TIMESTAMPTZ DEFAULT now() NOT NULL\r\n);\r\n\r\nALTER TABLE public.alternativas_procedimiento ENABLE ROW LEVEL SECURITY;\r\n\r\n-- ============================================\r\n-- 7. TABLA DE CPV RECOMENDADOS\r\n-- ============================================\r\n\r\nCREATE TABLE public.cpv_recomendados (\r\n  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\r\n  expediente_id UUID NOT NULL REFERENCES public.expedientes(id) ON DELETE CASCADE,\r\n  codigo TEXT NOT NULL,\r\n  descripcion TEXT NOT NULL,\r\n  puntuacion INTEGER CHECK (puntuacion >= 0 AND puntuacion <= 100),\r\n  justificacion TEXT,\r\n  created_at TIMESTAMPTZ DEFAULT now() NOT NULL\r\n);\r\n\r\nALTER TABLE public.cpv_recomendados ENABLE ROW LEVEL SECURITY;\r\n\r\n-- ============================================\r\n-- 8. TABLA DE EVIDENCIAS\r\n-- ============================================\r\n\r\nCREATE TABLE public.evidencias (\r\n  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\r\n  \r\n  -- Fuente\r\n  tipo_fuente tipo_fuente NOT NULL,\r\n  fuente_id TEXT NOT NULL,\r\n  fuente_nombre TEXT NOT NULL,\r\n  \r\n  -- Ubicación en la fuente\r\n  seccion TEXT,\r\n  rango TEXT,\r\n  \r\n  -- Versión y vigencia\r\n  version TEXT NOT NULL,\r\n  fecha_vigencia_inicio DATE NOT NULL,\r\n  fecha_vigencia_fin DATE,\r\n  \r\n  -- Contenido\r\n  texto_fragmento TEXT NOT NULL,\r\n  \r\n  -- Metadatos\r\n  metadatos JSONB DEFAULT '{}',\r\n  \r\n  created_at TIMESTAMPTZ DEFAULT now() NOT NULL\r\n);\r\n\r\nALTER TABLE public.evidencias ENABLE ROW LEVEL SECURITY;\r\n\r\n-- ============================================\r\n-- 9. TABLA DE REGLAS\r\n-- ============================================\r\n\r\nCREATE TABLE public.reglas (\r\n  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\r\n  codigo TEXT UNIQUE NOT NULL,\r\n  nombre TEXT NOT NULL,\r\n  descripcion TEXT NOT NULL,\r\n  \r\n  severidad severidad_regla NOT NULL,\r\n  \r\n  -- Fuente normativa asociada\r\n  evidencia_id UUID REFERENCES public.evidencias(id),\r\n  \r\n  -- Lógica de validación\r\n  condicion TEXT NOT NULL,\r\n  mensaje TEXT NOT NULL,\r\n  \r\n  -- Versionado\r\n  version INTEGER DEFAULT 1 NOT NULL,\r\n  estado TEXT DEFAULT 'borrador' CHECK (estado IN ('borrador', 'aprobada', 'obsoleta')),\r\n  \r\n  -- Aprobación\r\n  aprobador_id UUID REFERENCES auth.users(id),\r\n  aprobador_rol rol_usuario,\r\n  fecha_aprobacion TIMESTAMPTZ,\r\n  \r\n  created_at TIMESTAMPTZ DEFAULT now() NOT NULL,\r\n  updated_at TIMESTAMPTZ DEFAULT now() NOT NULL\r\n);\r\n\r\nALTER TABLE public.reglas ENABLE ROW LEVEL SECURITY;\r\n\r\n-- ============================================\r\n-- 10. TABLA DE DOCUMENTOS\r\n-- ============================================\r\n\r\nCREATE TABLE public.documentos (\r\n  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\r\n  expediente_id UUID NOT NULL REFERENCES public.expedientes(id) ON DELETE CASCADE,\r\n  \r\n  tipo tipo_documento NOT NULL,\r\n  nombre TEXT NOT NULL,\r\n  version INTEGER DEFAULT 1 NOT NULL,\r\n  hash TEXT,\r\n  \r\n  estado estado_revision DEFAULT 'pendiente' NOT NULL,\r\n  contenido JSONB,\r\n  \r\n  -- URLs de exportación\r\n  url_docx TEXT,\r\n  url_pdf TEXT,\r\n  \r\n  -- Trazabilidad\r\n  creador_id UUID NOT NULL REFERENCES auth.users(id),\r\n  \r\n  created_at TIMESTAMPTZ DEFAULT now() NOT NULL,\r\n  updated_at TIMESTAMPTZ DEFAULT now() NOT NULL\r\n);\r\n\r\nALTER TABLE public.documentos ENABLE ROW LEVEL SECURITY;\r\n\r\n-- ============================================\r\n-- 11. TABLA DE RELACIÓN DOCUMENTOS-EVIDENCIAS\r\n-- ============================================\r\n\r\nCREATE TABLE public.documentos_evidencias (\r\n  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\r\n  documento_id UUID NOT NULL REFERENCES public.documentos(id) ON DELETE CASCADE,\r\n  evidencia_id UUID NOT NULL REFERENCES public.evidencias(id) ON DELETE CASCADE,\r\n  created_at TIMESTAMPTZ DEFAULT now() NOT NULL,\r\n  UNIQUE(documento_id, evidencia_id)\r\n);\r\n\r\nALTER TABLE public.documentos_evidencias ENABLE ROW LEVEL SECURITY;\r\n\r\n-- ============================================\r\n-- 12. TABLA DE VALIDACIONES\r\n-- ============================================\r\n\r\nCREATE TABLE public.validaciones (\r\n  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\r\n  expediente_id UUID NOT NULL REFERENCES public.expedientes(id) ON DELETE CASCADE,\r\n  documento_id UUID REFERENCES public.documentos(id) ON DELETE CASCADE,\r\n  regla_id UUID NOT NULL REFERENCES public.reglas(id),\r\n  \r\n  -- Resultado\r\n  passed BOOLEAN NOT NULL,\r\n  valor_encontrado TEXT,\r\n  explicacion TEXT NOT NULL,\r\n  \r\n  -- Métricas\r\n  puntuacion_estructura INTEGER CHECK (puntuacion_estructura >= 0 AND puntuacion_estructura <= 100),\r\n  puntuacion_contenido INTEGER CHECK (puntuacion_contenido >= 0 AND puntuacion_contenido <= 100),\r\n  \r\n  -- Trazabilidad\r\n  usuario_id UUID NOT NULL REFERENCES auth.users(id),\r\n  \r\n  created_at TIMESTAMPTZ DEFAULT now() NOT NULL\r\n);\r\n\r\nALTER TABLE public.validaciones ENABLE ROW LEVEL SECURITY;\r\n\r\n-- ============================================\r\n-- 13. TABLA DE RELACIÓN VALIDACIONES-EVIDENCIAS\r\n-- ============================================\r\n\r\nCREATE TABLE public.validaciones_evidencias (\r\n  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\r\n  validacion_id UUID NOT NULL REFERENCES public.validaciones(id) ON DELETE CASCADE,\r\n  evidencia_id UUID NOT NULL REFERENCES public.evidencias(id) ON DELETE CASCADE,\r\n  created_at TIMESTAMPTZ DEFAULT now() NOT NULL,\r\n  UNIQUE(validacion_id, evidencia_id)\r\n);\r\n\r\nALTER TABLE public.validaciones_evidencias ENABLE ROW LEVEL SECURITY;\r\n\r\n-- ============================================\r\n-- 14. TABLA DE REVISIONES\r\n-- ============================================\r\n\r\nCREATE TABLE public.revisiones (\r\n  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\r\n  expediente_id UUID NOT NULL REFERENCES public.expedientes(id) ON DELETE CASCADE,\r\n  documento_id UUID REFERENCES public.documentos(id) ON DELETE CASCADE,\r\n  \r\n  -- Actor\r\n  usuario_id UUID NOT NULL REFERENCES auth.users(id),\r\n  rol rol_usuario NOT NULL,\r\n  \r\n  -- Cambio\r\n  cambio_descripcion TEXT NOT NULL,\r\n  decision decision_revision NOT NULL,\r\n  motivo TEXT,\r\n  \r\n  created_at TIMESTAMPTZ DEFAULT now() NOT NULL\r\n);\r\n\r\nALTER TABLE public.revisiones ENABLE ROW LEVEL SECURITY;\r\n\r\n-- ============================================\r\n-- 15. TABLA DE COMENTARIOS\r\n-- ============================================\r\n\r\nCREATE TABLE public.comentarios (\r\n  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\r\n  revision_id UUID NOT NULL REFERENCES public.revisiones(id) ON DELETE CASCADE,\r\n  usuario_id UUID NOT NULL REFERENCES auth.users(id),\r\n  rol rol_usuario NOT NULL,\r\n  texto TEXT NOT NULL,\r\n  created_at TIMESTAMPTZ DEFAULT now() NOT NULL\r\n);\r\n\r\nALTER TABLE public.comentarios ENABLE ROW LEVEL SECURITY;\r\n\r\n-- ============================================\r\n-- 16. TABLA DE AUDITORÍA\r\n-- ============================================\r\n\r\nCREATE TABLE public.audit_log (\r\n  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\r\n  expediente_id UUID REFERENCES public.expedientes(id) ON DELETE SET NULL,\r\n  usuario_id UUID REFERENCES auth.users(id),\r\n  accion TEXT NOT NULL,\r\n  entidad TEXT NOT NULL,\r\n  entidad_id UUID,\r\n  datos_anteriores JSONB,\r\n  datos_nuevos JSONB,\r\n  ip_address TEXT,\r\n  created_at TIMESTAMPTZ DEFAULT now() NOT NULL\r\n);\r\n\r\nALTER TABLE public.audit_log ENABLE ROW LEVEL SECURITY;\r\n\r\n-- ============================================\r\n-- 17. TRIGGERS PARA UPDATED_AT\r\n-- ============================================\r\n\r\nCREATE OR REPLACE FUNCTION public.update_updated_at_column()\r\nRETURNS TRIGGER AS $$\r\nBEGIN\r\n  NEW.updated_at = now();\r\n  RETURN NEW;\r\nEND;\r\n$$ LANGUAGE plpgsql;\r\n\r\nCREATE TRIGGER update_profiles_updated_at\r\n  BEFORE UPDATE ON public.profiles\r\n  FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();\r\n\r\nCREATE TRIGGER update_expedientes_updated_at\r\n  BEFORE UPDATE ON public.expedientes\r\n  FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();\r\n\r\nCREATE TRIGGER update_documentos_updated_at\r\n  BEFORE UPDATE ON public.documentos\r\n  FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();\r\n\r\nCREATE TRIGGER update_reglas_updated_at\r\n  BEFORE UPDATE ON public.reglas\r\n  FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();\r\n\r\n-- ============================================\r\n-- 18. TRIGGER PARA CREAR PERFIL AUTOMÁTICAMENTE\r\n-- ============================================\r\n\r\nCREATE OR REPLACE FUNCTION public.handle_new_user()\r\nRETURNS TRIGGER\r\nLANGUAGE plpgsql\r\nSECURITY DEFINER SET search_path = public\r\nAS $$\r\nBEGIN\r\n  INSERT INTO public.profiles (id, email, nombre)\r\n  VALUES (\r\n    NEW.id, \r\n    NEW.email,\r\n    COALESCE(NEW.raw_user_meta_data ->> 'nombre', NEW.email)\r\n  );\r\n  \r\n  -- Asignar rol por defecto: tramitador\r\n  INSERT INTO public.user_roles (user_id, role)\r\n  VALUES (NEW.id, 'tramitador');\r\n  \r\n  RETURN NEW;\r\nEND;\r\n$$;\r\n\r\nCREATE TRIGGER on_auth_user_created\r\n  AFTER INSERT ON auth.users\r\n  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();\r\n\r\n-- ============================================\r\n-- 19. GENERADOR DE CÓDIGO DE EXPEDIENTE\r\n-- ============================================\r\n\r\nCREATE OR REPLACE FUNCTION public.generate_expediente_codigo()\r\nRETURNS TRIGGER\r\nLANGUAGE plpgsql\r\nAS $$\r\nDECLARE\r\n  year_part TEXT;\r\n  seq_num INTEGER;\r\nBEGIN\r\n  year_part := to_char(NOW(), 'YYYY');\r\n  \r\n  SELECT COALESCE(MAX(\r\n    CAST(SUBSTRING(codigo FROM 'EXP-\\d{4}-(\\d+)') AS INTEGER)\r\n  ), 0) + 1\r\n  INTO seq_num\r\n  FROM public.expedientes\r\n  WHERE codigo LIKE 'EXP-' || year_part || '-%';\r\n  \r\n  NEW.codigo := 'EXP-' || year_part || '-' || LPAD(seq_num::TEXT, 6, '0');\r\n  RETURN NEW;\r\nEND;\r\n$$;\r\n\r\nCREATE TRIGGER generate_expediente_codigo_trigger\r\n  BEFORE INSERT ON public.expedientes\r\n  FOR EACH ROW\r\n  WHEN (NEW.codigo IS NULL OR NEW.codigo = '')\r\n  EXECUTE FUNCTION public.generate_expediente_codigo();\r\n\r\n-- ============================================\r\n-- 20. POLÍTICAS RLS - PROFILES\r\n-- ============================================\r\n\r\n-- Todos pueden ver perfiles\r\nCREATE POLICY \"Perfiles visibles para usuarios autenticados\"\r\n  ON public.profiles FOR SELECT\r\n  TO authenticated\r\n  USING (true);\r\n\r\n-- Solo el propio usuario puede actualizar su perfil\r\nCREATE POLICY \"Usuarios pueden actualizar su propio perfil\"\r\n  ON public.profiles FOR UPDATE\r\n  TO authenticated\r\n  USING (auth.uid() = id);\r\n\r\n-- ============================================\r\n-- 21. POLÍTICAS RLS - USER_ROLES\r\n-- ============================================\r\n\r\n-- Usuarios pueden ver sus propios roles\r\nCREATE POLICY \"Usuarios pueden ver sus propios roles\"\r\n  ON public.user_roles FOR SELECT\r\n  TO authenticated\r\n  USING (user_id = auth.uid());\r\n\r\n-- Solo supervisores pueden gestionar roles\r\nCREATE POLICY \"Supervisores pueden ver todos los roles\"\r\n  ON public.user_roles FOR SELECT\r\n  TO authenticated\r\n  USING (public.has_role(auth.uid(), 'supervisor'));\r\n\r\nCREATE POLICY \"Supervisores pueden asignar roles\"\r\n  ON public.user_roles FOR INSERT\r\n  TO authenticated\r\n  WITH CHECK (public.has_role(auth.uid(), 'supervisor'));\r\n\r\nCREATE POLICY \"Supervisores pueden eliminar roles\"\r\n  ON public.user_roles FOR DELETE\r\n  TO authenticated\r\n  USING (public.has_role(auth.uid(), 'supervisor'));\r\n\r\n-- ============================================\r\n-- 22. POLÍTICAS RLS - EXPEDIENTES\r\n-- ============================================\r\n\r\n-- Todos los usuarios autenticados pueden ver expedientes\r\nCREATE POLICY \"Usuarios pueden ver expedientes\"\r\n  ON public.expedientes FOR SELECT\r\n  TO authenticated\r\n  USING (public.has_any_role(auth.uid()));\r\n\r\n-- Solo tramitadores, jurídico y supervisores pueden crear\r\nCREATE POLICY \"Tramitadores pueden crear expedientes\"\r\n  ON public.expedientes FOR INSERT\r\n  TO authenticated\r\n  WITH CHECK (\r\n    public.has_role(auth.uid(), 'tramitador') OR\r\n    public.has_role(auth.uid(), 'juridico') OR\r\n    public.has_role(auth.uid(), 'supervisor')\r\n  );\r\n\r\n-- Tramitadores pueden editar sus expedientes, jurídico/interventor/supervisor todos\r\nCREATE POLICY \"Usuarios pueden actualizar expedientes según rol\"\r\n  ON public.expedientes FOR UPDATE\r\n  TO authenticated\r\n  USING (\r\n    (creador_id = auth.uid() AND public.has_role(auth.uid(), 'tramitador')) OR\r\n    public.has_role(auth.uid(), 'juridico') OR\r\n    public.has_role(auth.uid(), 'interventor') OR\r\n    public.has_role(auth.uid(), 'supervisor')\r\n  );\r\n\r\n-- Solo supervisores pueden eliminar\r\nCREATE POLICY \"Solo supervisores pueden eliminar expedientes\"\r\n  ON public.expedientes FOR DELETE\r\n  TO authenticated\r\n  USING (public.has_role(auth.uid(), 'supervisor'));\r\n\r\n-- ============================================\r\n-- 23. POLÍTICAS RLS - DOCUMENTOS\r\n-- ============================================\r\n\r\nCREATE POLICY \"Usuarios pueden ver documentos\"\r\n  ON public.documentos FOR SELECT\r\n  TO authenticated\r\n  USING (public.has_any_role(auth.uid()));\r\n\r\nCREATE POLICY \"Usuarios pueden crear documentos\"\r\n  ON public.documentos FOR INSERT\r\n  TO authenticated\r\n  WITH CHECK (\r\n    public.has_role(auth.uid(), 'tramitador') OR\r\n    public.has_role(auth.uid(), 'juridico') OR\r\n    public.has_role(auth.uid(), 'supervisor')\r\n  );\r\n\r\nCREATE POLICY \"Usuarios pueden actualizar documentos según rol\"\r\n  ON public.documentos FOR UPDATE\r\n  TO authenticated\r\n  USING (\r\n    (creador_id = auth.uid()) OR\r\n    public.has_role(auth.uid(), 'juridico') OR\r\n    public.has_role(auth.uid(), 'interventor') OR\r\n    public.has_role(auth.uid(), 'supervisor')\r\n  );\r\n\r\n-- ============================================\r\n-- 24. POLÍTICAS RLS - EVIDENCIAS\r\n-- ============================================\r\n\r\nCREATE POLICY \"Usuarios pueden ver evidencias\"\r\n  ON public.evidencias FOR SELECT\r\n  TO authenticated\r\n  USING (true);\r\n\r\nCREATE POLICY \"Jurídico y supervisor pueden crear evidencias\"\r\n  ON public.evidencias FOR INSERT\r\n  TO authenticated\r\n  WITH CHECK (\r\n    public.has_role(auth.uid(), 'juridico') OR\r\n    public.has_role(auth.uid(), 'supervisor')\r\n  );\r\n\r\nCREATE POLICY \"Jurídico y supervisor pueden actualizar evidencias\"\r\n  ON public.evidencias FOR UPDATE\r\n  TO authenticated\r\n  USING (\r\n    public.has_role(auth.uid(), 'juridico') OR\r\n    public.has_role(auth.uid(), 'supervisor')\r\n  );\r\n\r\n-- ============================================\r\n-- 25. POLÍTICAS RLS - REGLAS\r\n-- ============================================\r\n\r\nCREATE POLICY \"Usuarios pueden ver reglas\"\r\n  ON public.reglas FOR SELECT\r\n  TO authenticated\r\n  USING (true);\r\n\r\nCREATE POLICY \"Jurídico y supervisor pueden gestionar reglas\"\r\n  ON public.reglas FOR INSERT\r\n  TO authenticated\r\n  WITH CHECK (\r\n    public.has_role(auth.uid(), 'juridico') OR\r\n    public.has_role(auth.uid(), 'supervisor')\r\n  );\r\n\r\nCREATE POLICY \"Jurídico y supervisor pueden actualizar reglas\"\r\n  ON public.reglas FOR UPDATE\r\n  TO authenticated\r\n  USING (\r\n    public.has_role(auth.uid(), 'juridico') OR\r\n    public.has_role(auth.uid(), 'supervisor')\r\n  );\r\n\r\n-- ============================================\r\n-- 26. POLÍTICAS RLS - VALIDACIONES\r\n-- ============================================\r\n\r\nCREATE POLICY \"Usuarios pueden ver validaciones\"\r\n  ON public.validaciones FOR SELECT\r\n  TO authenticated\r\n  USING (public.has_any_role(auth.uid()));\r\n\r\nCREATE POLICY \"Usuarios pueden crear validaciones\"\r\n  ON public.validaciones FOR INSERT\r\n  TO authenticated\r\n  WITH CHECK (\r\n    public.has_role(auth.uid(), 'tramitador') OR\r\n    public.has_role(auth.uid(), 'juridico') OR\r\n    public.has_role(auth.uid(), 'interventor') OR\r\n    public.has_role(auth.uid(), 'supervisor')\r\n  );\r\n\r\n-- ============================================\r\n-- 27. POLÍTICAS RLS - REVISIONES\r\n-- ============================================\r\n\r\nCREATE POLICY \"Usuarios pueden ver revisiones\"\r\n  ON public.revisiones FOR SELECT\r\n  TO authenticated\r\n  USING (public.has_any_role(auth.uid()));\r\n\r\nCREATE POLICY \"Usuarios pueden crear revisiones según rol\"\r\n  ON public.revisiones FOR INSERT\r\n  TO authenticated\r\n  WITH CHECK (\r\n    public.has_role(auth.uid(), 'juridico') OR\r\n    public.has_role(auth.uid(), 'interventor') OR\r\n    public.has_role(auth.uid(), 'supervisor')\r\n  );\r\n\r\n-- ============================================\r\n-- 28. POLÍTICAS RLS - COMENTARIOS\r\n-- ============================================\r\n\r\nCREATE POLICY \"Usuarios pueden ver comentarios\"\r\n  ON public.comentarios FOR SELECT\r\n  TO authenticated\r\n  USING (public.has_any_role(auth.uid()));\r\n\r\nCREATE POLICY \"Usuarios pueden crear comentarios\"\r\n  ON public.comentarios FOR INSERT\r\n  TO authenticated\r\n  WITH CHECK (public.has_any_role(auth.uid()));\r\n\r\n-- ============================================\r\n-- 29. POLÍTICAS RLS - AUDIT_LOG\r\n-- ============================================\r\n\r\nCREATE POLICY \"Solo supervisores y auditores pueden ver audit_log\"\r\n  ON public.audit_log FOR SELECT\r\n  TO authenticated\r\n  USING (\r\n    public.has_role(auth.uid(), 'supervisor') OR\r\n    public.has_role(auth.uid(), 'auditor')\r\n  );\r\n\r\n-- Sistema puede insertar (sin restricción de usuario)\r\nCREATE POLICY \"Sistema puede insertar en audit_log\"\r\n  ON public.audit_log FOR INSERT\r\n  TO authenticated\r\n  WITH CHECK (true);\r\n\r\n-- ============================================\r\n-- 30. POLÍTICAS RLS - TABLAS AUXILIARES\r\n-- ============================================\r\n\r\n-- Alternativas procedimiento\r\nCREATE POLICY \"Usuarios pueden ver alternativas\"\r\n  ON public.alternativas_procedimiento FOR SELECT\r\n  TO authenticated\r\n  USING (public.has_any_role(auth.uid()));\r\n\r\nCREATE POLICY \"Usuarios pueden crear alternativas\"\r\n  ON public.alternativas_procedimiento FOR INSERT\r\n  TO authenticated\r\n  WITH CHECK (public.has_any_role(auth.uid()));\r\n\r\n-- CPV recomendados\r\nCREATE POLICY \"Usuarios pueden ver cpv_recomendados\"\r\n  ON public.cpv_recomendados FOR SELECT\r\n  TO authenticated\r\n  USING (public.has_any_role(auth.uid()));\r\n\r\nCREATE POLICY \"Usuarios pueden crear cpv_recomendados\"\r\n  ON public.cpv_recomendados FOR INSERT\r\n  TO authenticated\r\n  WITH CHECK (public.has_any_role(auth.uid()));\r\n\r\n-- Documentos-evidencias\r\nCREATE POLICY \"Usuarios pueden ver documentos_evidencias\"\r\n  ON public.documentos_evidencias FOR SELECT\r\n  TO authenticated\r\n  USING (public.has_any_role(auth.uid()));\r\n\r\nCREATE POLICY \"Usuarios pueden crear documentos_evidencias\"\r\n  ON public.documentos_evidencias FOR INSERT\r\n  TO authenticated\r\n  WITH CHECK (public.has_any_role(auth.uid()));\r\n\r\n-- Validaciones-evidencias\r\nCREATE POLICY \"Usuarios pueden ver validaciones_evidencias\"\r\n  ON public.validaciones_evidencias FOR SELECT\r\n  TO authenticated\r\n  USING (public.has_any_role(auth.uid()));\r\n\r\nCREATE POLICY \"Usuarios pueden crear validaciones_evidencias\"\r\n  ON public.validaciones_evidencias FOR INSERT\r\n  TO authenticated\r\n  WITH CHECK (public.has_any_role(auth.uid()));\r\n\r\n-- ============================================\r\n-- 31. ÍNDICES PARA RENDIMIENTO\r\n-- ============================================\r\n\r\nCREATE INDEX idx_expedientes_estado ON public.expedientes(estado);\r\nCREATE INDEX idx_expedientes_creador ON public.expedientes(creador_id);\r\nCREATE INDEX idx_expedientes_unidad ON public.expedientes(unidad);\r\nCREATE INDEX idx_documentos_expediente ON public.documentos(expediente_id);\r\nCREATE INDEX idx_validaciones_expediente ON public.validaciones(expediente_id);\r\nCREATE INDEX idx_revisiones_expediente ON public.revisiones(expediente_id);\r\nCREATE INDEX idx_user_roles_user ON public.user_roles(user_id);\r\nCREATE INDEX idx_audit_log_expediente ON public.audit_log(expediente_id);\r\nCREATE INDEX idx_audit_log_created ON public.audit_log(created_at DESC);\r\n",
+      "tables": [
+        "profiles",
+        "user_roles",
+        "expedientes",
+        "alternativas_procedimiento",
+        "cpv_recomendados",
+        "evidencias",
+        "reglas",
+        "documentos",
+        "documentos_evidencias",
+        "validaciones",
+        "validaciones_evidencias",
+        "revisiones",
+        "comentarios",
+        "audit_log"
+      ],
+      "enums": [
+        "estado_expediente",
+        "tipo_contrato",
+        "tipo_procedimiento",
+        "severidad_regla",
+        "estado_revision",
+        "rol_usuario",
+        "tipo_documento",
+        "tipo_fuente",
+        "decision_revision"
+      ],
+      "hasRLS": true
+    }
+  ],
+  "hasStorage": true,
+  "hasRealtime": false,
+  "hasAuth": true,
+  "framework": "react"
+}

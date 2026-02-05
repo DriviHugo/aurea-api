@@ -1,10 +1,14 @@
 import fs from "fs";
 import path from "path";
+import { fileURLToPath } from "url";
 import Anthropic from "@anthropic-ai/sdk";
 import type { ProjectInspection } from "../inspectors/project-inspector.js";
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const SCHEMA_PROMPT = fs.readFileSync(
-  path.join(import.meta.dirname, "../prompts/schema-migrator.md"),
+  path.join(__dirname, "../prompts/schema-migrator.md"),
   "utf-8",
 );
 

@@ -1,5 +1,5 @@
 {
-  "name": "boilerplate-api",
+  "name": "migration-boilerplate",
   "version": "1.0.0",
   "description": "Boilerplate for a Node.js API with Fastify, Prisma (MongoDB or PostgreSQL) and Redis",
   "private": true,
@@ -27,7 +27,6 @@
     "docker:up": "docker-compose -f ./docker/docker-compose.yml up -d --build",
     "docker:down": "docker-compose -f ./docker/docker-compose.yml down",
     "docker:logs": "docker-compose -f ./docker/docker-compose.yml logs -f",
-    "prepare": "husky",
     "migrate:inspect": "tsx migration/inspectors/project-inspector.ts",
     "migrate:schema": "tsx migration/ai-migrators/schema-migrator.ts",
     "migrate:routes": "tsx migration/ai-migrators/route-generator.ts",
@@ -38,7 +37,10 @@
     "migrate:all": "npm run migrate:inspect && npm run migrate:schema && npm run migrate:routes && npm run migrate:functions",
     "migrate:validate": "tsx migration/scripts/validate-schema.ts",
     "migrate:frontend": "tsx migration/ai-migrators/component-refactor.ts",
-    "migrate:types": "tsx migration/scripts/generate-types.ts"
+    "migrate:types": "tsx migration/scripts/generate-types.ts",
+    "migrate:docker": "tsx migration/scripts/setup-docker.ts",
+    "prepare": "husky",
+    "migrate:auto": "tsx migration/migrate.ts"
   },
   "engines": {
     "node": ">=22"
@@ -46,6 +48,7 @@
   "author": "1MillionBot",
   "license": "ISC",
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.72.1",
     "@fastify/compress": "^8.3.1",
     "@fastify/cookie": "^11.0.2",
     "@fastify/cors": "^11.2.0",
@@ -60,6 +63,7 @@
     "blocked": "^1.3.0",
     "dotenv": "^17.2.3",
     "fastify": "^5.6.2",
+    "glob": "^13.0.0",
     "ioredis": "^5.8.2",
     "jsonwebtoken": "^9.0.3",
     "nodemailer": "^7.0.12",
@@ -72,7 +76,6 @@
     "winston-daily-rotate-file": "^5.0.0"
   },
   "devDependencies": {
-    "@anthropic-ai/sdk": "^0.72.1",
     "@jest/globals": "^30.2.0",
     "@types/bcrypt": "~10.0.28-alpha",
     "@types/blocked": "~1.3.5",
@@ -94,7 +97,6 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-prettier": "^5.5.4",
     "eslint-plugin-security": "^3.0.1",
-    "glob": "^13.0.1",
     "fastify-tsconfig": "^3.0.0",
     "husky": "^9.1.7",
     "jest": "^30.2.0",
