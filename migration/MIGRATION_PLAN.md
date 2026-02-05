@@ -40,6 +40,58 @@ This plan addresses all required phases for Vibe Coding → On-Premise migration
 - Only business logic is project-specific
 - 95% of kit is reusable across projects
 
+### AI Provider Flexibility (Production Runtime)
+
+**✅ AI-Agnostic**: No vendor lock-in in production
+
+The migrated application supports multiple AI providers through a unified AI Gateway, giving you complete flexibility:
+
+| Provider       | Use Case                           | Cost       | Privacy | Compliance       |
+| -------------- | ---------------------------------- | ---------- | ------- | ---------------- |
+| **Ollama**     | Full control, no internet required | Free       | On-prem | ✅ ENS Alto      |
+| **OpenRouter** | Access 100+ models, single API     | Flexible   | Cloud   | Depends on model |
+| **Claude**     | Best quality for complex tasks     | Pay/token  | Cloud   | SOC2, GDPR       |
+| **OpenAI**     | Most popular, good ecosystem       | Pay/token  | Cloud   | SOC2, GDPR       |
+| **Gemini**     | Cost-effective, fast               | Lower cost | Cloud   | ISO 27001        |
+
+**Key Benefits:**
+
+- 🔄 **Switch in seconds**: Change `.env` variable, no code changes
+- 💰 **Cost optimization**: Route cheap tasks to Gemini, complex to Claude
+- 🔒 **Privacy control**: Use Ollama for sensitive data, cloud for public features
+- 🌐 **Offline capable**: Ollama works without internet (critical for government)
+- 🎯 **No vendor lock-in**: Not dependent on any AI company's pricing or availability
+- 🔧 **Multi-model routing**: Use different models for different features (document analysis vs chat)
+
+**Production Configuration:**
+
+```env
+# Production AI (used by your application at runtime)
+AI_PROVIDER="ollama"          # or "anthropic", "openai", "gemini", "openrouter"
+AI_MODEL="llama-3.3-70b"      # Model name (provider-specific)
+AI_BASE_URL="http://localhost:11434"  # For Ollama/custom endpoints
+
+# Multiple providers for different features (optional)
+AI_DOCUMENT_PROVIDER="ollama"
+AI_DOCUMENT_MODEL="llama-3.3-70b"
+
+AI_CHAT_PROVIDER="anthropic"
+AI_CHAT_MODEL="claude-sonnet-4-20250514"
+
+# Migration AI (only used during code generation - one-time)
+MIGRATION_AI_PROVIDER="anthropic"
+ANTHROPIC_API_KEY="sk-ant-api03-..."
+```
+
+**Recommended Production Setup:**
+
+- **Government/ENS Alto**: Ollama with `llama-3.3-70b` (100% on-premise)
+- **Enterprise**: Ollama + OpenRouter (sensitive data local, other features cloud)
+- **Startup**: Gemini (best cost/performance ratio)
+- **High Quality**: Claude Sonnet 4 (best reasoning and code generation)
+
+The AI Gateway abstracts all providers behind a single interface, making it trivial to switch or combine multiple providers.
+
 ---
 
 ## Prerequisites

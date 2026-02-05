@@ -108,18 +108,12 @@ async function inspectTables(projectPath: string): Promise<Table[]> {
 
   const tableRegex = /(\w+):\s*\{\s*Row:/g;
   const matches = [...content.matchAll(tableRegex)];
-  const tableNames = matches.map(m => m[1]);
+  const tableNames = matches.map((m) => m[1]);
 
   console.log(`   📋 Detected ${tableNames.length} tables`);
 
   return tableNames
     .filter((name): name is string => name !== undefined)
-    .map((name) => ({
-      name,
-      columns: [],
-      relations: [],
-    }));
-}
     .map((name) => ({
       name,
       columns: [],
@@ -360,26 +354,26 @@ function extractSQLEnums(content: string): string[] {
 
 // CLI usage
 (async () => {
-    const isMainModule = import.meta.url === `file://${process.argv[1]}`;
-    if (isMainModule) {
-      const projectPath = process.argv[2] || process.cwd();
-      const outputPath = process.argv[3] || "./migration/output/inspection.json";
-  
-      try {
-        const inspection = await inspectLovableProject(projectPath);
-        // Ensure directory exists
-        const fs = await import("fs");
-        const path = await import("path");
-        const dir = path.dirname(outputPath);
-        if (!fs.existsSync(dir)) {
-          fs.mkdirSync(dir, { recursive: true });
-        }
+  const isMainModule = import.meta.url === `file://${process.argv[1]}`;
+  if (isMainModule) {
+    const projectPath = process.argv[2] || process.cwd();
+    const outputPath = process.argv[3] || "./migration/output/inspection.json";
 
-        fs.writeFileSync(outputPath, JSON.stringify(inspection, null, 2));
-        console.log(`\n✅ Inspection guardada en: ${outputPath}`);
-      } catch (error) {
-        console.error("❌ Error:", error);
-        process.exit(1);
+    try {
+      const inspection = await inspectLovableProject(projectPath);
+      // Ensure directory exists
+      const fs = await import("fs");
+      const path = await import("path");
+      const dir = path.dirname(outputPath);
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
       }
+
+      fs.writeFileSync(outputPath, JSON.stringify(inspection, null, 2));
+      console.log(`\n✅ Inspection guardada en: ${outputPath}`);
+    } catch (error) {
+      console.error("❌ Error:", error);
+      process.exit(1);
     }
-  })();
+  }
+})();

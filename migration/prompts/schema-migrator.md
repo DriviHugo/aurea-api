@@ -163,6 +163,7 @@ model User {
 ```
 
 **Important Index Syntax:**
+
 - For sorted indexes: `@@index([field(sort: Desc)])` or `@@index([field(sort: Asc)])`
 - Never use: `@@index([field], sort: Desc)` (INVALID SYNTAX)
 - The sort parameter MUST be inside the field array parentheses
@@ -263,8 +264,9 @@ model Expediente {
    - Ensures unique constraint names in the database
 
 10. **Language:**
-   - All identifiers MUST be in English
-   - Never use Spanish or other languages for model, field, or enum names
+
+- All identifiers MUST be in English
+- Never use Spanish or other languages for model, field, or enum names
 
 ## Output Format
 

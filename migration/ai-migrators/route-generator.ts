@@ -155,8 +155,10 @@ Generate complete, production-ready code with NO placeholders or "... existing c
 // CLI execution - Immediate IIFE for ESM compatibility
 (async () => {
   // Check if this is the main module
-  const isMainModule = process.argv[1] && import.meta.url.endsWith(process.argv[1].replace(/\\/g, '/'));
-  
+  const isMainModule =
+    process.argv[1] &&
+    import.meta.url.endsWith(process.argv[1].replace(/\\/g, "/"));
+
   if (!isMainModule) return;
 
   try {
@@ -172,7 +174,10 @@ Generate complete, production-ready code with NO placeholders or "... existing c
 
     await generator.generateRoutes(options);
   } catch (error) {
-    console.error("❌ Route generation error:", error instanceof Error ? error.message : String(error));
+    console.error(
+      "❌ Route generation error:",
+      error instanceof Error ? error.message : String(error),
+    );
     process.exit(1);
   }
 })();
