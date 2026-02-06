@@ -89,6 +89,9 @@ ${includeSwagger ? "- Swagger/OpenAPI decorators" : ""}
 
     // Generate index.ts to auto-register all routes
     this.generateRoutesIndex(outputDir, models);
+    
+    // Auto-register generated routes in private/index.ts
+    this.registerInPrivateRoutes();
   }
 
   /**
@@ -143,6 +146,68 @@ ${registrations}
     const indexPath = path.join(outputDir, "index.ts");
     fs.writeFileSync(indexPath, indexContent, "utf-8");
     console.log(`✅ Generated: ${indexPath}`);
+  }
+
+  /**
+   * Auto-register generated routes in src/routes/private/index.ts
+   */
+  private registerInPrivateRoutes(): void {
+    console.log("\n📝 Registering generated routes in private/index.ts...");
+
+    const privateIndexPath = path.join(process.cwd(), "src", "routes", "private", "index.ts");
+    
+    if (!fs.existsSync(privateIndexPath)) {
+      console.log("⚠️  private/index.ts not found, skipping auto-registration");
+      return;
+    }
+
+    let content = fs.readFileSync(privateIndexPath, "utf-8");
+
+    // Check if already registered
+    if (content.includes('from "../generated/index.js"')) {
+      console.log("✅ Generated routes already registered in private/index.ts");
+      return;
+    }
+
+    // Find the last import statement
+    const lines = content.split("\n");
+    let lastImportIndex = -1;
+    
+    for (let i = 0; i < lines.length; i++) {
+      if (lines[i].trim().startsWith("import ") && !lines[i].includes("type {")) {
+        lastImportIndex = i;
+      }
+    }
+
+    // Insert the import after the last import
+    if (lastImportIndex !== -1) {
+      lines.splice(lastImportIndex + 1, 0, 'import generatedRoutes from "../generated/index.js";');
+    }
+
+    // Find the export default function and add registration
+    const exportIndex = lines.findIndex(line => line.includes("export default async"));
+    if (exportIndex !== -1) {
+      // Find the last fastify.register call
+      let lastRegisterIndex = -1;
+      for (let i = exportIndex; i < lines.length; i++) {
+        if (lines[i].includes("fastify.register(")) {
+          lastRegisterIndex = i;
+        }
+      }
+
+      if (lastRegisterIndex !== -1) {
+        // Add after last register, with empty line and comment
+        lines.splice(lastRegisterIndex + 1, 0, 
+          "",
+          "  // Auto-generated CRUD routes",
+          "  fastify.register(generatedRoutes);"
+        );
+      }
+    }
+
+    content = lines.join("\n");
+    fs.writeFileSync(privateIndexPath, content, "utf-8");
+    console.log("✅ Registered generated routes in private/index.ts");
   }
 
   private modelToKebabCase(modelName: string): string {
