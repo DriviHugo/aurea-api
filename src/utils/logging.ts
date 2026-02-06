@@ -5,8 +5,8 @@ export function errorToLogObject(error: unknown): Record<string, unknown> {
   function serializeCause(cause: unknown, seen = new WeakSet()): unknown {
     if (cause === undefined || cause === null) return cause;
     if (typeof cause !== "object") return cause;
-    if (seen.has(cause)) return "[Circular]";
-    seen.add(cause);
+    if (seen.has(cause as object)) return "[Circular]";
+    seen.add(cause as object);
     const result: Record<string, unknown> = {};
     for (const key of Object.getOwnPropertyNames(cause)) {
       try {

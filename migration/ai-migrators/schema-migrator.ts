@@ -1,14 +1,10 @@
 import fs from "fs";
 import path from "path";
-import { fileURLToPath } from "url";
 import Anthropic from "@anthropic-ai/sdk";
 import type { ProjectInspection } from "../inspectors/project-inspector.js";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
 const SCHEMA_PROMPT = fs.readFileSync(
-  path.join(__dirname, "../prompts/schema-migrator.md"),
+  path.join(import.meta.dirname, "../prompts/schema-migrator.md"),
   "utf-8",
 );
 
@@ -173,10 +169,7 @@ Has Auth: ${inspection.hasAuth}
 
 // CLI usage
 (async () => {
-  // Windows-compatible module detection
-  const isMainModule = import.meta.url.endsWith(
-    process.argv[1].replace(/\\/g, "/"),
-  );
+  const isMainModule = import.meta.url === `file://${process.argv[1]}`;
   if (isMainModule) {
     const inspectionPath =
       process.argv[2] || "./migration/output/inspection.json";
