@@ -41,7 +41,9 @@
     "migrate:types": "tsx migration/scripts/generate-types.ts",
     "migrate:docker": "tsx migration/scripts/setup-docker.ts",
     "prepare": "husky",
-    "migrate:auto": "tsx migration/migrate.ts"
+    "migrate:auto": "tsx migration/migrate.ts",
+    "test:endpoints": "tsx test-endpoints.ts",
+    "test:endpoints:auth": "tsx test-endpoints.ts --with-auth"
   },
   "engines": {
     "node": ">=22"
