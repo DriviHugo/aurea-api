@@ -1,12 +1,12 @@
 /**
  * Migration Endpoint Testing Script
- * 
+ *
  * This script automatically:
  * 1. Starts the development server
  * 2. Waits for it to be ready
  * 3. Tests all generated CRUD endpoints
  * 4. Shuts down the server
- * 
+ *
  * Success criteria:
  * - 401 (Unauthorized): Endpoint exists and is properly protected ✓
  * - 200-299 (OK): Endpoint accessible (shouldn't happen without auth)
@@ -14,7 +14,7 @@
  * - 0 (Connection failed): Server not running or connection issues ✗
  */
 
-import { spawn, type ChildProcess } from 'child_process';
+import { spawn, type ChildProcess } from "child_process";
 
 const PORT = 4789;
 const BASE_URL = `http://localhost:${PORT}`;
@@ -38,12 +38,12 @@ let serverProcess: ChildProcess | null = null;
 
 async function waitForServer(maxWaitMs: number): Promise<boolean> {
   const startTime = Date.now();
-  
+
   while (Date.now() - startTime < maxWaitMs) {
     try {
       const response = await fetch(`${BASE_URL}/health`);
       if (response.ok) {
-        console.log('✅ Server is ready');
+        console.log("✅ Server is ready");
         return true;
       }
     } catch {
@@ -51,14 +51,14 @@ async function waitForServer(maxWaitMs: number): Promise<boolean> {
     }
     await new Promise((resolve) => setTimeout(resolve, HEALTH_CHECK_INTERVAL));
   }
-  
+
   return false;
 }
 
 async function testEndpoint(endpoint: string): Promise<TestResult> {
   try {
     const response = await fetch(`${BASE_URL}/api/private/${endpoint}`);
-    
+
     return {
       endpoint,
       status: response.status,
@@ -80,34 +80,34 @@ async function testEndpoint(endpoint: string): Promise<TestResult> {
 
 function startServer(): Promise<void> {
   return new Promise((resolve, reject) => {
-    console.log('🚀 Starting development server...');
-    
-    serverProcess = spawn('npm', ['run', 'dev'], {
-      stdio: 'pipe',
+    console.log("🚀 Starting development server...");
+
+    serverProcess = spawn("npm", ["run", "dev"], {
+      stdio: "pipe",
       shell: true,
-      env: { ...process.env, NODE_ENV: 'development' },
+      env: { ...process.env, NODE_ENV: "development" },
     });
 
     if (!serverProcess.stdout || !serverProcess.stderr) {
-      reject(new Error('Failed to capture server output'));
+      reject(new Error("Failed to capture server output"));
       return;
     }
 
-    serverProcess.stdout.on('data', (data) => {
+    serverProcess.stdout.on("data", (data) => {
       const output = data.toString();
       console.log(`[SERVER] ${output.trim()}`);
     });
 
-    serverProcess.stderr.on('data', (data) => {
+    serverProcess.stderr.on("data", (data) => {
       const output = data.toString();
       console.error(`[SERVER ERROR] ${output.trim()}`);
     });
 
-    serverProcess.on('error', (error) => {
+    serverProcess.on("error", (error) => {
       reject(error);
     });
 
-    serverProcess.on('exit', (code) => {
+    serverProcess.on("exit", (code) => {
       if (code !== 0 && code !== null) {
         console.error(`❌ Server exited with code ${code}`);
       }
@@ -120,7 +120,7 @@ function startServer(): Promise<void> {
 
 function stopServer(): void {
   if (serverProcess) {
-    console.log('\n🛑 Stopping server...');
+    console.log("\n🛑 Stopping server...");
     serverProcess.kill();
     serverProcess = null;
   }
@@ -132,68 +132,69 @@ async function runTests() {
     await startServer();
 
     // Wait for server to be ready
-    console.log('⏳ Waiting for server to be ready...');
+    console.log("⏳ Waiting for server to be ready...");
     const isReady = await waitForServer(STARTUP_TIMEOUT);
-    
+
     if (!isReady) {
-      throw new Error('Server failed to start within timeout period');
+      throw new Error("Server failed to start within timeout period");
     }
 
     // Test all endpoints
-    console.log('\n📋 Testing generated endpoints...\n');
-    
+    console.log("\n📋 Testing generated endpoints...\n");
+
     if (ENDPOINTS_TO_TEST.length === 0) {
-      console.log('⚠️  No endpoints configured for testing.');
-      console.log('   Update the ENDPOINTS_TO_TEST array in this script with your generated endpoint names.');
+      console.log("⚠️  No endpoints configured for testing.");
+      console.log(
+        "   Update the ENDPOINTS_TO_TEST array in this script with your generated endpoint names.",
+      );
       return;
     }
 
     const results: TestResult[] = [];
-    
+
     for (const endpoint of ENDPOINTS_TO_TEST) {
       const result = await testEndpoint(endpoint);
       results.push(result);
-      
-      const emoji = result.status === 401 
-        ? '🔒' 
-        : result.success 
-          ? '✅' 
-          : '❌';
-      
-      const statusText = result.status === 401
-        ? 'Protected'
-        : result.status === 0
-          ? 'Connection failed'
-          : result.status === 404
-            ? 'Not found'
-            : `Status ${result.status}`;
-      
+
+      const emoji = result.status === 401 ? "🔒" : result.success ? "✅" : "❌";
+
+      const statusText =
+        result.status === 401
+          ? "Protected"
+          : result.status === 0
+            ? "Connection failed"
+            : result.status === 404
+              ? "Not found"
+              : `Status ${result.status}`;
+
       console.log(`${emoji} ${endpoint}: ${statusText}`);
-      
+
       if (result.error) {
         console.log(`   Error: ${result.error}`);
       }
     }
 
     // Summary
-    console.log('\n' + '='.repeat(60));
+    console.log("\n" + "=".repeat(60));
     const successful = results.filter((r) => r.success).length;
     const failed = results.filter((r) => !r.success).length;
     const protectedCount = results.filter((r) => r.status === 401).length;
-    
-    console.log('📊 Results:');
+
+    console.log("📊 Results:");
     console.log(`   ${successful}/${results.length} success`);
     console.log(`   ${protectedCount} protected`);
     console.log(`   ${failed} failed`);
-    
+
     if (failed > 0) {
-      console.log('\n❌ Some endpoints failed. Check the output above for details.');
+      console.log(
+        "\n❌ Some endpoints failed. Check the output above for details.",
+      );
       process.exitCode = 1;
     } else {
-      console.log('\n✅ All endpoints are working correctly!');
+      console.log("\n✅ All endpoints are working correctly!");
     }
   } catch (error) {
-    console.error('\n❌ Test failed:', error);
+    console.error("\n❌ Test failed:", error);
     process.exitCode = 1;
   } finally {
     stopServer();
@@ -201,12 +202,12 @@ async function runTests() {
 }
 
 // Handle cleanup on exit
-process.on('SIGINT', () => {
+process.on("SIGINT", () => {
   stopServer();
   process.exit();
 });
 
-process.on('SIGTERM', () => {
+process.on("SIGTERM", () => {
   stopServer();
   process.exit();
 });
