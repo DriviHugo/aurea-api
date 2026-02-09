@@ -2,21 +2,17 @@
 /**
  * Automated Migration Testing Script
  * Tests all generated CRUD endpoints to verify migration success
+ * 
+ * NOTE: This test verifies that endpoints exist and are properly protected.
+ * 401 (Unauthorized) responses are CORRECT - they indicate the endpoint exists
+ * and requires authentication.
  */
 
-import { spawn } from "child_process";
-import * as readline from "readline";
+import { spawn, ChildProcess } from "child_process";
 
 const API_BASE_URL = "http://localhost:4789";
 const WAIT_FOR_SERVER = 10000; // Wait 10 seconds for server to start
 const MAX_RETRIES = 3; // Retry server check 3 times
-
-// Test user credentials
-const TEST_USER = {
-  email: "test@migration.local",
-  password: "TestPassword123!",
-  name: "Migration Test User",
-};
 
 interface TestResult {
   endpoint: string;
@@ -27,7 +23,7 @@ interface TestResult {
 }
 
 const results: TestResult[] = [];
-let authCookies: string = "";
+let serverProcess: ChildProcess | null = null;
 
 // List of generated models to test
 const models = [
@@ -56,74 +52,6 @@ const models = [
   "validacionevidencia",
 ];
 
-async function registerUser(): Promise<boolean> {
-  try {
-    const response = await fetch(`${API_BASE_URL}/api/private/auth/register`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email: TEST_USER.email,
-        password: TEST_USER.password,
-        name: TEST_USER.name,
-      }),
-    });
-
-    if (response.status === 201 || response.status === 400) {
-      // 400 might mean user already exists, which is fine
-      return true;
-    }
-
-    const errorText = await response.text();
-    console.log(`   ⚠️  Registration failed with status ${response.status}: ${errorText}`);
-    return false;
-  } catch (error) {
-    console.log(`   ❌ Registration error: ${error instanceof Error ? error.message : String(error)}`);
-    return false;
-  }
-}
-
-async function loginUser(): Promise<boolean> {
-  try {
-    const response = await fetch(`${API_BASE_URL}/api/private/auth/login`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email: TEST_USER.email,
-        password: TEST_USER.password,
-        fingerprint: "test-migration-fingerprint",
-        ip: "127.0.0.1",
-        agent: "test-migration-script/1.0",
-      }),
-    });
-
-    if (response.ok) {
-      // Extract cookies from response headers
-      const setCookieHeaders = response.headers.getSetCookie?.() || [];
-      
-      if (setCookieHeaders.length > 0) {
-        // Extract just the cookie name=value pairs (before the first semicolon)
-        const cookies = setCookieHeaders
-          .map(cookie => cookie.split(';')[0])
-          .join('; ');
-        
-        authCookies = cookies;
-        return true;
-      }
-    }
-
-    const errorText = await response.text();
-    console.log(`   ⚠️  Login failed with status ${response.status}: ${errorText}`);
-    return false;
-  } catch (error) {
-    console.log(`   ❌ Login error: ${error instanceof Error ? error.message : String(error)}`);
-    return false;
-  }
-}
-
 async function testEndpoint(
   endpoint: string,
   method: string = "GET",
@@ -131,18 +59,11 @@ async function testEndpoint(
   const url = `${API_BASE_URL}${endpoint}`;
 
   try {
-    const headers: HeadersInit = {
-      "Content-Type": "application/json",
-    };
-
-    // Add auth cookies if available
-    if (authCookies) {
-      headers["Cookie"] = authCookies;
-    }
-
     const response = await fetch(url, {
       method,
-      headers,
+      headers: {
+        "Content-Type": "application/json",
+      },
     });
 
     const result: TestResult = {
@@ -150,10 +71,10 @@ async function testEndpoint(
       method,
       status: response.status,
       // Success criteria:
-      // - 200-299: OK
-      // - 404: endpoint exists but table is empty (OK for testing)
-      // - 401: endpoint exists but requires auth (OK if we're testing without auth)
-      success: response.ok || response.status === 404 || response.status === 401,
+      // - 401: endpoint exists and is properly protected ✓
+      // - 200-299: endpoint accessible (shouldn't happen without auth but OK)
+      // - 404: endpoint missing ✗
+      success: response.status === 401 || response.ok,
     };
 
     results.push(result);
@@ -203,30 +124,30 @@ async function waitForServer(): Promise<boolean> {
 async function runTests() {
   console.log("🧪 AUREA API - Automated Migration Testing");
   console.log("=".repeat(60));
+  console.log("\nℹ️  Testing endpoint availability and protection");
+  console.log("   ✅ 401 = Endpoint exists and requires auth (CORRECT)");
+  console.log("   ❌ 404 = Endpoint missing (ERROR)\n");
 
   // Start server in background
-  console.log("\n📦 Starting server...");
-  const serverProcess = spawn("npm", ["run", "dev"], {
+  console.log("📦 Starting server...");
+  serverProcess = spawn("npm", ["run", "dev"], {
     shell: true,
     stdio: "pipe",
   });
 
   let serverOutput = "";
-  let serverReady = false;
 
   serverProcess.stdout?.on("data", (data) => {
-    const output = data.toString();
-    serverOutput += output;
-    // Check if server is ready by looking for common startup messages
-    if (output.includes("Server listening") || output.includes("started") || output.includes("ready")) {
-      serverReady = true;
-    }
+    serverOutput += data.toString();
   });
 
   serverProcess.stderr?.on("data", (data) => {
+    serverOutput += data.toString();
+    // Only show critical errors
     const output = data.toString();
-    serverOutput += output;
-    console.error(`   Server error: ${output}`);
+    if (output.includes("ERROR") || output.includes("EADDRINUSE")) {
+      console.error(`   Server error: ${output}`);
+    }
   });
 
   serverProcess.on("error", (error) => {
@@ -240,12 +161,6 @@ async function runTests() {
     process.exit(1);
   }
 
-  // Note: Skipping authentication for now as it requires email configuration
-  // We'll test endpoints and verify they exist (401 = exists but needs auth)
-  console.log("ℹ️  Testing endpoints without authentication");
-  console.log("   (401 = endpoint exists and requires auth ✓)");
-  console.log("   (404 = endpoint missing ✗)\n");
-
   // Test all generated endpoints
   console.log("🔍 Testing Generated Endpoints");
   console.log("=".repeat(60));
@@ -257,7 +172,8 @@ async function runTests() {
     const result = await testEndpoint(endpoint);
 
     if (result.success) {
-      console.log(`✅ ${result.status}`);
+      const statusEmoji = result.status === 401 ? "🔒" : "✅";
+      console.log(`${statusEmoji} ${result.status}`);
     } else {
       console.log(`❌ ${result.status} ${result.error || ""}`);
     }
@@ -278,11 +194,9 @@ async function runTests() {
   console.log(`❌ Failed: ${failed}/${results.length}`);
   console.log(`📈 Success Rate: ${((successful / results.length) * 100).toFixed(1)}%`);
   console.log(`\n📋 Status Breakdown:`);
-  console.log(`   - 200 OK: ${status200} endpoints`);
-  console.log(`   - 404 Not Found (empty): ${status404} endpoints`);
-  if (status401 > 0) {
-    console.log(`   - 401 Unauthorized: ${status401} endpoints (✅ Protected correctly)`);
-  }
+  console.log(`   - 🔒 401 Unauthorized: ${status401} endpoints (Protected ✓)`);
+  console.log(`   - ✅ 200 OK: ${status200} endpoints`);
+  console.log(`   - ❌ 404 Not Found: ${status404} endpoints (Missing!)`);
 
   if (failed > 0) {
     console.log("\n❌ Failed Endpoints:");
@@ -304,6 +218,12 @@ async function runTests() {
 // Handle Ctrl+C
 process.on("SIGINT", () => {
   console.log("\n\n⚠️  Test interrupted by user");
+  console.log("🧹 Stopping server...");
+  
+  if (serverProcess) {
+    serverProcess.kill();
+  }
+  
   process.exit(0);
 });
 
