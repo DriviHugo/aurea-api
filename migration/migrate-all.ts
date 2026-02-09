@@ -12,7 +12,7 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const INSPECTION_FILE = "./inspection.json";
+const INSPECTION_FILE = "./migration/output/inspection.json";
 const SCHEMA_FILE = "./prisma/schema.prisma";
 
 interface MigrationStep {
@@ -26,17 +26,17 @@ const STEPS: MigrationStep[] = [
   {
     name: "1️⃣  Inspection",
     script: "tsx",
-    args: ["migration/inspector.ts", "--output", INSPECTION_FILE],
+    args: [
+      "migration/inspectors/project-inspector.ts",
+      "", // source path will be added if provided
+      INSPECTION_FILE,
+    ],
     description: "Analyzing source project and extracting metadata...",
   },
   {
     name: "2️⃣  Schema Generation",
     script: "tsx",
-    args: [
-      "migration/ai-migrators/schema-migrator.ts",
-      INSPECTION_FILE,
-      SCHEMA_FILE,
-    ],
+    args: ["migration/ai-migrators/schema-migrator.ts"],
     description: "Generating Prisma schema from inspection data...",
   },
   {
@@ -54,7 +54,7 @@ const STEPS: MigrationStep[] = [
   {
     name: "5️⃣  Edge Functions Migration",
     script: "tsx",
-    args: ["migration/ai-migrators/function-migrator.ts", INSPECTION_FILE],
+    args: ["migration/ai-migrators/function-migrator.ts"],
     description: "Migrating Deno edge functions to Fastify routes...",
   },
 ];
@@ -103,8 +103,11 @@ async function main() {
         throw new Error(`Source project not found: ${sourcePath}`);
       }
       console.log(`\n📂 Source Project: ${path.resolve(sourcePath)}`);
-      // Update inspector args to include source path
-      STEPS[0].args.push(sourcePath);
+      // Update inspector args to include source path (replace empty string placeholder)
+      STEPS[0].args[1] = sourcePath;
+    } else {
+      // Remove the empty source path placeholder if no source provided
+      STEPS[0].args.splice(1, 1);
     }
 
     // Execute each step

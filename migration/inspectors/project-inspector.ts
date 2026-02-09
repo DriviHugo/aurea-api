@@ -354,7 +354,11 @@ function extractSQLEnums(content: string): string[] {
 
 // CLI usage
 (async () => {
-  const isMainModule = import.meta.url === `file://${process.argv[1]}`;
+  // Check if this is the main module being executed
+  const isMainModule =
+    import.meta.url === `file://${process.argv[1]}` ||
+    import.meta.url.includes(process.argv[1]?.replace(/\\/g, "/"));
+
   if (isMainModule) {
     const projectPath = process.argv[2] || process.cwd();
     const outputPath = process.argv[3] || "./migration/output/inspection.json";
@@ -362,8 +366,6 @@ function extractSQLEnums(content: string): string[] {
     try {
       const inspection = await inspectLovableProject(projectPath);
       // Ensure directory exists
-      const fs = await import("fs");
-      const path = await import("path");
       const dir = path.dirname(outputPath);
       if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir, { recursive: true });
