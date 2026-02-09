@@ -35,7 +35,7 @@
     "migrate:functions": "tsx migration/ai-migrators/function-migrator.ts",
     "migrate:auth": "tsx migration/ai-migrators/auth-generator.ts",
     "migrate:users": "tsx migration/scripts/migrate-users.ts",
-    "migrate:all": "npm run migrate:inspect && npm run migrate:schema && npm run migrate:routes && npm run migrate:functions",
+    "migrate:all": "tsx migration/migrate-all.ts",
     "migrate:validate": "tsx migration/scripts/validate-schema.ts",
     "migrate:frontend": "tsx migration/ai-migrators/component-refactor.ts",
     "migrate:types": "tsx migration/scripts/generate-types.ts"
