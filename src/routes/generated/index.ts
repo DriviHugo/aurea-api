@@ -28,14 +28,18 @@ export default async (fastify: FastifyInstance): Promise<void> => {
   fastify.register(aifunctionlogRoutes, { prefix: "/aifunctionlog" });
   fastify.register(aifunctionversionRoutes, { prefix: "/aifunctionversion" });
   fastify.register(aiproviderRoutes, { prefix: "/aiprovider" });
-  fastify.register(alternativaprocedimientoRoutes, { prefix: "/alternativaprocedimiento" });
+  fastify.register(alternativaprocedimientoRoutes, {
+    prefix: "/alternativaprocedimiento",
+  });
   fastify.register(auditlogRoutes, { prefix: "/auditlog" });
   fastify.register(comentarioRoutes, { prefix: "/comentario" });
   fastify.register(cpvcodigoRoutes, { prefix: "/cpvcodigo" });
   fastify.register(cpvrecomendadoRoutes, { prefix: "/cpvrecomendado" });
   fastify.register(documentoRoutes, { prefix: "/documento" });
   fastify.register(documentoevidenciaRoutes, { prefix: "/documentoevidencia" });
-  fastify.register(documentogeneracionRoutes, { prefix: "/documentogeneracion" });
+  fastify.register(documentogeneracionRoutes, {
+    prefix: "/documentogeneracion",
+  });
   fastify.register(documentoseccionRoutes, { prefix: "/documentoseccion" });
   fastify.register(documentoversionRoutes, { prefix: "/documentoversion" });
   fastify.register(evidenciaRoutes, { prefix: "/evidencia" });
@@ -46,5 +50,7 @@ export default async (fastify: FastifyInstance): Promise<void> => {
   fastify.register(revisionRoutes, { prefix: "/revision" });
   fastify.register(userroleRoutes, { prefix: "/userrole" });
   fastify.register(validacionRoutes, { prefix: "/validacion" });
-  fastify.register(validacionevidenciaRoutes, { prefix: "/validacionevidencia" });
+  fastify.register(validacionevidenciaRoutes, {
+    prefix: "/validacionevidencia",
+  });
 };
