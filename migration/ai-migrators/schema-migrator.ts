@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import { pathToFileURL } from "url";
 import Anthropic from "@anthropic-ai/sdk";
 import type { ProjectInspection } from "../inspectors/project-inspector.js";
 
@@ -169,7 +170,7 @@ Has Auth: ${inspection.hasAuth}
 
 // CLI usage
 (async () => {
-  const isMainModule = import.meta.url === `file://${process.argv[1]}`;
+  const isMainModule = import.meta.url === pathToFileURL(process.argv[1]).href;
   if (isMainModule) {
     const inspectionPath =
       process.argv[2] || "./migration/output/inspection.json";
