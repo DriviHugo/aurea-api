@@ -9,6 +9,15 @@ Includes automated migration tools, AI-powered code generation, and a production
 
 ---
 
+## 📚 Quick Links
+
+- **[QUICKSTART.md](./QUICKSTART.md)** - Get started in 2 commands
+- **[TESTING.md](./TESTING.md)** - Automated testing guide
+- **[TROUBLESHOOTING.md](./TROUBLESHOOTING.md)** - Common issues and solutions
+- **[migration/README.md](./migration/README.md)** - Detailed migration docs
+
+---
+
 ## 📁 Project Structure
 
 ```
