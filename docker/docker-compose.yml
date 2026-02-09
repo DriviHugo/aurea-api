@@ -3,12 +3,12 @@ version: "3.8"
 services:
   postgres:
     image: postgres:15-alpine
-    container_name: aurea-api-postgres
+    container_name: migration-boilerplate-postgres
     restart: unless-stopped
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: boilerplate-api
+      POSTGRES_DB: myproject
     ports:
       - "54320:5432"
     volumes:
@@ -21,7 +21,7 @@ services:
 
   redis:
     image: redis:7-alpine
-    container_name: aurea-api-redis
+    container_name: migration-boilerplate-redis
     restart: unless-stopped
     ports:
       - "35302:6379"
