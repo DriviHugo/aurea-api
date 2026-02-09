@@ -38,7 +38,8 @@
     "migrate:all": "tsx --env-file=.env migration/migrate-all.ts",
     "migrate:validate": "tsx migration/scripts/validate-schema.ts",
     "migrate:frontend": "tsx migration/ai-migrators/component-refactor.ts",
-    "migrate:types": "tsx migration/scripts/generate-types.ts"
+    "migrate:types": "tsx migration/scripts/generate-types.ts",
+    "test:migration": "tsx test-migration.ts"
   },
   "engines": {
     "node": ">=22"

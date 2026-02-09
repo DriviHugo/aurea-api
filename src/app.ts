@@ -65,4 +65,13 @@ fastify.register(isSameUserOrAdmin);
 fastify.register(privateRoutes, { prefix: `${regularRoutePath}/private` });
 fastify.register(publicRoutes, { prefix: `${regularRoutePath}/public` });
 
+// Health check endpoint (no prefix, available at /health)
+fastify.get("/health", async () => {
+  return {
+    status: "ok",
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+  };
+});
+
 export default fastify;
