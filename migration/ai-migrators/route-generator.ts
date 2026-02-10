@@ -89,10 +89,10 @@ ${includeSwagger ? "- Swagger/OpenAPI decorators" : ""}
 
     // Generate index.ts to auto-register all routes
     this.generateRoutesIndex(outputDir, models);
-    
+
     // Auto-register generated routes in private/index.ts
     this.registerInPrivateRoutes();
-    
+
     // Update test scripts with generated endpoint names
     this.updateTestScripts(models);
   }
@@ -157,8 +157,14 @@ ${registrations}
   private registerInPrivateRoutes(): void {
     console.log("\n📝 Registering generated routes in private/index.ts...");
 
-    const privateIndexPath = path.join(process.cwd(), "src", "routes", "private", "index.ts");
-    
+    const privateIndexPath = path.join(
+      process.cwd(),
+      "src",
+      "routes",
+      "private",
+      "index.ts",
+    );
+
     if (!fs.existsSync(privateIndexPath)) {
       console.log("⚠️  private/index.ts not found, skipping auto-registration");
       return;
@@ -175,20 +181,29 @@ ${registrations}
     // Find the last import statement
     const lines = content.split("\n");
     let lastImportIndex = -1;
-    
+
     for (let i = 0; i < lines.length; i++) {
-      if (lines[i].trim().startsWith("import ") && !lines[i].includes("type {")) {
+      if (
+        lines[i].trim().startsWith("import ") &&
+        !lines[i].includes("type {")
+      ) {
         lastImportIndex = i;
       }
     }
 
     // Insert the import after the last import
     if (lastImportIndex !== -1) {
-      lines.splice(lastImportIndex + 1, 0, 'import generatedRoutes from "../generated/index.js";');
+      lines.splice(
+        lastImportIndex + 1,
+        0,
+        'import generatedRoutes from "../generated/index.js";',
+      );
     }
 
     // Find the export default function and add registration
-    const exportIndex = lines.findIndex(line => line.includes("export default async"));
+    const exportIndex = lines.findIndex((line) =>
+      line.includes("export default async"),
+    );
     if (exportIndex !== -1) {
       // Find the last fastify.register call
       let lastRegisterIndex = -1;
@@ -200,10 +215,12 @@ ${registrations}
 
       if (lastRegisterIndex !== -1) {
         // Add after last register, with empty line and comment
-        lines.splice(lastRegisterIndex + 1, 0, 
+        lines.splice(
+          lastRegisterIndex + 1,
+          0,
           "",
           "  // Auto-generated CRUD routes",
-          "  fastify.register(generatedRoutes);"
+          "  fastify.register(generatedRoutes);",
         );
       }
     }
@@ -219,8 +236,8 @@ ${registrations}
   private updateTestScripts(models: string[]): void {
     console.log("\n📝 Updating test scripts with endpoint names...");
 
-    const endpointNames = models.map(model => this.modelToKebabCase(model));
-    const endpointsArrayString = `const ENDPOINTS_TO_TEST: string[] = [\n  ${endpointNames.map(e => `"${e}"`).join(",\n  ")},\n];`;
+    const endpointNames = models.map((model) => this.modelToKebabCase(model));
+    const endpointsArrayString = `const ENDPOINTS_TO_TEST: string[] = [\n  ${endpointNames.map((e) => `"${e}"`).join(",\n  ")},\n];`;
 
     // Update test-migration.ts
     const testMigrationPath = path.join(process.cwd(), "test-migration.ts");
@@ -228,10 +245,12 @@ ${registrations}
       let content = fs.readFileSync(testMigrationPath, "utf-8");
       content = content.replace(
         /const ENDPOINTS_TO_TEST: string\[\] = \[[\s\S]*?\];/,
-        endpointsArrayString
+        endpointsArrayString,
       );
       fs.writeFileSync(testMigrationPath, content, "utf-8");
-      console.log("✅ Updated test-migration.ts with " + models.length + " endpoints");
+      console.log(
+        "✅ Updated test-migration.ts with " + models.length + " endpoints",
+      );
     }
 
     // Update quick-test.ts
@@ -240,10 +259,12 @@ ${registrations}
       let content = fs.readFileSync(quickTestPath, "utf-8");
       content = content.replace(
         /const ENDPOINTS_TO_TEST: string\[\] = \[[\s\S]*?\];/,
-        endpointsArrayString
+        endpointsArrayString,
       );
       fs.writeFileSync(quickTestPath, content, "utf-8");
-      console.log("✅ Updated quick-test.ts with " + models.length + " endpoints");
+      console.log(
+        "✅ Updated quick-test.ts with " + models.length + " endpoints",
+      );
     }
   }
 
