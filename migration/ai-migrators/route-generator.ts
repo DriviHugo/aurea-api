@@ -92,6 +92,9 @@ ${includeSwagger ? "- Swagger/OpenAPI decorators" : ""}
     
     // Auto-register generated routes in private/index.ts
     this.registerInPrivateRoutes();
+    
+    // Update test scripts with generated endpoint names
+    this.updateTestScripts(models);
   }
 
   /**
@@ -208,6 +211,40 @@ ${registrations}
     content = lines.join("\n");
     fs.writeFileSync(privateIndexPath, content, "utf-8");
     console.log("✅ Registered generated routes in private/index.ts");
+  }
+
+  /**
+   * Update test scripts with generated endpoint names
+   */
+  private updateTestScripts(models: string[]): void {
+    console.log("\n📝 Updating test scripts with endpoint names...");
+
+    const endpointNames = models.map(model => this.modelToKebabCase(model));
+    const endpointsArrayString = `const ENDPOINTS_TO_TEST: string[] = [\n  ${endpointNames.map(e => `"${e}"`).join(",\n  ")},\n];`;
+
+    // Update test-migration.ts
+    const testMigrationPath = path.join(process.cwd(), "test-migration.ts");
+    if (fs.existsSync(testMigrationPath)) {
+      let content = fs.readFileSync(testMigrationPath, "utf-8");
+      content = content.replace(
+        /const ENDPOINTS_TO_TEST: string\[\] = \[[\s\S]*?\];/,
+        endpointsArrayString
+      );
+      fs.writeFileSync(testMigrationPath, content, "utf-8");
+      console.log("✅ Updated test-migration.ts with " + models.length + " endpoints");
+    }
+
+    // Update quick-test.ts
+    const quickTestPath = path.join(process.cwd(), "quick-test.ts");
+    if (fs.existsSync(quickTestPath)) {
+      let content = fs.readFileSync(quickTestPath, "utf-8");
+      content = content.replace(
+        /const ENDPOINTS_TO_TEST: string\[\] = \[[\s\S]*?\];/,
+        endpointsArrayString
+      );
+      fs.writeFileSync(quickTestPath, content, "utf-8");
+      console.log("✅ Updated quick-test.ts with " + models.length + " endpoints");
+    }
   }
 
   private modelToKebabCase(modelName: string): string {
