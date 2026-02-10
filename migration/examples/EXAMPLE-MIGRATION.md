@@ -76,8 +76,8 @@
 ### Comando Ejecutado
 
 ```bash
-cd c:\Users\hugop\Repositories\aurea-api
-npm run migrate:inspect -- --source ../aurea-1mb
+cd /path/to/your-api-project
+npm run migrate:inspect -- --source ../your-lovable-project
 ```
 
 ### Resultado `inspection.json`

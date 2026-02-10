@@ -46,20 +46,11 @@ npm run migrate:all /path/to/your-lovable-project
 - ✅ Migrates edge functions to Fastify
 - ✅ Registers all routes automatically
 
-### 5. Configure Test Endpoints
+### 5. Run Automated Tests
 
-Edit `test-migration.ts` and add your model names:
+> **Note:** Endpoint testing is now fully automated! The migration process automatically updates test scripts with all generated endpoint names.
 
-```typescript
-const ENDPOINTS_TO_TEST: string[] = [
-  "user",
-  "post",
-  "comment",
-  // add your models here
-];
-```
-
-### 6. Run Automated Tests
+### 6. Test Your Endpoints
 
 ```bash
 npm run test:migration
@@ -105,6 +96,7 @@ After migration:
 - ✅ `src/routes/generated/*.routes.ts` (one per model)
 - ✅ All routes automatically registered
 - ✅ Edge functions converted to Fastify
+- ✅ Test scripts automatically updated with endpoint names
 
 After testing:
 
@@ -123,15 +115,15 @@ After testing:
 
 **Migration fails:**
 
-- Check `ANTHROPIC_API_KEY` or `GEMINI_API_KEY` is set
+- Check `ANTHROPIC_API_KEY` or `GEMINI_API_KEY` is set in `.env`
 - Verify source project path is correct
 - Ensure Docker is running
 
 **Tests fail:**
 
-- Update `ENDPOINTS_TO_TEST` array in `test-migration.ts`
 - Check Docker containers are healthy: `docker ps`
-- Verify database is accessible
+- Verify database migrations are applied: `npm run db:migrate:deploy`
+- Ensure Redis is running on port 35302
 
 **Need help?**
 

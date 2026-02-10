@@ -71,7 +71,7 @@ migration-boilerplate/
 
 ```bash
 # Clone the repository
-git clone https://github.com/DriviHugo/migration-boilerplate.git my-project-api
+git clone https://github.com/1millionbot/migration-boilerplate-api.git my-project-api
 cd my-project-api
 npm install
 
@@ -227,8 +227,8 @@ Interactive API documentation is available via **Swagger UI** at:
 1. **Clone the repository**
 
    ```bash
-   git clone https://github.com/1millionbot/boilerplate-api.git
-   cd boilerplate-api
+   git clone https://github.com/1millionbot/migration-boilerplate-api.git
+   cd migration-boilerplate-api
    ```
 
 2. **Install dependencies**
