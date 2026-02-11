@@ -214,7 +214,7 @@ export const createApiKeyResponseSchema: JSONSchemaType<CreateApiKeyResponse> =
       key: {
         type: "string",
         description: "The actual API key in plain text format",
-        examples: ["sk_test_4eC39HqLyjWDarjtT1zdp7dc"],
+        examples: ["sk_test_xxxxxxxxxxxxxxxxxxxx"],
       },
     },
     required: [...apiKeyResponseSchema.required, "key"],
