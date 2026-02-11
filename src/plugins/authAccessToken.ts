@@ -24,7 +24,7 @@ const authAccessTokenPlugin = fp(async (fastify: FastifyInstance) => {
 
       // Try to get token from Authorization header (Bearer token)
       const authHeader = request.headers.authorization;
-      if (authHeader && authHeader.startsWith("Bearer ")) {
+      if (authHeader?.startsWith("Bearer ")) {
         accessToken = authHeader.substring(7);
       }
 
@@ -36,7 +36,6 @@ const authAccessTokenPlugin = fp(async (fastify: FastifyInstance) => {
             : "access_token";
         // eslint-disable-next-line
         if (request.cookies[keyAccessToken]) {
-          // eslint-disable-next-line security/detect-object-injection
           const cookieToken = request.unsignCookie(
             request.cookies[keyAccessToken],
           );
