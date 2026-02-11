@@ -6,6 +6,8 @@ export default async (fastify: FastifyInstance): Promise<void> => {
   // Rutas de autenticación
   await fastify.register(authRoutes, { prefix: "/auth" });
 
+  // OLD BOILERPLATE ROUTE (DISABLED - uses authApiKey which is disabled)
+  /*
   fastify.route({
     method: "GET",
     url: "/example",
@@ -27,4 +29,5 @@ export default async (fastify: FastifyInstance): Promise<void> => {
       return { message: "This is a public route." };
     },
   });
+  */
 };

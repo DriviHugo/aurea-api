@@ -20,23 +20,39 @@ const authAccessTokenPlugin = fp(async (fastify: FastifyInstance) => {
   fastify.decorate(
     "authAccessToken",
     async (request: FastifyRequest, _reply: FastifyReply) => {
-      const keyAccessToken =
-        process.env["NODE_ENV"] === "production"
-          ? "__Secure-access_token"
-          : "access_token";
-      // eslint-disable-next-line
-      if (!request.cookies[keyAccessToken]) {
-        throw new Errors.unauthorizedToken();
-      }
-      // eslint-disable-next-line security/detect-object-injection
-      const accessToken = request.unsignCookie(request.cookies[keyAccessToken]);
+      let accessToken: string | null = null;
 
-      if (!accessToken.valid) {
+      // Try to get token from Authorization header (Bearer token)
+      const authHeader = request.headers.authorization;
+      if (authHeader && authHeader.startsWith("Bearer ")) {
+        accessToken = authHeader.substring(7);
+      }
+
+      // Fallback: try to get token from cookies (legacy)
+      if (!accessToken) {
+        const keyAccessToken =
+          process.env["NODE_ENV"] === "production"
+            ? "__Secure-access_token"
+            : "access_token";
+        // eslint-disable-next-line
+        if (request.cookies[keyAccessToken]) {
+          // eslint-disable-next-line security/detect-object-injection
+          const cookieToken = request.unsignCookie(
+            request.cookies[keyAccessToken],
+          );
+          if (cookieToken.valid) {
+            accessToken = cookieToken.value;
+          }
+        }
+      }
+
+      // No token found in either header or cookie
+      if (!accessToken) {
         throw new Errors.unauthorizedToken();
       }
 
       try {
-        const { sub, jti } = verifyAccessToken(accessToken.value);
+        const { sub, jti } = verifyAccessToken(accessToken);
         request.userId = sub;
         request.sessionId = jti;
       } catch {

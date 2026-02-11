@@ -78,10 +78,6 @@ const routes: FastifyPluginAsync = async (fastify) => {
             skip,
             take: limit,
             orderBy: { createdAt: "desc" },
-            include: {
-              expediente: { select: { id: true, numero: true } },
-              creador: { select: { id: true, nombre: true, apellido: true } },
-            },
           }),
           prisma.documento.count({ where }),
         ]);
@@ -152,16 +148,6 @@ const routes: FastifyPluginAsync = async (fastify) => {
 
         const documento = await prisma.documento.findUnique({
           where: { id },
-          include: {
-            expediente: { select: { id: true, numero: true, titulo: true } },
-            creador: { select: { id: true, nombre: true, apellido: true } },
-            documentosEvidencias: true,
-            validaciones: true,
-            revisiones: true,
-            secciones: true,
-            generaciones: true,
-            versiones: true,
-          },
         });
 
         if (!documento) {

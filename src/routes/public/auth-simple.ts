@@ -36,7 +36,7 @@ export default async function authRoutes(app: FastifyInstance) {
 
   // Me - requiere autenticación
   app.get("/me", {
-    onRequest: [app.authenticate],
+    preValidation: [app.authAccessToken],
     handler: authController.me,
   });
 }

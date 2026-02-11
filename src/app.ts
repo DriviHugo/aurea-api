@@ -15,12 +15,14 @@ import privateRoutes from "./routes/private/index.js";
 import publicRoutes from "./routes/public/index.js";
 import authAccessToken from "./plugins/authAccessToken.js";
 import authRefreshToken from "./plugins/authRefreshToken.js";
-import authApiKey from "./plugins/authApiKey.js";
-import allowAdmin from "./plugins/allowAdmin.js";
-import isSameUserOrAdmin from "./plugins/isSameUserOrAdmin.js";
+// OLD BOILERPLATE PLUGINS (DISABLED)
+// import authApiKey from "./plugins/authApiKey.js";
+// import allowAdmin from "./plugins/allowAdmin.js";
+// import isSameUserOrAdmin from "./plugins/isSameUserOrAdmin.js";
 import customFormatsAjvPlugin from "./plugins/ajvCustomFormats.js";
 import errorHandler from "./plugins/errorHandler.js";
 import originRequestId from "./plugins/originRequestId.js";
+import prismaPlugin from "./plugins/prisma.js";
 
 const regularRoutePath = "/api";
 
@@ -30,9 +32,15 @@ const fastify: FastifyInstance = fastifyModule({
 
 // Plugins
 fastify.register(cors, {
-  origin: [process.env["FRONTEND_BASE_URL"] ?? "http://localhost:3000"],
+  origin: [
+    process.env["FRONTEND_BASE_URL"] ?? "http://localhost:8080",
+    "http://localhost:8080",
+    "http://localhost:8081",
+    "http://127.0.0.1:8080",
+    "http://127.0.0.1:8081",
+  ],
   credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
 });
 
 fastify.register(helmet);
@@ -50,6 +58,7 @@ fastify.register(fastifySwagger, swaggerConfig);
 fastify.register(fastifySwaggerUi, swaggerUiConfig);
 fastify.register(swaggerSchemas);
 fastify.register(customFormatsAjvPlugin);
+fastify.register(prismaPlugin);
 fastify.register(originRequestId);
 fastify.register(errorHandler);
 
@@ -57,9 +66,10 @@ fastify.register(errorHandler);
 fastify.register(logRequest);
 fastify.register(authAccessToken);
 fastify.register(authRefreshToken);
-fastify.register(authApiKey);
-fastify.register(allowAdmin);
-fastify.register(isSameUserOrAdmin);
+// OLD BOILERPLATE HOOKS (DISABLED)
+// fastify.register(authApiKey);
+// fastify.register(allowAdmin);
+// fastify.register(isSameUserOrAdmin);
 
 // Routes
 fastify.register(privateRoutes, { prefix: `${regularRoutePath}/private` });

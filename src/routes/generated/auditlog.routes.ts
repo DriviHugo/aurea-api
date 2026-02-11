@@ -105,14 +105,6 @@ const routes: FastifyPluginAsync = async (fastify) => {
             skip,
             take: limit,
             orderBy: { createdAt: "desc" },
-            include: {
-              expediente: {
-                select: { id: true, numeroExpediente: true },
-              },
-              usuario: {
-                select: { id: true, firstName: true, lastName: true },
-              },
-            },
           }),
           prisma.auditLog.count({ where }),
         ]);
@@ -159,14 +151,6 @@ const routes: FastifyPluginAsync = async (fastify) => {
 
         const auditLog = await prisma.auditLog.findUnique({
           where: { id },
-          include: {
-            expediente: {
-              select: { id: true, numeroExpediente: true },
-            },
-            usuario: {
-              select: { id: true, firstName: true, lastName: true },
-            },
-          },
         });
 
         if (!auditLog) {
@@ -226,14 +210,6 @@ const routes: FastifyPluginAsync = async (fastify) => {
 
         const auditLog = await prisma.auditLog.create({
           data,
-          include: {
-            expediente: {
-              select: { id: true, numeroExpediente: true },
-            },
-            usuario: {
-              select: { id: true, firstName: true, lastName: true },
-            },
-          },
         });
 
         return reply.status(201).send(auditLog);
@@ -318,14 +294,6 @@ const routes: FastifyPluginAsync = async (fastify) => {
         const auditLog = await prisma.auditLog.update({
           where: { id },
           data,
-          include: {
-            expediente: {
-              select: { id: true, numeroExpediente: true },
-            },
-            usuario: {
-              select: { id: true, firstName: true, lastName: true },
-            },
-          },
         });
 
         return reply.status(200).send(auditLog);

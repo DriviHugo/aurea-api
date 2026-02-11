@@ -76,12 +76,6 @@ const routes: FastifyPluginAsync = async (fastify) => {
             skip,
             take: limit,
             orderBy: { createdAt: "desc" },
-            include: {
-              expediente: true,
-              documento: true,
-              regla: true,
-              usuario: true,
-            },
           }),
           prisma.validacion.count({ where }),
         ]);
@@ -148,13 +142,6 @@ const routes: FastifyPluginAsync = async (fastify) => {
 
         const validacion = await prisma.validacion.findUnique({
           where: { id },
-          include: {
-            expediente: true,
-            documento: true,
-            regla: true,
-            usuario: true,
-            validacionesEvidencias: true,
-          },
         });
 
         if (!validacion) {

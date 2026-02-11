@@ -71,14 +71,6 @@ const routes: FastifyPluginAsync = async (fastify) => {
             skip,
             take: limit,
             orderBy: { createdAt: "desc" },
-            include: {
-              revision: {
-                select: { id: true, titulo: true },
-              },
-              usuario: {
-                select: { id: true, nombre: true, email: true },
-              },
-            },
           }),
           prisma.comentario.count({ where }),
         ]);
@@ -155,14 +147,6 @@ const routes: FastifyPluginAsync = async (fastify) => {
 
         const comentario = await prisma.comentario.findUnique({
           where: { id },
-          include: {
-            revision: {
-              select: { id: true, titulo: true },
-            },
-            usuario: {
-              select: { id: true, nombre: true, email: true },
-            },
-          },
         });
 
         if (!comentario) {

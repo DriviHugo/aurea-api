@@ -1,10 +1,13 @@
 import type { FastifyRequest, FastifyReply } from "fastify";
 import prisma from "../config/prisma.js";
-import { hashPassword, validatePasswordHash } from "../utils/crypto.js";
+import {
+  hashPassword,
+  validatePasswordHash,
+  generateRandomHexToken,
+} from "../utils/crypto.js";
 import {
   signAccessToken,
   signRefreshToken,
-  REFRESH_TOKEN_EXPIRATION_IN_SECONDS,
   ACCESS_TOKEN_EXPIRATION_IN_SECONDS,
 } from "../utils/jwt.js";
 
@@ -27,38 +30,56 @@ export const login = async (
   req: FastifyRequest<{ Body: LoginBody }>,
   res: FastifyReply,
 ): Promise<void> => {
-  const { email, password } = req.body;
+  try {
+    const { email, password } = req.body;
 
-  // Buscar usuario por email
-  const user = await prisma.profile.findUnique({
-    where: { email },
-  });
+    console.log("Login attempt:", email);
 
-  // Validar contraseña
-  const passwordHash = user?.password ?? DUMMY_PASSWORD_HASH;
-  const passwordCheck = await validatePasswordHash(password, passwordHash);
+    // Buscar usuario por email
+    const user = await prisma.profile.findUnique({
+      where: { email },
+    });
 
-  if (!user || !passwordCheck || !user.activo) {
-    return res.status(401).send({
-      error: "Credenciales inválidas",
+    console.log("User found:", !!user, "has password:", !!user?.password);
+
+    // Validar contraseña
+    const passwordHash = user?.password ?? DUMMY_PASSWORD_HASH;
+    const passwordCheck = await validatePasswordHash(password, passwordHash);
+
+    console.log("Password check:", passwordCheck, "active:", user?.activo);
+
+    if (!user || !passwordCheck || !user.activo) {
+      return res.status(401).send({
+        error: "Credenciales inválidas",
+      });
+    }
+
+    // Generar tokens JWT
+    console.log("Generating session ID...");
+    const sessionId = generateRandomHexToken(32);
+    console.log("Signing access token...");
+    const accessToken = signAccessToken({ sub: user.id, jti: sessionId });
+    console.log("Signing refresh token...");
+    const refreshToken = signRefreshToken(sessionId);
+
+    console.log("Sending response...");
+    return res.send({
+      access_token: accessToken,
+      refresh_token: refreshToken,
+      expires_in: ACCESS_TOKEN_EXPIRATION_IN_SECONDS,
+      user: {
+        id: user.id,
+        email: user.email,
+        nombre: user.nombre,
+        apellidos: user.apellidos,
+      },
+    });
+  } catch (error) {
+    console.error("Login error:", error);
+    return res.status(500).send({
+      error: "Error interno del servidor",
     });
   }
-
-  // Generar tokens JWT
-  const accessToken = signAccessToken({ sub: user.id });
-  const refreshToken = signRefreshToken(user.id);
-
-  return res.send({
-    access_token: accessToken,
-    refresh_token: refreshToken,
-    expires_in: ACCESS_TOKEN_EXPIRATION_IN_SECONDS,
-    user: {
-      id: user.id,
-      email: user.email,
-      nombre: user.nombre,
-      apellidos: user.apellidos,
-    },
-  });
 };
 
 export const register = async (
@@ -88,14 +109,15 @@ export const register = async (
       email,
       password: hashedPassword,
       nombre,
-      apellidos,
+      apellidos: apellidos ?? null,
       activo: true,
     },
   });
 
   // Generar tokens JWT
-  const accessToken = signAccessToken({ sub: user.id });
-  const refreshToken = signRefreshToken(user.id);
+  const sessionId = generateRandomHexToken(32);
+  const accessToken = signAccessToken({ sub: user.id, jti: sessionId });
+  const refreshToken = signRefreshToken(sessionId);
 
   return res.status(201).send({
     access_token: accessToken,

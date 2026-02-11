@@ -90,15 +90,6 @@ const routes: FastifyPluginAsync = async (fastify) => {
             skip,
             take: limit,
             orderBy: { createdAt: "desc" },
-            include: {
-              usuario: {
-                select: {
-                  id: true,
-                  nombre: true,
-                  email: true,
-                },
-              },
-            },
           }),
           prisma.incidencia.count(),
         ]);
@@ -150,15 +141,6 @@ const routes: FastifyPluginAsync = async (fastify) => {
 
         const incidencia = await prisma.incidencia.findUnique({
           where: { id },
-          include: {
-            usuario: {
-              select: {
-                id: true,
-                nombre: true,
-                email: true,
-              },
-            },
-          },
         });
 
         if (!incidencia) {
@@ -217,15 +199,6 @@ const routes: FastifyPluginAsync = async (fastify) => {
           data: {
             ...data,
             estado: data.estado || "pendiente",
-          },
-          include: {
-            usuario: {
-              select: {
-                id: true,
-                nombre: true,
-                email: true,
-              },
-            },
           },
         });
 
@@ -299,15 +272,6 @@ const routes: FastifyPluginAsync = async (fastify) => {
         const incidencia = await prisma.incidencia.update({
           where: { id },
           data,
-          include: {
-            usuario: {
-              select: {
-                id: true,
-                nombre: true,
-                email: true,
-              },
-            },
-          },
         });
 
         return reply.status(200).send(incidencia);

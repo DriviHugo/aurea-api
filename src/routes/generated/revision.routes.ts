@@ -71,11 +71,6 @@ const routes: FastifyPluginAsync = async (fastify) => {
             skip,
             take: limit,
             orderBy: { createdAt: "desc" },
-            include: {
-              expediente: { select: { numero: true, titulo: true } },
-              documento: { select: { nombre: true } },
-              usuario: { select: { nombre: true, apellido: true } },
-            },
           }),
           prisma.revision.count({ where }),
         ]);
@@ -140,17 +135,6 @@ const routes: FastifyPluginAsync = async (fastify) => {
 
         const revision = await prisma.revision.findUnique({
           where: { id },
-          include: {
-            expediente: { select: { numero: true, titulo: true } },
-            documento: { select: { nombre: true } },
-            usuario: { select: { nombre: true, apellido: true } },
-            comentarios: {
-              include: {
-                usuario: { select: { nombre: true, apellido: true } },
-              },
-              orderBy: { createdAt: "desc" },
-            },
-          },
         });
 
         if (!revision) {
