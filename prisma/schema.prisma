@@ -107,7 +107,8 @@ enum NivelRiesgo {
 
 model Profile {
   id                     String  @id @db.Uuid
-  email                  String?
+  email                  String? @unique
+  password               String?
   nombre                 String
   apellidos              String?
   unidad                 String?

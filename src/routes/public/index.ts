@@ -1,7 +1,11 @@
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { basicResponseSchema } from "../../schema/common.js";
+import authRoutes from "./auth-simple.js";
 
 export default async (fastify: FastifyInstance): Promise<void> => {
+  // Rutas de autenticación
+  await fastify.register(authRoutes, { prefix: "/auth" });
+
   fastify.route({
     method: "GET",
     url: "/example",
