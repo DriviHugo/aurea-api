@@ -64,7 +64,7 @@ export class GeminiAdapter implements AIProviderAdapter {
       };
     };
     const candidate = data.candidates[0];
-    if (!candidate || !candidate.content.parts[0]) {
+    if (!candidate?.content.parts[0]) {
       throw new Error("No candidates returned from Gemini");
     }
     const content = candidate.content.parts[0].text;

@@ -1,306 +1,335 @@
-import type { FastifyPluginAsync } from 'fastify';
-import type { PrismaClient } from '@prisma/client';
+import type { FastifyPluginAsync } from "fastify";
+import type { PrismaClient } from "@prisma/client";
 
 const routes: FastifyPluginAsync = async (fastify) => {
   const prisma: PrismaClient = fastify.prisma;
 
   // List UserRoles with pagination
-  fastify.get('/', {
-    preValidation: [fastify.authAccessToken],
-    schema: {
-      tags: ['UserRoles'],
-      description: 'Get paginated list of user roles',
-      querystring: {
-        type: 'object',
-        properties: {
-          page: { type: 'integer', minimum: 1, default: 1 },
-          limit: { type: 'integer', minimum: 1, maximum: 100, default: 10 },
-          userId: { type: 'string', format: 'uuid' },
-          role: { type: 'string' }
-        }
-      },
-      response: {
-        200: {
-          type: 'object',
+  fastify.get(
+    "/",
+    {
+      preValidation: [fastify.authAccessToken],
+      schema: {
+        tags: ["UserRoles"],
+        description: "Get paginated list of user roles",
+        querystring: {
+          type: "object",
           properties: {
-            data: {
-              type: 'array',
-              items: {
-                type: 'object',
-                properties: {
-                  id: { type: 'string', format: 'uuid' },
-                  userId: { type: 'string', format: 'uuid' },
-                  role: { type: 'string' },
-                  createdAt: { type: 'string', format: 'date-time' }
-                }
-              }
+            page: { type: "integer", minimum: 1, default: 1 },
+            limit: { type: "integer", minimum: 1, maximum: 100, default: 10 },
+            userId: { type: "string", format: "uuid" },
+            role: { type: "string" },
+          },
+        },
+        response: {
+          200: {
+            type: "object",
+            properties: {
+              data: {
+                type: "array",
+                items: {
+                  type: "object",
+                  properties: {
+                    id: { type: "string", format: "uuid" },
+                    userId: { type: "string", format: "uuid" },
+                    role: { type: "string" },
+                    createdAt: { type: "string", format: "date-time" },
+                  },
+                },
+              },
+              total: { type: "integer" },
+              page: { type: "integer" },
+              limit: { type: "integer" },
+              totalPages: { type: "integer" },
             },
-            total: { type: 'integer' },
-            page: { type: 'integer' },
-            limit: { type: 'integer' },
-            totalPages: { type: 'integer' }
-          }
-        }
+          },
+        },
+      },
+    },
+    async (request, reply) => {
+      try {
+        const { page = 1, limit = 10, userId, role } = request.query as any;
+        const skip = (page - 1) * limit;
+
+        const where: any = {};
+        if (userId) where.userId = userId;
+        if (role) where.role = role;
+
+        const [userRoles, total] = await Promise.all([
+          prisma.userRole.findMany({
+            where,
+            skip,
+            take: limit,
+            orderBy: { createdAt: "desc" },
+          }),
+          prisma.userRole.count({ where }),
+        ]);
+
+        const totalPages = Math.ceil(total / limit);
+
+        return reply.status(200).send({
+          data: userRoles,
+          total,
+          page,
+          limit,
+          totalPages,
+        });
+      } catch (error) {
+        return reply.status(500).send({ error: "Internal server error" });
       }
-    }
-  }, async (request, reply) => {
-    try {
-      const { page = 1, limit = 10, userId, role } = request.query as any;
-      const skip = (page - 1) * limit;
-
-      const where: any = {};
-      if (userId) where.userId = userId;
-      if (role) where.role = role;
-
-      const [userRoles, total] = await Promise.all([
-        prisma.userRole.findMany({
-          where,
-          skip,
-          take: limit,
-          orderBy: { createdAt: 'desc' }
-        }),
-        prisma.userRole.count({ where })
-      ]);
-
-      const totalPages = Math.ceil(total / limit);
-
-      return reply.status(200).send({
-        data: userRoles,
-        total,
-        page,
-        limit,
-        totalPages
-      });
-    } catch (error) {
-      return reply.status(500).send({ error: 'Internal server error' });
-    }
-  });
+    },
+  );
 
   // Get UserRole by ID
-  fastify.get('/:id', {
-    preValidation: [fastify.authAccessToken],
-    schema: {
-      tags: ['UserRoles'],
-      description: 'Get user role by ID',
-      params: {
-        type: 'object',
-        required: ['id'],
-        properties: {
-          id: { type: 'string', format: 'uuid' }
-        }
-      },
-      response: {
-        200: {
-          type: 'object',
+  fastify.get(
+    "/:id",
+    {
+      preValidation: [fastify.authAccessToken],
+      schema: {
+        tags: ["UserRoles"],
+        description: "Get user role by ID",
+        params: {
+          type: "object",
+          required: ["id"],
           properties: {
-            id: { type: 'string', format: 'uuid' },
-            userId: { type: 'string', format: 'uuid' },
-            role: { type: 'string' },
-            createdAt: { type: 'string', format: 'date-time' }
-          }
+            id: { type: "string", format: "uuid" },
+          },
         },
-        404: {
-          type: 'object',
-          properties: {
-            error: { type: 'string' }
-          }
+        response: {
+          200: {
+            type: "object",
+            properties: {
+              id: { type: "string", format: "uuid" },
+              userId: { type: "string", format: "uuid" },
+              role: { type: "string" },
+              createdAt: { type: "string", format: "date-time" },
+            },
+          },
+          404: {
+            type: "object",
+            properties: {
+              error: { type: "string" },
+            },
+          },
+        },
+      },
+    },
+    async (request, reply) => {
+      try {
+        const { id } = request.params as { id: string };
+
+        const userRole = await prisma.userRole.findUnique({
+          where: { id },
+        });
+
+        if (!userRole) {
+          return reply.status(404).send({ error: "User role not found" });
         }
+
+        return reply.status(200).send(userRole);
+      } catch (error) {
+        return reply.status(500).send({ error: "Internal server error" });
       }
-    }
-  }, async (request, reply) => {
-    try {
-      const { id } = request.params as { id: string };
-
-      const userRole = await prisma.userRole.findUnique({
-        where: { id }
-      });
-
-      if (!userRole) {
-        return reply.status(404).send({ error: 'User role not found' });
-      }
-
-      return reply.status(200).send(userRole);
-    } catch (error) {
-      return reply.status(500).send({ error: 'Internal server error' });
-    }
-  });
+    },
+  );
 
   // Create UserRole
-  fastify.post('/', {
-    preValidation: [fastify.authAccessToken],
-    schema: {
-      tags: ['UserRoles'],
-      description: 'Create a new user role',
-      body: {
-        type: 'object',
-        required: ['userId', 'role'],
-        properties: {
-          userId: { type: 'string', format: 'uuid' },
-          role: { type: 'string' }
-        }
-      },
-      response: {
-        201: {
-          type: 'object',
+  fastify.post(
+    "/",
+    {
+      preValidation: [fastify.authAccessToken],
+      schema: {
+        tags: ["UserRoles"],
+        description: "Create a new user role",
+        body: {
+          type: "object",
+          required: ["userId", "role"],
           properties: {
-            id: { type: 'string', format: 'uuid' },
-            userId: { type: 'string', format: 'uuid' },
-            role: { type: 'string' },
-            createdAt: { type: 'string', format: 'date-time' }
-          }
+            userId: { type: "string", format: "uuid" },
+            role: { type: "string" },
+          },
         },
-        400: {
-          type: 'object',
-          properties: {
-            error: { type: 'string' }
-          }
-        }
-      }
-    }
-  }, async (request, reply) => {
-    try {
-      const { userId, role } = request.body as { userId: string; role: string };
+        response: {
+          201: {
+            type: "object",
+            properties: {
+              id: { type: "string", format: "uuid" },
+              userId: { type: "string", format: "uuid" },
+              role: { type: "string" },
+              createdAt: { type: "string", format: "date-time" },
+            },
+          },
+          400: {
+            type: "object",
+            properties: {
+              error: { type: "string" },
+            },
+          },
+        },
+      },
+    },
+    async (request, reply) => {
+      try {
+        const { userId, role } = request.body as {
+          userId: string;
+          role: string;
+        };
 
-      const userRole = await prisma.userRole.create({
-        data: {
-          userId,
-          role: role as any
-        }
-      });
+        const userRole = await prisma.userRole.create({
+          data: {
+            userId,
+            role: role as any,
+          },
+        });
 
-      return reply.status(201).send(userRole);
-    } catch (error: any) {
-      if (error.code === 'P2002') {
-        return reply.status(400).send({ error: 'User role combination already exists' });
+        return reply.status(201).send(userRole);
+      } catch (error: any) {
+        if (error.code === "P2002") {
+          return reply
+            .status(400)
+            .send({ error: "User role combination already exists" });
+        }
+        return reply.status(500).send({ error: "Internal server error" });
       }
-      return reply.status(500).send({ error: 'Internal server error' });
-    }
-  });
+    },
+  );
 
   // Update UserRole
-  fastify.put('/:id', {
-    preValidation: [fastify.authAccessToken],
-    schema: {
-      tags: ['UserRoles'],
-      description: 'Update user role by ID',
-      params: {
-        type: 'object',
-        required: ['id'],
-        properties: {
-          id: { type: 'string', format: 'uuid' }
-        }
-      },
-      body: {
-        type: 'object',
-        properties: {
-          userId: { type: 'string', format: 'uuid' },
-          role: { type: 'string' }
-        }
-      },
-      response: {
-        200: {
-          type: 'object',
+  fastify.put(
+    "/:id",
+    {
+      preValidation: [fastify.authAccessToken],
+      schema: {
+        tags: ["UserRoles"],
+        description: "Update user role by ID",
+        params: {
+          type: "object",
+          required: ["id"],
           properties: {
-            id: { type: 'string', format: 'uuid' },
-            userId: { type: 'string', format: 'uuid' },
-            role: { type: 'string' },
-            createdAt: { type: 'string', format: 'date-time' }
-          }
+            id: { type: "string", format: "uuid" },
+          },
         },
-        404: {
-          type: 'object',
+        body: {
+          type: "object",
           properties: {
-            error: { type: 'string' }
-          }
+            userId: { type: "string", format: "uuid" },
+            role: { type: "string" },
+          },
         },
-        400: {
-          type: 'object',
-          properties: {
-            error: { type: 'string' }
-          }
+        response: {
+          200: {
+            type: "object",
+            properties: {
+              id: { type: "string", format: "uuid" },
+              userId: { type: "string", format: "uuid" },
+              role: { type: "string" },
+              createdAt: { type: "string", format: "date-time" },
+            },
+          },
+          404: {
+            type: "object",
+            properties: {
+              error: { type: "string" },
+            },
+          },
+          400: {
+            type: "object",
+            properties: {
+              error: { type: "string" },
+            },
+          },
+        },
+      },
+    },
+    async (request, reply) => {
+      try {
+        const { id } = request.params as { id: string };
+        const updateData = request.body as { userId?: string; role?: string };
+
+        const existingUserRole = await prisma.userRole.findUnique({
+          where: { id },
+        });
+
+        if (!existingUserRole) {
+          return reply.status(404).send({ error: "User role not found" });
         }
+
+        const data: any = {};
+        if (updateData.userId) data.userId = updateData.userId;
+        if (updateData.role) data.role = updateData.role;
+
+        const userRole = await prisma.userRole.update({
+          where: { id },
+          data,
+        });
+
+        return reply.status(200).send(userRole);
+      } catch (error: any) {
+        if (error.code === "P2002") {
+          return reply
+            .status(400)
+            .send({ error: "User role combination already exists" });
+        }
+        return reply.status(500).send({ error: "Internal server error" });
       }
-    }
-  }, async (request, reply) => {
-    try {
-      const { id } = request.params as { id: string };
-      const updateData = request.body as { userId?: string; role?: string };
-
-      const existingUserRole = await prisma.userRole.findUnique({
-        where: { id }
-      });
-
-      if (!existingUserRole) {
-        return reply.status(404).send({ error: 'User role not found' });
-      }
-
-      const data: any = {};
-      if (updateData.userId) data.userId = updateData.userId;
-      if (updateData.role) data.role = updateData.role;
-
-      const userRole = await prisma.userRole.update({
-        where: { id },
-        data
-      });
-
-      return reply.status(200).send(userRole);
-    } catch (error: any) {
-      if (error.code === 'P2002') {
-        return reply.status(400).send({ error: 'User role combination already exists' });
-      }
-      return reply.status(500).send({ error: 'Internal server error' });
-    }
-  });
+    },
+  );
 
   // Delete UserRole
-  fastify.delete('/:id', {
-    preValidation: [fastify.authAccessToken],
-    schema: {
-      tags: ['UserRoles'],
-      description: 'Delete user role by ID',
-      params: {
-        type: 'object',
-        required: ['id'],
-        properties: {
-          id: { type: 'string', format: 'uuid' }
-        }
-      },
-      response: {
-        200: {
-          type: 'object',
+  fastify.delete(
+    "/:id",
+    {
+      preValidation: [fastify.authAccessToken],
+      schema: {
+        tags: ["UserRoles"],
+        description: "Delete user role by ID",
+        params: {
+          type: "object",
+          required: ["id"],
           properties: {
-            message: { type: 'string' }
-          }
+            id: { type: "string", format: "uuid" },
+          },
         },
-        404: {
-          type: 'object',
-          properties: {
-            error: { type: 'string' }
-          }
+        response: {
+          200: {
+            type: "object",
+            properties: {
+              message: { type: "string" },
+            },
+          },
+          404: {
+            type: "object",
+            properties: {
+              error: { type: "string" },
+            },
+          },
+        },
+      },
+    },
+    async (request, reply) => {
+      try {
+        const { id } = request.params as { id: string };
+
+        const existingUserRole = await prisma.userRole.findUnique({
+          where: { id },
+        });
+
+        if (!existingUserRole) {
+          return reply.status(404).send({ error: "User role not found" });
         }
+
+        await prisma.userRole.delete({
+          where: { id },
+        });
+
+        return reply
+          .status(200)
+          .send({ message: "User role deleted successfully" });
+      } catch (error) {
+        return reply.status(500).send({ error: "Internal server error" });
       }
-    }
-  }, async (request, reply) => {
-    try {
-      const { id } = request.params as { id: string };
-
-      const existingUserRole = await prisma.userRole.findUnique({
-        where: { id }
-      });
-
-      if (!existingUserRole) {
-        return reply.status(404).send({ error: 'User role not found' });
-      }
-
-      await prisma.userRole.delete({
-        where: { id }
-      });
-
-      return reply.status(200).send({ message: 'User role deleted successfully' });
-    } catch (error) {
-      return reply.status(500).send({ error: 'Internal server error' });
-    }
-  });
+    },
+  );
 };
 
 export default routes;

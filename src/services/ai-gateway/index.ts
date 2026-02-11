@@ -147,7 +147,7 @@ function getDefaultModel(provider: AIProvider): string {
     [AIProvider.ANTHROPIC]: "claude-3-5-sonnet-20241022",
     [AIProvider.DEEPSEEK]: "deepseek-chat",
   };
-  return defaults[provider]!;
+  return defaults[provider];
 }
 
 // Export types and enums
