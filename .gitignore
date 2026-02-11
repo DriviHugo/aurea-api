@@ -41,3 +41,8 @@ migration/output/
 # Test coverage
 coverage/
 .nyc_output/
+
+# Test files temporales
+test-*.mjs
+create-test-user-proper.mjs
+logs.txt
