@@ -30,8 +30,29 @@ interface TestResult {
 
 // List of generated endpoints to test (update this list after migration)
 const ENDPOINTS_TO_TEST: string[] = [
-  // Add your generated endpoint names here
-  // Example: 'user', 'post', 'comment', etc.
+  "profile",
+  "user-role",
+  "expediente",
+  "alternativa-procedimiento",
+  "cpv-recomendado",
+  "cpv-codigo",
+  "evidencia",
+  "regla",
+  "documento",
+  "documento-seccion",
+  "documento-generacion",
+  "documento-version",
+  "documento-evidencia",
+  "validacion",
+  "validacion-evidencia",
+  "revision",
+  "comentario",
+  "audit-log",
+  "ai-provider",
+  "ai-function",
+  "ai-function-version",
+  "ai-function-log",
+  "incidencia",
 ];
 
 let serverProcess: ChildProcess | null = null;

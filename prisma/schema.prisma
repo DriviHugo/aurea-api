@@ -1,0 +1,569 @@
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum EstadoExpediente {
+  ingesta
+  borrador
+  alternativas
+  validado
+  aprobado
+  revision
+  incidencia
+  enRedaccion    @map("en_redaccion")
+  conObservaciones @map("con_observaciones")
+  listoValidacion  @map("listo_validacion")
+  enIntervencion   @map("en_intervencion")
+  cerrado
+}
+
+enum TipoContrato {
+  obras
+  servicios
+  suministros
+  concesionObras     @map("concesion_obras")
+  concesionServicios @map("concesion_servicios")
+  mixto
+}
+
+enum TipoProcedimiento {
+  abierto
+  abiertoSimplificado      @map("abierto_simplificado")
+  abiertoSupersimplificado @map("abierto_supersimplificado")
+  restringido
+  negociadoSinPublicidad   @map("negociado_sin_publicidad")
+  negociadoConPublicidad   @map("negociado_con_publicidad")
+  dialogoCompetitivo       @map("dialogo_competitivo")
+  asociacionInnovacion     @map("asociacion_innovacion")
+  menor
+  contratoBasado           @map("contrato_basado")
+}
+
+enum SeveridadRegla {
+  bloqueo
+  aviso
+  recomendacion
+}
+
+enum EstadoRevision {
+  pendiente
+  enRevision   @map("en_revision")
+  aprobado
+  rechazado
+  corregir
+}
+
+enum RolUsuario {
+  tramitador
+  juridico
+  interventor
+  supervisor
+  auditor
+  admin
+  auditorApp   @map("auditor_app")
+  auditorIa    @map("auditor_ia")
+}
+
+enum TipoDocumento {
+  memoria
+  ppt
+  pcap
+  anexoTecnico    @map("anexo_tecnico")
+  anexoEconomico  @map("anexo_economico")
+  informeNecesidad @map("informe_necesidad")
+  justificacionProcedimiento @map("justificacion_procedimiento")
+}
+
+enum TipoFuente {
+  boe
+  pcsp
+  doctrina
+  alfil
+  plantilla
+  tribunalCuentas @map("tribunal_cuentas")
+}
+
+enum DecisionRevision {
+  conforme
+  corregir
+  rechazar
+}
+
+enum AiProviderType {
+  lovable
+  openai
+  custom
+}
+
+enum NivelRiesgo {
+  verde
+  ambar
+  rojo
+}
+
+model Profile {
+  id                     String  @id @db.Uuid
+  email                  String?
+  nombre                 String
+  apellidos              String?
+  unidad                 String?
+  activo                 Boolean @default(true)
+  mostrarAyudaWizard     Boolean @default(true) @map("mostrar_ayuda_wizard")
+  createdAt              DateTime @default(now()) @map("created_at")
+  updatedAt              DateTime @updatedAt @map("updated_at")
+
+  expedientesCreados     Expediente[] @relation("ExpedienteCreador")
+  documentosCreados      Documento[] @relation("DocumentoCreador")
+  validaciones           Validacion[]
+  revisiones             Revision[]
+  comentarios            Comentario[]
+  auditLogs              AuditLog[]
+  reglasAprobadas        Regla[] @relation("ReglaAprobador")
+  incidenciasReportadas  Incidencia[]
+  aiVersionesCreadas     AiFunctionVersion[] @relation("AiFunctionVersionCreador")
+
+  @@map("profiles")
+}
+
+model UserRole {
+  id        String     @id @default(uuid()) @db.Uuid
+  userId    String     @map("user_id") @db.Uuid
+  role      RolUsuario
+  createdAt DateTime   @default(now()) @map("created_at")
+
+  @@unique([userId, role])
+  @@map("user_roles")
+}
+
+model Expediente {
+  id                      String           @id @default(uuid()) @db.Uuid
+  codigo                  String           @unique
+  unidad                  String
+  organo                  String
+  creadorId               String           @map("creador_id") @db.Uuid
+  estado                  EstadoExpediente @default(borrador)
+  tipoContrato            TipoContrato     @map("tipo_contrato")
+  objeto                  String
+  descripcion             String?
+  valorEstimadoContrato   Decimal?         @map("valor_estimado_contrato") @db.Decimal(15,2)
+  presupuestoBaseLicitacion Decimal?       @map("presupuesto_base_licitacion") @db.Decimal(15,2)
+  iva                     Decimal?         @db.Decimal(15,2)
+  importeProrrogas        Decimal?         @map("importe_prorrogas") @db.Decimal(15,2)
+  importeModificados      Decimal?         @map("importe_modificados") @db.Decimal(15,2)
+  procedimientoPropuesto  TipoProcedimiento? @map("procedimiento_propuesto")
+  procedimientoSeleccionado TipoProcedimiento? @map("procedimiento_seleccionado")
+  cpvElegido              String?          @map("cpv_elegido")
+  tieneLotes              Boolean          @default(false) @map("tiene_lotes")
+  justificacionLotes      String?          @map("justificacion_lotes")
+  numLotes                Int?             @map("num_lotes")
+  esUrgente               Boolean          @default(false) @map("es_urgente")
+  esEmergencia            Boolean          @default(false) @map("es_emergencia")
+  justificacionUrgencia   String?          @map("justificacion_urgencia")
+  porcentajeCompletitud   Int              @default(0) @map("porcentaje_completitud")
+  nivelRiesgo             NivelRiesgo      @default(verde) @map("nivel_riesgo")
+  ultimaAccionPendiente   String?          @map("ultima_accion_pendiente")
+  fechaVencimiento        DateTime?        @map("fecha_vencimiento")
+  metadatos               Json             @default("{}")
+  createdAt               DateTime         @default(now()) @map("created_at")
+  updatedAt               DateTime         @updatedAt @map("updated_at")
+
+  creador                 Profile          @relation("ExpedienteCreador", fields: [creadorId], references: [id])
+  alternativasProcedimiento AlternativaProcedimiento[]
+  cpvRecomendados         CpvRecomendado[]
+  documentos              Documento[]
+  validaciones            Validacion[]
+  revisiones              Revision[]
+  auditLogs               AuditLog[]
+
+  @@index([estado], name: "idx_expedientes_estado")
+  @@index([creadorId], name: "idx_expedientes_creador")
+  @@index([unidad], name: "idx_expedientes_unidad")
+  @@map("expedientes")
+}
+
+model AlternativaProcedimiento {
+  id              String            @id @default(uuid()) @db.Uuid
+  expedienteId    String            @map("expediente_id") @db.Uuid
+  procedimiento   TipoProcedimiento
+  puntuacion      Int?              @db.Integer
+  justificacion   String
+  createdAt       DateTime          @default(now()) @map("created_at")
+
+  expediente      Expediente        @relation(fields: [expedienteId], references: [id], onDelete: Cascade)
+
+  @@map("alternativas_procedimiento")
+}
+
+model CpvRecomendado {
+  id              String     @id @default(uuid()) @db.Uuid
+  expedienteId    String     @map("expediente_id") @db.Uuid
+  codigo          String
+  descripcion     String
+  puntuacion      Int?       @db.Integer
+  justificacion   String?
+  createdAt       DateTime   @default(now()) @map("created_at")
+
+  expediente      Expediente @relation(fields: [expedienteId], references: [id], onDelete: Cascade)
+
+  @@map("cpv_recomendados")
+}
+
+model CpvCodigo {
+  id              String    @id @default(uuid()) @db.Uuid
+  codigo          String    @unique
+  descripcion     String
+  descripcionEn   String?   @map("descripcion_en")
+  nivel           Int       @db.Integer
+  codigoPadre     String?   @map("codigo_padre")
+  activo          Boolean   @default(true)
+  createdAt       DateTime  @default(now()) @map("created_at")
+
+  @@index([codigo], name: "idx_cpv_codigo")
+  @@index([codigo], name: "idx_cpv_codigo_prefix")
+  @@index([nivel], name: "idx_cpv_nivel")
+  @@index([activo], name: "idx_cpv_activo")
+  @@map("cpv_codigos")
+}
+
+model Evidencia {
+  id                    String    @id @default(uuid()) @db.Uuid
+  tipoFuente            TipoFuente @map("tipo_fuente")
+  fuenteId              String    @map("fuente_id")
+  fuenteNombre          String    @map("fuente_nombre")
+  seccion               String?
+  rango                 String?
+  version               String
+  fechaVigenciaInicio   DateTime  @map("fecha_vigencia_inicio") @db.Date
+  fechaVigenciaFin      DateTime? @map("fecha_vigencia_fin") @db.Date
+  textoFragmento        String    @map("texto_fragmento")
+  metadatos             Json      @default("{}")
+  createdAt             DateTime  @default(now()) @map("created_at")
+
+  reglas                Regla[]
+  documentosEvidencias  DocumentoEvidencia[]
+  validacionesEvidencias ValidacionEvidencia[]
+
+  @@map("evidencias")
+}
+
+model Regla {
+  id                String         @id @default(uuid()) @db.Uuid
+  codigo            String         @unique
+  nombre            String
+  descripcion       String
+  severidad         SeveridadRegla
+  evidenciaId       String?        @map("evidencia_id") @db.Uuid
+  condicion         String
+  mensaje           String
+  version           Int            @default(1)
+  estado            String         @default("borrador")
+  aprobadorId       String?        @map("aprobador_id") @db.Uuid
+  aprobadorRol      RolUsuario?    @map("aprobador_rol")
+  fechaAprobacion   DateTime?      @map("fecha_aprobacion")
+  createdAt         DateTime       @default(now()) @map("created_at")
+  updatedAt         DateTime       @updatedAt @map("updated_at")
+
+  evidencia         Evidencia?     @relation(fields: [evidenciaId], references: [id])
+  aprobador         Profile?       @relation("ReglaAprobador", fields: [aprobadorId], references: [id])
+  validaciones      Validacion[]
+
+  @@map("reglas")
+}
+
+model Documento {
+  id              String         @id @default(uuid()) @db.Uuid
+  expedienteId    String         @map("expediente_id") @db.Uuid
+  tipo            TipoDocumento
+  nombre          String
+  version         Int            @default(1)
+  hash            String?
+  estado          EstadoRevision @default(pendiente)
+  contenido       Json?
+  urlDocx         String?        @map("url_docx")
+  urlPdf          String?        @map("url_pdf")
+  creadorId       String         @map("creador_id") @db.Uuid
+  createdAt       DateTime       @default(now()) @map("created_at")
+  updatedAt       DateTime       @updatedAt @map("updated_at")
+
+  expediente      Expediente     @relation(fields: [expedienteId], references: [id], onDelete: Cascade)
+  creador         Profile        @relation("DocumentoCreador", fields: [creadorId], references: [id])
+  documentosEvidencias DocumentoEvidencia[]
+  validaciones    Validacion[]
+  revisiones      Revision[]
+  secciones       DocumentoSeccion[]
+  generaciones    DocumentoGeneracion[]
+  versiones       DocumentoVersion[]
+
+  @@index([expedienteId], name: "idx_documentos_expediente")
+  @@map("documentos")
+}
+
+model DocumentoSeccion {
+  id                    String   @id @default(uuid()) @db.Uuid
+  documentoId           String   @map("documento_id") @db.Uuid
+  orden                 Int
+  titulo                String
+  descripcion           String?
+  contenido             String?
+  estado                String   @default("pendiente")
+  tokensUsados          Int?     @map("tokens_usados")
+  tiempoGeneracionMs    Int?     @map("tiempo_generacion_ms")
+  articulosLcsp         String[] @map("articulos_lcsp")
+  createdAt             DateTime @default(now()) @map("created_at")
+  updatedAt             DateTime @updatedAt @map("updated_at")
+
+  documento             Documento @relation(fields: [documentoId], references: [id], onDelete: Cascade)
+
+  @@unique([documentoId, orden])
+  @@index([documentoId], name: "idx_documento_secciones_documento")
+  @@index([estado], name: "idx_documento_secciones_estado")
+  @@map("documento_secciones")
+}
+
+model DocumentoGeneracion {
+  id                  String    @id @default(uuid()) @db.Uuid
+  documentoId         String    @map("documento_id") @db.Uuid
+  version             Int       @default(1)
+  plan                Json      @default("{}")
+  estado              String    @default("planificando")
+  seccionActual       Int       @default(0) @map("seccion_actual")
+  totalSecciones      Int?      @map("total_secciones")
+  revisionGlobal      Json?     @map("revision_global")
+  errores             Json?
+  usuarioId           String    @map("usuario_id") @db.Uuid
+  createdAt           DateTime  @default(now()) @map("created_at")
+  completedAt         DateTime? @map("completed_at")
+
+  documento           Documento @relation(fields: [documentoId], references: [id], onDelete: Cascade)
+
+  @@index([documentoId], name: "idx_documento_generaciones_documento")
+  @@index([estado], name: "idx_documento_generaciones_estado")
+  @@map("documento_generaciones")
+}
+
+model DocumentoVersion {
+  id                    String   @id @default(uuid()) @db.Uuid
+  documentoId           String   @map("documento_id") @db.Uuid
+  version               Int
+  contenidoSnapshot     Json     @map("contenido_snapshot")
+  seccionesSnapshot     Json?    @map("secciones_snapshot")
+  descripcionCambio     String?  @map("descripcion_cambio")
+  usuarioId             String   @map("usuario_id") @db.Uuid
+  createdAt             DateTime @default(now()) @map("created_at")
+
+  documento             Documento @relation(fields: [documentoId], references: [id], onDelete: Cascade)
+
+  @@unique([documentoId, version])
+  @@index([documentoId], name: "idx_documento_versiones_documento")
+  @@map("documento_versiones")
+}
+
+model DocumentoEvidencia {
+  id           String    @id @default(uuid()) @db.Uuid
+  documentoId  String    @map("documento_id") @db.Uuid
+  evidenciaId  String    @map("evidencia_id") @db.Uuid
+  createdAt    DateTime  @default(now()) @map("created_at")
+
+  documento    Documento @relation(fields: [documentoId], references: [id], onDelete: Cascade)
+  evidencia    Evidencia @relation(fields: [evidenciaId], references: [id], onDelete: Cascade)
+
+  @@unique([documentoId, evidenciaId])
+  @@map("documentos_evidencias")
+}
+
+model Validacion {
+  id                     String    @id @default(uuid()) @db.Uuid
+  expedienteId           String    @map("expediente_id") @db.Uuid
+  documentoId            String?   @map("documento_id") @db.Uuid
+  reglaId                String    @map("regla_id") @db.Uuid
+  passed                 Boolean
+  valorEncontrado        String?   @map("valor_encontrado")
+  explicacion            String
+  puntuacionEstructura   Int?      @map("puntuacion_estructura")
+  puntuacionContenido    Int?      @map("puntuacion_contenido")
+  usuarioId              String    @map("usuario_id") @db.Uuid
+  createdAt              DateTime  @default(now()) @map("created_at")
+
+  expediente             Expediente @relation(fields: [expedienteId], references: [id], onDelete: Cascade)
+  documento              Documento? @relation(fields: [documentoId], references: [id], onDelete: Cascade)
+  regla                  Regla      @relation(fields: [reglaId], references: [id])
+  usuario                Profile    @relation(fields: [usuarioId], references: [id])
+  validacionesEvidencias ValidacionEvidencia[]
+
+  @@index([expedienteId], name: "idx_validaciones_expediente")
+  @@map("validaciones")
+}
+
+model ValidacionEvidencia {
+  id            String     @id @default(uuid()) @db.Uuid
+  validacionId  String     @map("validacion_id") @db.Uuid
+  evidenciaId   String     @map("evidencia_id") @db.Uuid
+  createdAt     DateTime   @default(now()) @map("created_at")
+
+  validacion    Validacion @relation(fields: [validacionId], references: [id], onDelete: Cascade)
+  evidencia     Evidencia  @relation(fields: [evidenciaId], references: [id], onDelete: Cascade)
+
+  @@unique([validacionId, evidenciaId])
+  @@map("validaciones_evidencias")
+}
+
+model Revision {
+  id                  String          @id @default(uuid()) @db.Uuid
+  expedienteId        String          @map("expediente_id") @db.Uuid
+  documentoId         String?         @map("documento_id") @db.Uuid
+  usuarioId           String          @map("usuario_id") @db.Uuid
+  rol                 RolUsuario
+  cambioDescripcion   String          @map("cambio_descripcion")
+  decision            DecisionRevision
+  motivo              String?
+  createdAt           DateTime        @default(now()) @map("created_at")
+
+  expediente          Expediente      @relation(fields: [expedienteId], references: [id], onDelete: Cascade)
+  documento           Documento?      @relation(fields: [documentoId], references: [id], onDelete: Cascade)
+  usuario             Profile         @relation(fields: [usuarioId], references: [id])
+  comentarios         Comentario[]
+
+  @@index([expedienteId], name: "idx_revisiones_expediente")
+  @@map("revisiones")
+}
+
+model Comentario {
+  id          String     @id @default(uuid()) @db.Uuid
+  revisionId  String     @map("revision_id") @db.Uuid
+  usuarioId   String     @map("usuario_id") @db.Uuid
+  rol         RolUsuario
+  texto       String
+  createdAt   DateTime   @default(now()) @map("created_at")
+
+  revision    Revision   @relation(fields: [revisionId], references: [id], onDelete: Cascade)
+  usuario     Profile    @relation(fields: [usuarioId], references: [id])
+
+  @@map("comentarios")
+}
+
+model AuditLog {
+  id                String      @id @default(uuid()) @db.Uuid
+  expedienteId      String?     @map("expediente_id") @db.Uuid
+  usuarioId         String?     @map("usuario_id") @db.Uuid
+  accion            String
+  entidad           String
+  entidadId         String?     @map("entidad_id") @db.Uuid
+  datosAnteriores   Json?       @map("datos_anteriores")
+  datosNuevos       Json?       @map("datos_nuevos")
+  ipAddress         String?     @map("ip_address")
+  createdAt         DateTime    @default(now()) @map("created_at")
+
+  expediente        Expediente? @relation(fields: [expedienteId], references: [id], onDelete: SetNull)
+  usuario           Profile?    @relation(fields: [usuarioId], references: [id])
+
+  @@index([expedienteId], name: "idx_audit_log_expediente")
+  @@index([createdAt(sort: Desc)], name: "idx_audit_log_created")
+  @@map("audit_log")
+}
+
+model AiProvider {
+  id                     String          @id @default(uuid()) @db.Uuid
+  nombre                 String          @unique
+  tipo                   AiProviderType  @default(custom)
+  baseUrl                String          @map("base_url")
+  apiKeySecretName       String?         @map("api_key_secret_name")
+  modelosDisponibles     String[]        @map("modelos_disponibles")
+  parametrosDefecto      Json            @default("{\"temperature\": 0.3}") @map("parametros_defecto")
+  activo                 Boolean         @default(true)
+  createdAt              DateTime        @default(now()) @map("created_at")
+  updatedAt              DateTime        @updatedAt @map("updated_at")
+
+  aiFunctions            AiFunction[]
+  aiFunctionVersions     AiFunctionVersion[]
+
+  @@map("ai_providers")
+}
+
+model AiFunction {
+  id                     String    @id @default(uuid()) @db.Uuid
+  codigo                 String    @unique
+  nombre                 String
+  descripcion            String?
+  categoria              String
+  providerId             String?   @map("provider_id") @db.Uuid
+  modelo                 String
+  systemPrompt           String    @map("system_prompt")
+  userPromptTemplate     String?   @map("user_prompt_template")
+  toolSchema             Json?     @map("tool_schema")
+  parametros             Json      @default("{\"temperature\": 0.3}")
+  activo                 Boolean   @default(true)
+  versionActual          Int       @default(1) @map("version_actual")
+  createdAt              DateTime  @default(now()) @map("created_at")
+  updatedAt              DateTime  @updatedAt @map("updated_at")
+
+  provider               AiProvider? @relation(fields: [providerId], references: [id])
+  versions               AiFunctionVersion[]
+
+  @@map("ai_functions")
+}
+
+model AiFunctionVersion {
+  id                     String     @id @default(uuid()) @db.Uuid
+  functionId             String     @map("function_id") @db.Uuid
+  version                Int
+  systemPrompt           String     @map("system_prompt")
+  userPromptTemplate     String?    @map("user_prompt_template")
+  toolSchema             Json?      @map("tool_schema")
+  parametros             Json?
+  modelo                 String
+  providerId             String?    @map("provider_id") @db.Uuid
+  motivoCambio           String?    @map("motivo_cambio")
+  creadoPor              String?    @map("creado_por") @db.Uuid
+  createdAt              DateTime   @default(now()) @map("created_at")
+
+  function               AiFunction @relation(fields: [functionId], references: [id], onDelete: Cascade)
+  provider               AiProvider? @relation(fields: [providerId], references: [id])
+  creador                Profile?   @relation("AiFunctionVersionCreador", fields: [creadoPor], references: [id])
+
+  @@unique([functionId, version])
+  @@map("ai_function_versions")
+}
+
+model AiFunctionLog {
+  id               String   @id @default(uuid()) @db.Uuid
+  functionCode     String   @map("function_code")
+  functionName     String?  @map("function_name")
+  providerName     String?  @map("provider_name")
+  modelo           String
+  inputVariables   Json     @default("{}") @map("input_variables")
+  systemPrompt     String?  @map("system_prompt")
+  userPrompt       String?  @map("user_prompt")
+  response         Json?
+  tokensInput      Int?     @map("tokens_input")
+  tokensOutput     Int?     @map("tokens_output")
+  durationMs       Int?     @map("duration_ms")
+  status           String   @default("success")
+  errorMessage     String?  @map("error_message")
+  usuarioId        String?  @map("usuario_id") @db.Uuid
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  @@index([createdAt(sort: Desc)], name: "idx_ai_function_logs_created_at")
+  @@index([functionCode], name: "idx_ai_function_logs_function_code")
+  @@map("ai_function_logs")
+}
+
+model Incidencia {
+  id                      String   @id @default(uuid()) @db.Uuid
+  usuarioId               String   @map("usuario_id") @db.Uuid
+  ubicacion               String
+  funcionalidad           String
+  descripcion             String
+  comportamientoEsperado  String   @map("comportamiento_esperado")
+  screenshotUrl           String?  @map("screenshot_url")
+  estado                  String   @default("pendiente")
+  createdAt               DateTime @default(now()) @map("created_at")
+  updatedAt               DateTime @updatedAt @map("updated_at")
+
+  usuario                 Profile  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@map("incidencias")
+}
