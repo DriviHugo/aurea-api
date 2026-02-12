@@ -13,6 +13,7 @@ import { swaggerConfig, swaggerUiConfig } from "./config/swagger.js";
 import swaggerSchemas from "./schema/swagger.js";
 import privateRoutes from "./routes/private/index.js";
 import publicRoutes from "./routes/public/index.js";
+import functionsRoutes from "./routes/functions/index.js";
 import authAccessToken from "./plugins/authAccessToken.js";
 import authRefreshToken from "./plugins/authRefreshToken.js";
 // OLD BOILERPLATE PLUGINS (DISABLED)
@@ -74,6 +75,7 @@ fastify.register(authRefreshToken);
 // Routes
 fastify.register(privateRoutes, { prefix: `${regularRoutePath}/private` });
 fastify.register(publicRoutes, { prefix: `${regularRoutePath}/public` });
+fastify.register(functionsRoutes, { prefix: `${regularRoutePath}/functions` });
 
 // Health check endpoint (no prefix, available at /health)
 fastify.get("/health", async () => {

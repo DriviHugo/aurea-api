@@ -1,6 +1,67 @@
 import type { FastifyPluginAsync } from "fastify";
 import type { PrismaClient } from "@prisma/client";
 
+/**
+ * Convert snake_case enum value to camelCase for Prisma
+ */
+function snakeToCamelValue(value: string | null | undefined): string | null {
+  if (!value) return null;
+  return value.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
+}
+
+/**
+ * Map of valid enum values (both snake_case and camelCase accepted)
+ */
+const PROCEDIMIENTO_VALUES = [
+  "abierto",
+  "abierto_simplificado",
+  "abiertoSimplificado",
+  "abierto_supersimplificado",
+  "abiertoSupersimplificado",
+  "restringido",
+  "negociado_sin_publicidad",
+  "negociadoSinPublicidad",
+  "negociado_con_publicidad",
+  "negociadoConPublicidad",
+  "dialogo_competitivo",
+  "dialogoCompetitivo",
+  "asociacion_innovacion",
+  "asociacionInnovacion",
+  "menor",
+  "contrato_basado",
+  "contratoBasado",
+];
+
+const TIPO_CONTRATO_VALUES = [
+  "obras",
+  "servicios",
+  "suministros",
+  "concesion_obras",
+  "concesionObras",
+  "concesion_servicios",
+  "concesionServicios",
+  "mixto",
+];
+
+const ESTADO_VALUES = [
+  "ingesta",
+  "borrador",
+  "alternativas",
+  "validado",
+  "aprobado",
+  "revision",
+  "incidencia",
+  "en_redaccion",
+  "enRedaccion",
+  "con_observaciones",
+  "conObservaciones",
+  "listo_validacion",
+  "listoValidacion",
+  "en_intervencion",
+  "enIntervencion",
+  "cerrado",
+];
+
 const expedienteSchema = {
   type: "object",
   properties: {
@@ -10,17 +71,11 @@ const expedienteSchema = {
     creadorId: { type: "string", format: "uuid" },
     estado: {
       type: "string",
-      enum: ["borrador", "en_tramite", "aprobado", "rechazado", "finalizado"],
+      enum: ESTADO_VALUES,
     },
     tipoContrato: {
       type: "string",
-      enum: [
-        "suministros",
-        "servicios",
-        "obras",
-        "concesion_obras",
-        "concesion_servicios",
-      ],
+      enum: TIPO_CONTRATO_VALUES,
     },
     objeto: { type: "string" },
     descripcion: { type: "string" },
@@ -31,23 +86,11 @@ const expedienteSchema = {
     importeModificados: { type: "number" },
     procedimientoPropuesto: {
       type: "string",
-      enum: [
-        "abierto",
-        "restringido",
-        "negociado",
-        "dialogo_competitivo",
-        "asociacion_innovacion",
-      ],
+      enum: PROCEDIMIENTO_VALUES,
     },
     procedimientoSeleccionado: {
       type: "string",
-      enum: [
-        "abierto",
-        "restringido",
-        "negociado",
-        "dialogo_competitivo",
-        "asociacion_innovacion",
-      ],
+      enum: PROCEDIMIENTO_VALUES,
     },
     cpvElegido: { type: "string" },
     tieneLotes: { type: "boolean" },
@@ -208,6 +251,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
             type: "object",
             properties: {
               error: { type: "string" },
+              message: { type: "string" },
             },
           },
         },
@@ -215,11 +259,21 @@ const routes: FastifyPluginAsync = async (fastify) => {
     },
     async (request, reply) => {
       try {
+        fastify.log.info({ body: request.body }, "Creating expediente");
         const data = request.body as any;
 
+        // Convert snake_case enum values to camelCase for Prisma
         const expediente = await prisma.expediente.create({
           data: {
             ...data,
+            estado: snakeToCamelValue(data.estado) || "borrador",
+            tipoContrato: snakeToCamelValue(data.tipoContrato),
+            procedimientoPropuesto: snakeToCamelValue(
+              data.procedimientoPropuesto,
+            ),
+            procedimientoSeleccionado: snakeToCamelValue(
+              data.procedimientoSeleccionado,
+            ),
             valorEstimadoContrato: data.valorEstimadoContrato
               ? parseFloat(data.valorEstimadoContrato)
               : null,
