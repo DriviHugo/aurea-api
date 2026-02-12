@@ -24,8 +24,10 @@ const authAccessTokenPlugin = fp(async (fastify: FastifyInstance) => {
 
       // Try to get token from Authorization header (Bearer token)
       const authHeader = request.headers.authorization;
+      console.log("[authAccessToken] Authorization header:", authHeader);
       if (authHeader?.startsWith("Bearer ")) {
         accessToken = authHeader.substring(7);
+        console.log("[authAccessToken] Token from header:", accessToken.substring(0, 20) + "...");
       }
 
       // Fallback: try to get token from cookies (legacy)
@@ -47,14 +49,18 @@ const authAccessTokenPlugin = fp(async (fastify: FastifyInstance) => {
 
       // No token found in either header or cookie
       if (!accessToken) {
+        console.log("[authAccessToken] No token found");
         throw new Errors.unauthorizedToken();
       }
 
       try {
+        console.log("[authAccessToken] Verifying token...");
         const { sub, jti } = verifyAccessToken(accessToken);
+        console.log("[authAccessToken] Token verified successfully, userId:", sub);
         request.userId = sub;
         request.sessionId = jti;
-      } catch {
+      } catch (error) {
+        console.log("[authAccessToken] Token verification failed:", error);
         throw new Errors.unauthorizedToken();
       }
     },

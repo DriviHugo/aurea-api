@@ -2,8 +2,8 @@ import jwt from "jsonwebtoken";
 import { Errors } from "../errors/appErrorFactory.js";
 
 const ACCESS_TOKEN_SECRET = process.env["ACCESS_TOKEN_SECRET"]!;
-const ACCESS_TOKEN_EXPIRATION = "15m";
-export const ACCESS_TOKEN_EXPIRATION_IN_SECONDS = 60 * 15; // 15 minutes
+const ACCESS_TOKEN_EXPIRATION = "8h"; // 8 hours for development
+export const ACCESS_TOKEN_EXPIRATION_IN_SECONDS = 60 * 60 * 8; // 8 hours
 
 const REFRESH_TOKEN_SECRET = process.env["REFRESH_TOKEN_SECRET"]!;
 const REFRESH_TOKEN_EXPIRATION = "30d"; // 30 days

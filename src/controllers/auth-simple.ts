@@ -136,8 +136,8 @@ export const me = async (
   req: FastifyRequest,
   res: FastifyReply,
 ): Promise<void> => {
-  // @ts-ignore - userId viene del middleware de autenticación
-  const userId = req.user?.sub;
+  // userId viene del middleware authAccessToken
+  const userId = req.userId;
 
   if (!userId) {
     return res.status(401).send({ error: "No autenticado" });
