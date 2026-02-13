@@ -16,16 +16,13 @@
 import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
 import {
   createAIGateway,
-  AIGatewayService,
+  type AIGatewayService,
 } from "../../services/ai-gateway/index.js";
 
-// Lazy initialization of AI Gateway
 let aiGateway: AIGatewayService | null = null;
 
 function getAIGateway(): AIGatewayService {
-  if (!aiGateway) {
-    aiGateway = createAIGateway();
-  }
+  aiGateway ??= createAIGateway();
   return aiGateway;
 }
 
@@ -199,21 +196,16 @@ async function handleAnalysis(
   systemPrompt: string,
   userPrompt: string,
   analysisName: string,
-): Promise<any> {
-  console.log(`[AI-Analysis] Processing ${analysisName} request`);
-
+): Promise<unknown> {
   const response = await gateway.completeSimple(systemPrompt, userPrompt);
 
-  // Parse the JSON response
   try {
     const cleanResponse = response
       .replace(/```json\n?/g, "")
       .replace(/```\n?/g, "")
       .trim();
-    const result = JSON.parse(cleanResponse);
-    console.log(`[AI-Analysis] Successfully processed ${analysisName}`);
-    return result;
-  } catch (parseError) {
+    return JSON.parse(cleanResponse);
+  } catch {
     console.error(
       `[AI-Analysis] Failed to parse ${analysisName} response:`,
       response,
@@ -222,6 +214,10 @@ async function handleAnalysis(
       `Error al procesar la respuesta de IA para ${analysisName}`,
     );
   }
+}
+
+function optionalField(value: string | undefined, label: string): string {
+  return value !== undefined && value !== "" ? `${label}: ${value}` : "";
 }
 
 // Base interface for analysis requests
@@ -240,12 +236,20 @@ interface BudgetAnalysisBody extends BaseAnalysisBody {
   tipoContrato?: string;
 }
 
-interface PartidasBody extends BudgetAnalysisBody {
-  numLotes?: number;
-  lotes?: any[];
+interface LoteInfo {
+  numero: number;
+  nombre: string;
+  porcentaje: number;
 }
 
-export default async function aiAnalysisRoutes(app: FastifyInstance) {
+interface PartidasBody extends BudgetAnalysisBody {
+  numLotes?: number;
+  lotes?: LoteInfo[];
+}
+
+export default async function aiAnalysisRoutes(
+  app: FastifyInstance,
+): Promise<void> {
   // CPV Analysis
   app.post("/ai-analizar-cpv", {
     preValidation: [app.authAccessToken],
@@ -257,8 +261,8 @@ export default async function aiAnalysisRoutes(app: FastifyInstance) {
       const userPrompt = `Analiza el siguiente objeto de contrato y sugiere códigos CPV:
 
 OBJETO: ${objeto}
-${unidad ? `UNIDAD: ${unidad}` : ""}
-${organo ? `ÓRGANO: ${organo}` : ""}`;
+${optionalField(unidad, "UNIDAD")}
+${optionalField(organo, "ÓRGANO")}`;
 
       try {
         const result = await handleAnalysis(
@@ -285,9 +289,9 @@ ${organo ? `ÓRGANO: ${organo}` : ""}`;
       const userPrompt = `Determina el tipo de contrato para:
 
 OBJETO: ${objeto}
-${cpvPrincipal ? `CPV PRINCIPAL: ${cpvPrincipal}` : ""}
-${unidad ? `UNIDAD: ${unidad}` : ""}
-${organo ? `ÓRGANO: ${organo}` : ""}`;
+${optionalField(cpvPrincipal, "CPV PRINCIPAL")}
+${optionalField(unidad, "UNIDAD")}
+${optionalField(organo, "ÓRGANO")}`;
 
       try {
         const result = await handleAnalysis(
@@ -314,8 +318,8 @@ ${organo ? `ÓRGANO: ${organo}` : ""}`;
       const userPrompt = `Analiza si el siguiente objeto de contrato podría justificar tramitación de emergencia (Art. 120 LCSP):
 
 OBJETO: ${objeto}
-${unidad ? `UNIDAD: ${unidad}` : ""}
-${organo ? `ÓRGANO: ${organo}` : ""}`;
+${optionalField(unidad, "UNIDAD")}
+${optionalField(organo, "ÓRGANO")}`;
 
       try {
         const result = await handleAnalysis(
@@ -342,8 +346,8 @@ ${organo ? `ÓRGANO: ${organo}` : ""}`;
       const userPrompt = `Analiza si el siguiente objeto de contrato podría estar cubierto por contratación centralizada (DGRCC):
 
 OBJETO: ${objeto}
-${unidad ? `UNIDAD: ${unidad}` : ""}
-${organo ? `ÓRGANO: ${organo}` : ""}`;
+${optionalField(unidad, "UNIDAD")}
+${optionalField(organo, "ÓRGANO")}`;
 
       try {
         const result = await handleAnalysis(
@@ -370,8 +374,8 @@ ${organo ? `ÓRGANO: ${organo}` : ""}`;
       const userPrompt = `Analiza si el siguiente objeto de contrato podría ser prestado por un medio propio (Arts. 32-33 LCSP):
 
 OBJETO: ${objeto}
-${unidad ? `UNIDAD: ${unidad}` : ""}
-${organo ? `ÓRGANO: ${organo}` : ""}`;
+${optionalField(unidad, "UNIDAD")}
+${optionalField(organo, "ÓRGANO")}`;
 
       try {
         const result = await handleAnalysis(
@@ -398,9 +402,9 @@ ${organo ? `ÓRGANO: ${organo}` : ""}`;
       const userPrompt = `Analiza si el siguiente objeto de contrato tiene características de suscripción:
 
 OBJETO: ${objeto}
-${cpvPrincipal ? `CPV PRINCIPAL: ${cpvPrincipal}` : ""}
-${unidad ? `UNIDAD: ${unidad}` : ""}
-${organo ? `ÓRGANO: ${organo}` : ""}`;
+${optionalField(cpvPrincipal, "CPV PRINCIPAL")}
+${optionalField(unidad, "UNIDAD")}
+${optionalField(organo, "ÓRGANO")}`;
 
       try {
         const result = await handleAnalysis(
@@ -427,9 +431,9 @@ ${organo ? `ÓRGANO: ${organo}` : ""}`;
       const userPrompt = `Analiza el nivel de innovación requerido para:
 
 OBJETO: ${objeto}
-${cpvPrincipal ? `CPV PRINCIPAL: ${cpvPrincipal}` : ""}
-${unidad ? `UNIDAD: ${unidad}` : ""}
-${organo ? `ÓRGANO: ${organo}` : ""}`;
+${optionalField(cpvPrincipal, "CPV PRINCIPAL")}
+${optionalField(unidad, "UNIDAD")}
+${optionalField(organo, "ÓRGANO")}`;
 
       try {
         const result = await handleAnalysis(
@@ -456,8 +460,8 @@ ${organo ? `ÓRGANO: ${organo}` : ""}`;
       const userPrompt = `Estima la duración recomendada para el contrato:
 
 OBJETO: ${objeto}
-${tipoContrato ? `TIPO: ${tipoContrato}` : ""}
-${cpvPrincipal ? `CPV PRINCIPAL: ${cpvPrincipal}` : ""}`;
+${optionalField(tipoContrato, "TIPO")}
+${optionalField(cpvPrincipal, "CPV PRINCIPAL")}`;
 
       try {
         const result = await handleAnalysis(
@@ -484,8 +488,8 @@ ${cpvPrincipal ? `CPV PRINCIPAL: ${cpvPrincipal}` : ""}`;
       const userPrompt = `Analiza si el contrato debería dividirse en lotes (Art. 99.3 LCSP):
 
 OBJETO: ${objeto}
-${tipoContrato ? `TIPO: ${tipoContrato}` : ""}
-${cpvPrincipal ? `CPV PRINCIPAL: ${cpvPrincipal}` : ""}`;
+${optionalField(tipoContrato, "TIPO")}
+${optionalField(cpvPrincipal, "CPV PRINCIPAL")}`;
 
       try {
         const result = await handleAnalysis(
@@ -512,12 +516,12 @@ ${cpvPrincipal ? `CPV PRINCIPAL: ${cpvPrincipal}` : ""}`;
       let userPrompt = `Propón las partidas presupuestarias para:
 
 OBJETO: ${objeto}
-${tipoContrato ? `TIPO: ${tipoContrato}` : ""}
-${cpvPrincipal ? `CPV PRINCIPAL: ${cpvPrincipal}` : ""}`;
+${optionalField(tipoContrato, "TIPO")}
+${optionalField(cpvPrincipal, "CPV PRINCIPAL")}`;
 
-      if (numLotes && numLotes > 1 && lotes) {
+      if (numLotes !== undefined && numLotes > 1 && lotes !== undefined) {
         userPrompt += `\n\nDIVISIÓN EN ${numLotes} LOTES:
-${lotes.map((l: any) => `- Lote ${l.numero}: ${l.nombre} (${l.porcentaje}%)`).join("\n")}
+${lotes.map((l) => `- Lote ${l.numero}: ${l.nombre} (${l.porcentaje}%)`).join("\n")}
 
 Asigna las partidas al lote correspondiente usando el campo loteNumero.`;
       }

@@ -7,8 +7,17 @@ interface ErrorFactoryOptions {
   details?: AppErrorDetails;
 }
 
+interface ErrorDefaults {
+  statusCode: number;
+  message: string;
+  code: string;
+}
+
 // Helper to merge options with defaults
-function mergeOptions(defaults: any, options: ErrorFactoryOptions = {}) {
+function mergeOptions(
+  defaults: ErrorDefaults,
+  options: ErrorFactoryOptions = {},
+): ErrorDefaults & ErrorFactoryOptions {
   return {
     ...defaults,
     ...(options.message !== undefined ? { message: options.message } : {}),

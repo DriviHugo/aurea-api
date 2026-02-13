@@ -48,7 +48,7 @@ export class GeminiAdapter implements AIProviderAdapter {
     if (!response.ok) {
       const error = (await response.json()) as { error?: { message?: string } };
       throw new Error(
-        `Gemini API error: ${response.status} - ${error.error?.message || "Unknown error"}`,
+        `Gemini API error: ${response.status} - ${error.error?.message ?? "Unknown error"}`,
       );
     }
 
@@ -73,15 +73,16 @@ export class GeminiAdapter implements AIProviderAdapter {
       content,
       model: this.config.model,
       usage: {
-        promptTokens: data.usageMetadata?.promptTokenCount || 0,
-        completionTokens: data.usageMetadata?.candidatesTokenCount || 0,
-        totalTokens: data.usageMetadata?.totalTokenCount || 0,
+        promptTokens: data.usageMetadata?.promptTokenCount ?? 0,
+        completionTokens: data.usageMetadata?.candidatesTokenCount ?? 0,
+        totalTokens: data.usageMetadata?.totalTokenCount ?? 0,
       },
       finishReason: candidate.finishReason === "STOP" ? "stop" : "error",
     };
   }
 
   validateConfig(): boolean {
-    return !!this.config.apiKey && !!this.config.model;
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    return this.config.apiKey !== undefined && this.config.model !== undefined;
   }
 }

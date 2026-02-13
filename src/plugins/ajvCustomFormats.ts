@@ -3,7 +3,9 @@ import type { FastifyPluginAsync } from "fastify";
 import fp from "fastify-plugin";
 import AjvImport from "ajv";
 import addFormatsImport from "ajv-formats";
+// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 const Ajv = AjvImport.default ?? AjvImport;
+// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 const addFormats = addFormatsImport.default ?? addFormatsImport;
 
 // Custom format to validate IP addresses (v4 or v6) or CIDR notation

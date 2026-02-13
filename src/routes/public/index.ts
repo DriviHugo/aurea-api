@@ -1,5 +1,4 @@
-import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
-import { basicResponseSchema } from "../../schema/common.js";
+import type { FastifyInstance } from "fastify";
 import authRoutes from "./auth-simple.js";
 
 export default async (fastify: FastifyInstance): Promise<void> => {

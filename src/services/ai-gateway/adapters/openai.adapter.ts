@@ -31,7 +31,7 @@ export class OpenAIAdapter implements AIProviderAdapter {
     if (!response.ok) {
       const error = (await response.json()) as { error?: { message?: string } };
       throw new Error(
-        `OpenAI API error: ${response.status} - ${error.error?.message || "Unknown error"}`,
+        `OpenAI API error: ${response.status} - ${error.error?.message ?? "Unknown error"}`,
       );
     }
 
@@ -62,6 +62,7 @@ export class OpenAIAdapter implements AIProviderAdapter {
   }
 
   validateConfig(): boolean {
-    return !!this.config.apiKey && !!this.config.model;
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    return this.config.apiKey !== undefined && this.config.model !== undefined;
   }
 }

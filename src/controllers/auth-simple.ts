@@ -33,36 +33,23 @@ export const login = async (
   try {
     const { email, password } = req.body;
 
-    console.log("Login attempt:", email);
-
-    // Buscar usuario por email
     const user = await prisma.profile.findUnique({
       where: { email },
     });
 
-    console.log("User found:", !!user, "has password:", !!user?.password);
-
-    // Validar contraseña
     const passwordHash = user?.password ?? DUMMY_PASSWORD_HASH;
     const passwordCheck = await validatePasswordHash(password, passwordHash);
 
-    console.log("Password check:", passwordCheck, "active:", user?.activo);
-
-    if (!user || !passwordCheck || !user.activo) {
+    if (user === null || !passwordCheck || user.activo !== true) {
       return res.status(401).send({
         error: "Credenciales inválidas",
       });
     }
 
-    // Generar tokens JWT
-    console.log("Generating session ID...");
     const sessionId = generateRandomHexToken(32);
-    console.log("Signing access token...");
     const accessToken = signAccessToken({ sub: user.id, jti: sessionId });
-    console.log("Signing refresh token...");
     const refreshToken = signRefreshToken(sessionId);
 
-    console.log("Sending response...");
     return res.send({
       access_token: accessToken,
       refresh_token: refreshToken,
@@ -88,21 +75,18 @@ export const register = async (
 ): Promise<void> => {
   const { email, password, nombre, apellidos } = req.body;
 
-  // Verificar si el usuario ya existe
   const existingUser = await prisma.profile.findUnique({
     where: { email },
   });
 
-  if (existingUser) {
+  if (existingUser !== null) {
     return res.status(400).send({
       error: "El email ya está registrado",
     });
   }
 
-  // Hash de la contraseña
   const hashedPassword = await hashPassword(password);
 
-  // Crear usuario
   const user = await prisma.profile.create({
     data: {
       id: crypto.randomUUID(),
@@ -114,7 +98,6 @@ export const register = async (
     },
   });
 
-  // Generar tokens JWT
   const sessionId = generateRandomHexToken(32);
   const accessToken = signAccessToken({ sub: user.id, jti: sessionId });
   const refreshToken = signRefreshToken(sessionId);
@@ -136,15 +119,8 @@ export const me = async (
   req: FastifyRequest,
   res: FastifyReply,
 ): Promise<void> => {
-  // userId viene del middleware authAccessToken
-  const userId = req.userId;
-
-  if (!userId) {
-    return res.status(401).send({ error: "No autenticado" });
-  }
-
   const user = await prisma.profile.findUnique({
-    where: { id: userId },
+    where: { id: req.userId },
     select: {
       id: true,
       email: true,
@@ -155,7 +131,7 @@ export const me = async (
     },
   });
 
-  if (!user) {
+  if (user === null) {
     return res.status(404).send({ error: "Usuario no encontrado" });
   }
 

@@ -42,7 +42,7 @@ export class AnthropicAdapter implements AIProviderAdapter {
     if (!response.ok) {
       const error = (await response.json()) as { error?: { message?: string } };
       throw new Error(
-        `Anthropic API error: ${response.status} - ${error.error?.message || "Unknown error"}`,
+        `Anthropic API error: ${response.status} - ${error.error?.message ?? "Unknown error"}`,
       );
     }
 
@@ -70,6 +70,7 @@ export class AnthropicAdapter implements AIProviderAdapter {
   }
 
   validateConfig(): boolean {
-    return !!this.config.apiKey && !!this.config.model;
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    return this.config.apiKey !== undefined && this.config.model !== undefined;
   }
 }

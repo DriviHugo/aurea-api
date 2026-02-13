@@ -64,7 +64,9 @@ const SECTION_CONTEXTS: Record<string, string> = {
     "Resumen del análisis realizado. Ofrece una visión global de las características del expediente.",
 };
 
-export default async function aiWizardHelpRoutes(app: FastifyInstance) {
+export default async function aiWizardHelpRoutes(
+  app: FastifyInstance,
+): Promise<void> {
   app.post("/ai-wizard-help", {
     preValidation: [app.authAccessToken],
     schema: {
@@ -88,11 +90,10 @@ export default async function aiWizardHelpRoutes(app: FastifyInstance) {
 
       // Check if AI is configured
       const aiApiKey = process.env["AI_API_KEY"];
-      if (!aiApiKey) {
-        // Return a static default response if no AI configured
+      if (aiApiKey === undefined || aiApiKey === "") {
         return reply.status(200).send({
           ayuda: getStaticHelp(stepId, sectionId),
-          section: sectionId || stepId,
+          section: sectionId ?? stepId,
           consejos: getStaticConsejos(stepId, sectionId),
         });
       }
@@ -100,22 +101,27 @@ export default async function aiWizardHelpRoutes(app: FastifyInstance) {
       try {
         const anthropic = new Anthropic({ apiKey: aiApiKey });
 
-        const stepContext =
-          STEP_CONTEXTS[stepId] ||
-          "Proporciona ayuda general sobre contratación pública.";
-        const sectionContext = sectionId
-          ? SECTION_CONTEXTS[sectionId] || ""
-          : "";
+        const stepContext = Object.hasOwn(STEP_CONTEXTS, stepId)
+          ? // eslint-disable-next-line security/detect-object-injection
+            STEP_CONTEXTS[stepId]
+          : "Proporciona ayuda general sobre contratación pública.";
+        const sectionContext =
+          sectionId !== undefined && sectionId !== ""
+            ? Object.hasOwn(SECTION_CONTEXTS, sectionId)
+              ? // eslint-disable-next-line security/detect-object-injection
+                SECTION_CONTEXTS[sectionId]
+              : ""
+            : "";
 
         const userPrompt = `
-PASO ACTUAL: ${stepId}${sectionId ? ` > ${sectionId}` : ""}
+PASO ACTUAL: ${stepId}${sectionId !== undefined && sectionId !== "" ? ` > ${sectionId}` : ""}
 ${stepContext}
 ${sectionContext}
 
 CONTEXTO DEL EXPEDIENTE:
-- Objeto: ${objeto || "No definido aún"}
-- Tipo de contrato: ${tipoContrato || "No determinado"}
-${contexto ? `- Datos adicionales: ${JSON.stringify(contexto)}` : ""}
+- Objeto: ${objeto ?? "No definido aún"}
+- Tipo de contrato: ${tipoContrato ?? "No determinado"}
+${contexto !== undefined ? `- Datos adicionales: ${JSON.stringify(contexto)}` : ""}
 
 Proporciona ayuda contextual y práctica para este paso.`;
 
@@ -129,16 +135,15 @@ Proporciona ayuda contextual y práctica para este paso.`;
         const textContent = response.content.find(
           (block) => block.type === "text",
         );
-        if (!textContent || textContent.type !== "text") {
+        if (textContent?.type !== "text") {
           throw new Error("No text response from AI");
         }
 
-        // Parse JSON response
         const jsonMatch = textContent.text.match(/\{[\s\S]*\}/);
         if (!jsonMatch) {
           return reply.status(200).send({
             ayuda: textContent.text,
-            section: sectionId || stepId,
+            section: sectionId ?? stepId,
           });
         }
 
@@ -146,10 +151,9 @@ Proporciona ayuda contextual y práctica para este paso.`;
         return reply.status(200).send(parsed);
       } catch (error) {
         console.error("[ai-wizard-help] Error:", error);
-        // Fallback to static help on error
         return reply.status(200).send({
           ayuda: getStaticHelp(stepId, sectionId),
-          section: sectionId || stepId,
+          section: sectionId ?? stepId,
           consejos: getStaticConsejos(stepId, sectionId),
         });
       }
@@ -173,7 +177,9 @@ function getStaticHelp(stepId: string, sectionId?: string): string {
       "Revisa todos los datos del expediente antes de crearlo. Asegúrate de que toda la información es correcta.",
   };
 
-  if (sectionId) {
+  const DEFAULT_HELP = "Completa la información requerida en este paso.";
+
+  if (sectionId !== undefined && sectionId !== "") {
     const sectionHelps: Record<string, string> = {
       cpv: "Los códigos CPV (Common Procurement Vocabulary) clasifican el objeto del contrato. Elige el código que mejor describa la prestación principal.",
       tipo: "El tipo de contrato (obras, servicios, suministros) determina la normativa aplicable y los umbrales de licitación.",
@@ -184,17 +190,24 @@ function getStaticHelp(stepId: string, sectionId?: string): string {
       lotes:
         "El Art. 99.3 LCSP establece la obligación de dividir en lotes salvo justificación en contrario. Evalúa si la división es conveniente.",
     };
-    return (
-      sectionHelps[sectionId] ||
-      helps[stepId] ||
-      "Completa la información requerida en este paso."
-    );
+    const sectionHelp = Object.hasOwn(sectionHelps, sectionId)
+      ? // eslint-disable-next-line security/detect-object-injection
+        sectionHelps[sectionId]
+      : undefined;
+    const stepHelp = Object.hasOwn(helps, stepId)
+      ? // eslint-disable-next-line security/detect-object-injection
+        helps[stepId]
+      : undefined;
+    return sectionHelp ?? stepHelp ?? DEFAULT_HELP;
   }
 
-  return helps[stepId] || "Completa la información requerida en este paso.";
+  return Object.hasOwn(helps, stepId)
+    ? // eslint-disable-next-line security/detect-object-injection
+      helps[stepId]
+    : DEFAULT_HELP;
 }
 
-function getStaticConsejos(stepId: string, sectionId?: string): string[] {
+function getStaticConsejos(stepId: string, _sectionId?: string): string[] {
   const defaultConsejos = [
     "Consulta la LCSP 9/2017 ante cualquier duda",
     "Documenta todas las decisiones tomadas",
@@ -219,5 +232,8 @@ function getStaticConsejos(stepId: string, sectionId?: string): string[] {
     ],
   };
 
-  return stepConsejos[stepId] || defaultConsejos;
+  return Object.hasOwn(stepConsejos, stepId)
+    ? // eslint-disable-next-line security/detect-object-injection
+      stepConsejos[stepId]
+    : defaultConsejos;
 }

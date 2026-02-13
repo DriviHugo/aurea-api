@@ -10,12 +10,15 @@ export function errorToLogObject(error: unknown): Record<string, unknown> {
     const result: Record<string, unknown> = {};
     for (const key of Object.getOwnPropertyNames(cause)) {
       try {
-        const value = (cause as any)[key];
+        // eslint-disable-next-line security/detect-object-injection
+        const value: unknown = (cause as Record<string, unknown>)[key];
+        // eslint-disable-next-line security/detect-object-injection
         result[key] =
           typeof value === "object" && value !== null
             ? serializeCause(value, seen)
             : value;
       } catch (e) {
+        // eslint-disable-next-line security/detect-object-injection
         result[key] = `[Unserializable: ${(e as Error).message}]`;
       }
     }

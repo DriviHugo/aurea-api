@@ -34,7 +34,7 @@ export class AzureOpenAIAdapter implements AIProviderAdapter {
     if (!response.ok) {
       const error = (await response.json()) as { error?: { message?: string } };
       throw new Error(
-        `Azure OpenAI error: ${response.status} - ${error.error?.message || "Unknown error"}`,
+        `Azure OpenAI error: ${response.status} - ${error.error?.message ?? "Unknown error"}`,
       );
     }
 
@@ -64,6 +64,12 @@ export class AzureOpenAIAdapter implements AIProviderAdapter {
   }
 
   validateConfig(): boolean {
-    return !!this.config.apiKey && !!this.config.baseUrl && !!this.config.model;
+    /* eslint-disable @typescript-eslint/no-unnecessary-condition */
+    return (
+      this.config.apiKey !== undefined &&
+      this.config.baseUrl !== undefined &&
+      this.config.model !== undefined
+    );
+    /* eslint-enable @typescript-eslint/no-unnecessary-condition */
   }
 }

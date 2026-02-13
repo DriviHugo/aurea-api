@@ -9,7 +9,7 @@
 import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
 import {
   createAIGateway,
-  AIGatewayService,
+  type AIGatewayService,
 } from "../../services/ai-gateway/index.js";
 
 interface AIContratoBody {
@@ -20,14 +20,15 @@ interface AIContratoBody {
   organo?: string;
 }
 
-// Lazy initialization of AI Gateway
 let aiGateway: AIGatewayService | null = null;
 
 function getAIGateway(): AIGatewayService {
-  if (!aiGateway) {
-    aiGateway = createAIGateway();
-  }
+  aiGateway ??= createAIGateway();
   return aiGateway;
+}
+
+function optionalField(value: string | undefined, label: string): string {
+  return value !== undefined && value !== "" ? `${label}: ${value}` : "";
 }
 
 const SYSTEM_PROMPT_MEJORAR_OBJETO = `Eres un experto en contratación pública española (LCSP 9/2017). 
@@ -96,7 +97,9 @@ El JSON debe tener esta estructura exacta:
   "observaciones": "Observaciones adicionales sobre la clasificación"
 }`;
 
-export default async function aiContratoRoutes(app: FastifyInstance) {
+export default async function aiContratoRoutes(
+  app: FastifyInstance,
+): Promise<void> {
   app.post("/ai-contrato", {
     preValidation: [app.authAccessToken],
     schema: {
@@ -132,9 +135,9 @@ export default async function aiContratoRoutes(app: FastifyInstance) {
             userPrompt = `Mejora el siguiente objeto de contrato:
 
 OBJETO: ${objeto}
-TIPO DE CONTRATO: ${tipoContrato || "servicios"}
-${unidad ? `UNIDAD CONTRATANTE: ${unidad}` : ""}
-${organo ? `ÓRGANO DE CONTRATACIÓN: ${organo}` : ""}
+TIPO DE CONTRATO: ${tipoContrato ?? "servicios"}
+${optionalField(unidad, "UNIDAD CONTRATANTE")}
+${optionalField(organo, "ÓRGANO DE CONTRATACIÓN")}
 
 Recuerda responder SOLO con JSON válido.`;
             break;
@@ -144,7 +147,7 @@ Recuerda responder SOLO con JSON válido.`;
             userPrompt = `Propón un presupuesto realista para el siguiente objeto de contrato:
 
 OBJETO: ${objeto}
-TIPO DE CONTRATO: ${tipoContrato || "servicios"}
+TIPO DE CONTRATO: ${tipoContrato ?? "servicios"}
 
 Recuerda responder SOLO con JSON válido.`;
             break;
@@ -154,7 +157,7 @@ Recuerda responder SOLO con JSON válido.`;
             userPrompt = `Sugiere los códigos CPV más apropiados para el siguiente objeto de contrato:
 
 OBJETO: ${objeto}
-TIPO DE CONTRATO: ${tipoContrato || "servicios"}
+TIPO DE CONTRATO: ${tipoContrato ?? "servicios"}
 
 Recuerda responder SOLO con JSON válido.`;
             break;
@@ -165,22 +168,16 @@ Recuerda responder SOLO con JSON válido.`;
               .send({ error: `Tipo de operación no válido: ${type}` });
         }
 
-        console.log(
-          `[AI-Contrato] Processing ${type} request for object: ${objeto.substring(0, 50)}...`,
-        );
-
         const response = await gateway.completeSimple(systemPrompt, userPrompt);
 
-        // Parse the JSON response
         let result;
         try {
-          // Remove any markdown code blocks if present
           const cleanResponse = response
             .replace(/```json\n?/g, "")
             .replace(/```\n?/g, "")
             .trim();
           result = JSON.parse(cleanResponse);
-        } catch (parseError) {
+        } catch {
           console.error("[AI-Contrato] Failed to parse AI response:", response);
           return reply.status(500).send({
             error: "Error al procesar la respuesta de IA",
@@ -188,7 +185,6 @@ Recuerda responder SOLO con JSON válido.`;
           });
         }
 
-        console.log(`[AI-Contrato] Successfully processed ${type} request`);
         return reply.send(result);
       } catch (error) {
         console.error("[AI-Contrato] Error:", error);

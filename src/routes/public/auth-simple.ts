@@ -1,7 +1,7 @@
 import type { FastifyInstance } from "fastify";
 import * as authController from "../../controllers/auth-simple.js";
 
-export default async function authRoutes(app: FastifyInstance) {
+export default async function authRoutes(app: FastifyInstance): Promise<void> {
   // Login - público
   app.post("/login", {
     schema: {

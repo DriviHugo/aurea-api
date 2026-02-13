@@ -13,7 +13,7 @@ export class OllamaAdapter implements AIProviderAdapter {
   constructor(private config: AIConfig) {}
 
   async complete(request: AICompletionRequest): Promise<AICompletionResponse> {
-    const baseUrl = this.config.baseUrl || "http://localhost:11434";
+    const baseUrl = this.config.baseUrl ?? "http://localhost:11434";
 
     const response = await fetch(`${baseUrl}/api/chat`, {
       method: "POST",
@@ -46,15 +46,16 @@ export class OllamaAdapter implements AIProviderAdapter {
       content: data.message.content,
       model: this.config.model,
       usage: {
-        promptTokens: data.prompt_eval_count || 0,
-        completionTokens: data.eval_count || 0,
-        totalTokens: (data.prompt_eval_count || 0) + (data.eval_count || 0),
+        promptTokens: data.prompt_eval_count ?? 0,
+        completionTokens: data.eval_count ?? 0,
+        totalTokens: (data.prompt_eval_count ?? 0) + (data.eval_count ?? 0),
       },
       finishReason: data.done ? "stop" : "error",
     };
   }
 
   validateConfig(): boolean {
-    return !!this.config.model;
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    return this.config.model !== undefined;
   }
 }
