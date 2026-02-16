@@ -168,7 +168,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
           "POST /documento-generacion - received data",
         );
 
-        if (!body || !body.documentoId || !body.usuarioId) {
+        if (!body?.documentoId || !body.usuarioId) {
           return reply.status(400).send({
             error: "Missing required fields: documentoId, usuarioId",
           });
