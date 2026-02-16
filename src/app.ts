@@ -29,6 +29,9 @@ const regularRoutePath = "/api";
 
 const fastify: FastifyInstance = fastifyModule({
   genReqId: () => uuidv4(),
+  logger: {
+    level: "info",
+  },
 });
 
 // Plugins

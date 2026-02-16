@@ -1,6 +1,20 @@
 import type { FastifyPluginAsync } from "fastify";
 import type { PrismaClient } from "@prisma/client";
 
+// Convert snake_case tipo to camelCase for Prisma enum
+function convertTipoDocumento(tipo: string): string {
+  const tipoMap: Record<string, string> = {
+    memoria: "memoria",
+    ppt: "ppt",
+    pcap: "pcap",
+    anexo_tecnico: "anexoTecnico",
+    anexo_economico: "anexoEconomico",
+    informe_necesidad: "informeNecesidad",
+    justificacion_procedimiento: "justificacionProcedimiento",
+  };
+  return tipoMap[tipo] || tipo;
+}
+
 const routes: FastifyPluginAsync = async (fastify) => {
   const prisma: PrismaClient = fastify.prisma;
 
@@ -216,6 +230,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
     async (request, reply) => {
       try {
         const data = request.body as any;
+        fastify.log.info({ body: data }, "POST /documentos - received data");
 
         // Verify expediente exists
         const expediente = await prisma.expediente.findUnique({
@@ -223,6 +238,10 @@ const routes: FastifyPluginAsync = async (fastify) => {
         });
 
         if (!expediente) {
+          fastify.log.warn(
+            { expedienteId: data.expedienteId },
+            "Expediente not found",
+          );
           return reply.status(400).send({ error: "Expediente not found" });
         }
 
@@ -232,13 +251,14 @@ const routes: FastifyPluginAsync = async (fastify) => {
         });
 
         if (!creador) {
+          fastify.log.warn({ creadorId: data.creadorId }, "Creador not found");
           return reply.status(400).send({ error: "Creador not found" });
         }
 
         const documento = await prisma.documento.create({
           data: {
             expedienteId: data.expedienteId,
-            tipo: data.tipo,
+            tipo: convertTipoDocumento(data.tipo) as any,
             nombre: data.nombre,
             version: data.version || 1,
             hash: data.hash,
@@ -250,8 +270,16 @@ const routes: FastifyPluginAsync = async (fastify) => {
           },
         });
 
+        fastify.log.info(
+          { documentoId: documento.id },
+          "Documento created successfully",
+        );
         return reply.status(201).send(documento);
       } catch (error) {
+        fastify.log.error(
+          { error, body: request.body },
+          "POST /documentos - error creating documento",
+        );
         return reply.status(500).send({ error: "Internal server error" });
       }
     },

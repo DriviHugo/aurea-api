@@ -156,45 +156,21 @@ const routes: FastifyPluginAsync = async (fastify) => {
     },
   );
 
-  // POST /documento-secciones - Create
+  // POST /documento-secciones - Create (handles array for batch insert)
   fastify.post(
     "/",
     {
       preValidation: [fastify.authAccessToken],
       schema: {
         tags: ["DocumentoSeccion"],
-        description: "Create new documento seccion",
-        body: {
-          type: "object",
-          required: ["documentoId", "orden", "titulo"],
-          properties: {
-            documentoId: { type: "string", format: "uuid" },
-            orden: { type: "integer", minimum: 1 },
-            titulo: { type: "string", minLength: 1 },
-            descripcion: { type: "string" },
-            contenido: { type: "string" },
-            estado: { type: "string", default: "pendiente" },
-            tokensUsados: { type: "integer", minimum: 0 },
-            tiempoGeneracionMs: { type: "integer", minimum: 0 },
-            articulosLcsp: { type: "array", items: { type: "string" } },
-          },
-        },
+        description: "Create new documento seccion(s)",
+        // No body validation - handle arrays in handler
         response: {
           201: {
-            type: "object",
-            properties: {
-              id: { type: "string" },
-              documentoId: { type: "string" },
-              orden: { type: "integer" },
-              titulo: { type: "string" },
-              descripcion: { type: ["string", "null"] },
-              contenido: { type: ["string", "null"] },
-              estado: { type: "string" },
-              tokensUsados: { type: ["integer", "null"] },
-              tiempoGeneracionMs: { type: ["integer", "null"] },
-              articulosLcsp: { type: "array", items: { type: "string" } },
-              createdAt: { type: "string", format: "date-time" },
-              updatedAt: { type: "string", format: "date-time" },
+            type: "array",
+            items: {
+              type: "object",
+              additionalProperties: true,
             },
           },
           400: {
@@ -208,24 +184,41 @@ const routes: FastifyPluginAsync = async (fastify) => {
     },
     async (request, reply) => {
       try {
-        const data = request.body as any;
+        const rawBody = request.body as any;
 
-        const documentoSeccion = await prisma.documentoSeccion.create({
-          data: {
-            documentoId: data.documentoId,
-            orden: data.orden,
-            titulo: data.titulo,
-            descripcion: data.descripcion,
-            contenido: data.contenido,
-            estado: data.estado || "pendiente",
-            tokensUsados: data.tokensUsados,
-            tiempoGeneracionMs: data.tiempoGeneracionMs,
-            articulosLcsp: data.articulosLcsp || [],
-          },
-        });
+        // Handle both array and single object
+        const items = Array.isArray(rawBody) ? rawBody : [rawBody];
 
-        return reply.status(201).send(documentoSeccion);
+        fastify.log.info(
+          { count: items.length, firstItem: items[0] },
+          "POST /documento-seccion - creating secciones",
+        );
+
+        const created = [];
+        for (const data of items) {
+          const documentoSeccion = await prisma.documentoSeccion.create({
+            data: {
+              documentoId: data.documentoId,
+              orden: data.orden,
+              titulo: data.titulo,
+              descripcion: data.descripcion,
+              contenido: data.contenido,
+              estado: data.estado || "pendiente",
+              tokensUsados: data.tokensUsados,
+              tiempoGeneracionMs: data.tiempoGeneracionMs,
+              articulosLcsp: data.articulosLcsp || [],
+            },
+          });
+          created.push(documentoSeccion);
+        }
+
+        fastify.log.info(
+          { count: created.length },
+          "DocumentoSecciones created",
+        );
+        return reply.status(201).send(created);
       } catch (error: any) {
+        fastify.log.error({ error }, "POST /documento-seccion - error");
         if (error.code === "P2002") {
           return reply.status(400).send({
             error:

@@ -414,10 +414,7 @@ export default async function aiGenerarDocumentoRoutes(
                 DOCUMENT_SECTIONS[tipoDocumento]
               : DEFAULT_SECTIONS;
 
-            return reply.send({
-              data: { secciones },
-              error: null,
-            });
+            return reply.send({ secciones });
           }
 
           case "generar_seccion": {
@@ -461,12 +458,9 @@ export default async function aiGenerarDocumentoRoutes(
             );
 
             return reply.send({
-              data: {
-                contenido,
-                tokensUsados: 0,
-                tiempoGeneracionMs: Date.now() - startTime,
-              },
-              error: null,
+              contenido,
+              tokensUsados: 0,
+              tiempoGeneracionMs: Date.now() - startTime,
             });
           }
 
@@ -506,10 +500,7 @@ Responde SOLO con JSON válido.`;
               })),
             };
 
-            return reply.send({
-              data: parseJsonSafely(response, fallbackResult),
-              error: null,
-            });
+            return reply.send(parseJsonSafely(response, fallbackResult));
           }
 
           default:

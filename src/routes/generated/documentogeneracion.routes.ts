@@ -142,24 +142,11 @@ const routes: FastifyPluginAsync = async (fastify) => {
       schema: {
         tags: ["DocumentoGeneracion"],
         description: "Create new DocumentoGeneracion",
-        body: {
-          type: "object",
-          required: ["documentoId"],
-          properties: {
-            documentoId: { type: "string", format: "uuid" },
-            version: { type: "integer", minimum: 1 },
-            plan: { type: "object" },
-          },
-        },
+        // No body validation - handle arrays and objects in handler
         response: {
           201: {
             type: "object",
-            properties: {
-              id: { type: "string", format: "uuid" },
-              documentoId: { type: "string", format: "uuid" },
-              version: { type: "integer" },
-              plan: { type: "object" },
-            },
+            additionalProperties: true,
           },
           400: {
             type: "object",
@@ -172,18 +159,43 @@ const routes: FastifyPluginAsync = async (fastify) => {
     },
     async (request, reply) => {
       try {
-        const { documentoId, version = 1, plan = {} } = request.body as any;
+        // Handle both array and object body (Supabase compatibility)
+        const rawBody = request.body as any;
+        const body = Array.isArray(rawBody) ? rawBody[0] : rawBody;
+
+        fastify.log.info(
+          { rawBody, processedBody: body },
+          "POST /documento-generacion - received data",
+        );
+
+        if (!body || !body.documentoId || !body.usuarioId) {
+          return reply.status(400).send({
+            error: "Missing required fields: documentoId, usuarioId",
+          });
+        }
 
         const documentoGeneracion = await prisma.documentoGeneracion.create({
           data: {
-            documentoId,
-            version,
-            plan,
+            documentoId: body.documentoId,
+            usuarioId: body.usuarioId,
+            version: body.version || 1,
+            plan: body.plan || {},
+            estado: body.estado || "planificando",
+            seccionActual: body.seccionActual || 0,
+            totalSecciones: body.totalSecciones,
           },
         });
 
+        fastify.log.info(
+          { id: documentoGeneracion.id },
+          "DocumentoGeneracion created",
+        );
         return reply.status(201).send(documentoGeneracion);
       } catch (error) {
+        fastify.log.error(
+          { error, body: request.body },
+          "POST /documento-generacion - error",
+        );
         if (error.code === "P2002") {
           return reply
             .status(400)
