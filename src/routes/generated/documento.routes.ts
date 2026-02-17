@@ -380,7 +380,9 @@ const routes: FastifyPluginAsync = async (fastify) => {
         const documento = await prisma.documento.update({
           where: { id },
           data: {
-            tipo: data.tipo ? convertTipoDocumento(data.tipo) as any : undefined,
+            tipo: data.tipo
+              ? (convertTipoDocumento(data.tipo) as any)
+              : undefined,
             nombre: data.nombre,
             version: data.version,
             hash: data.hash,

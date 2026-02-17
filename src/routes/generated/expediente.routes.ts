@@ -27,7 +27,9 @@ function normalizeExpediente(exp: any): any {
     estado: camelToSnakeValue(exp.estado),
     tipo_contrato: camelToSnakeValue(exp.tipoContrato),
     procedimiento_propuesto: camelToSnakeValue(exp.procedimientoPropuesto),
-    procedimiento_seleccionado: camelToSnakeValue(exp.procedimientoSeleccionado),
+    procedimiento_seleccionado: camelToSnakeValue(
+      exp.procedimientoSeleccionado,
+    ),
     nivel_riesgo: exp.nivelRiesgo,
   };
 }
@@ -123,7 +125,10 @@ const expedienteSchema = {
     esEmergencia: { type: "boolean" },
     justificacionUrgencia: { type: "string" },
     porcentajeCompletitud: { type: "integer", minimum: 0, maximum: 100 },
-    nivelRiesgo: { type: "string", enum: ["verde", "ambar", "amarillo", "rojo"] },
+    nivelRiesgo: {
+      type: "string",
+      enum: ["verde", "ambar", "amarillo", "rojo"],
+    },
     ultimaAccionPendiente: { type: "string" },
     fechaVencimiento: { type: "string", format: "date-time" },
     metadatos: { type: "object" },
@@ -385,10 +390,21 @@ const routes: FastifyPluginAsync = async (fastify) => {
         const updateData: Record<string, unknown> = {};
 
         const allowedFields = [
-          "codigo", "unidad", "organo", "objeto", "descripcion",
-          "cpvElegido", "tieneLotes", "justificacionLotes", "numLotes",
-          "esUrgente", "esEmergencia", "justificacionUrgencia",
-          "porcentajeCompletitud", "ultimaAccionPendiente", "metadatos",
+          "codigo",
+          "unidad",
+          "organo",
+          "objeto",
+          "descripcion",
+          "cpvElegido",
+          "tieneLotes",
+          "justificacionLotes",
+          "numLotes",
+          "esUrgente",
+          "esEmergencia",
+          "justificacionUrgencia",
+          "porcentajeCompletitud",
+          "ultimaAccionPendiente",
+          "metadatos",
         ];
 
         for (const field of allowedFields) {
@@ -405,27 +421,41 @@ const routes: FastifyPluginAsync = async (fastify) => {
           updateData.tipoContrato = snakeToCamelValue(data.tipoContrato);
         }
         if (data.procedimientoPropuesto !== undefined) {
-          updateData.procedimientoPropuesto = snakeToCamelValue(data.procedimientoPropuesto);
+          updateData.procedimientoPropuesto = snakeToCamelValue(
+            data.procedimientoPropuesto,
+          );
         }
         if (data.procedimientoSeleccionado !== undefined) {
-          updateData.procedimientoSeleccionado = snakeToCamelValue(data.procedimientoSeleccionado);
+          updateData.procedimientoSeleccionado = snakeToCamelValue(
+            data.procedimientoSeleccionado,
+          );
         }
         if (data.nivelRiesgo !== undefined) {
-          fastify.log.info({ nivelRiesgo: data.nivelRiesgo }, "nivelRiesgo from camelCase");
+          fastify.log.info(
+            { nivelRiesgo: data.nivelRiesgo },
+            "nivelRiesgo from camelCase",
+          );
           updateData.nivelRiesgo = data.nivelRiesgo;
         }
         // Also handle snake_case from frontend
         if (data.nivel_riesgo !== undefined) {
-          fastify.log.info({ nivel_riesgo: data.nivel_riesgo }, "nivel_riesgo from snake_case");
+          fastify.log.info(
+            { nivel_riesgo: data.nivel_riesgo },
+            "nivel_riesgo from snake_case",
+          );
           updateData.nivelRiesgo = data.nivel_riesgo;
         }
 
         // Handle numeric fields
         if (data.valorEstimadoContrato !== undefined) {
-          updateData.valorEstimadoContrato = parseFloat(data.valorEstimadoContrato);
+          updateData.valorEstimadoContrato = parseFloat(
+            data.valorEstimadoContrato,
+          );
         }
         if (data.presupuestoBaseLicitacion !== undefined) {
-          updateData.presupuestoBaseLicitacion = parseFloat(data.presupuestoBaseLicitacion);
+          updateData.presupuestoBaseLicitacion = parseFloat(
+            data.presupuestoBaseLicitacion,
+          );
         }
         if (data.iva !== undefined) {
           updateData.iva = parseFloat(data.iva);
@@ -451,13 +481,18 @@ const routes: FastifyPluginAsync = async (fastify) => {
 
         return reply.status(200).send(normalizeExpediente(expediente));
       } catch (error: any) {
-        fastify.log.error({ error: error.message, code: error.code }, "Error updating expediente");
+        fastify.log.error(
+          { error: error.message, code: error.code },
+          "Error updating expediente",
+        );
         if (error.code === "P2002") {
           return reply
             .status(400)
             .send({ error: "Expediente with this codigo already exists" });
         }
-        return reply.status(500).send({ error: error.message || "Internal server error" });
+        return reply
+          .status(500)
+          .send({ error: error.message || "Internal server error" });
       }
     },
   );
