@@ -15,6 +15,28 @@ function convertTipoDocumento(tipo: string): string {
   return tipoMap[tipo] || tipo;
 }
 
+// Convert camelCase tipo back to snake_case for API response
+function convertTipoToSnakeCase(tipo: string): string {
+  const tipoMap: Record<string, string> = {
+    memoria: "memoria",
+    ppt: "ppt",
+    pcap: "pcap",
+    anexoTecnico: "anexo_tecnico",
+    anexoEconomico: "anexo_economico",
+    informeNecesidad: "informe_necesidad",
+    justificacionProcedimiento: "justificacion_procedimiento",
+  };
+  return tipoMap[tipo] || tipo;
+}
+
+// Helper to normalize documento response
+function normalizeDocumento(doc: any) {
+  return {
+    ...doc,
+    tipo: convertTipoToSnakeCase(doc.tipo),
+  };
+}
+
 const routes: FastifyPluginAsync = async (fastify) => {
   const prisma: PrismaClient = fastify.prisma;
 
@@ -83,7 +105,8 @@ const routes: FastifyPluginAsync = async (fastify) => {
 
         const where: any = {};
         if (expedienteId) where.expedienteId = expedienteId;
-        if (tipo) where.tipo = tipo;
+        // Convert tipo from snake_case to camelCase for Prisma query
+        if (tipo) where.tipo = convertTipoDocumento(tipo);
         if (estado) where.estado = estado;
 
         const [documentos, total] = await Promise.all([
@@ -99,7 +122,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
         const totalPages = Math.ceil(total / limit);
 
         return reply.status(200).send({
-          data: documentos,
+          data: documentos.map(normalizeDocumento),
           total,
           page,
           limit,
@@ -168,7 +191,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
           return reply.status(404).send({ error: "Documento not found" });
         }
 
-        return reply.status(200).send(documento);
+        return reply.status(200).send(normalizeDocumento(documento));
       } catch (error) {
         return reply.status(500).send({ error: "Internal server error" });
       }
@@ -274,7 +297,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
           { documentoId: documento.id },
           "Documento created successfully",
         );
-        return reply.status(201).send(documento);
+        return reply.status(201).send(normalizeDocumento(documento));
       } catch (error) {
         fastify.log.error(
           { error, body: request.body },
@@ -357,7 +380,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
         const documento = await prisma.documento.update({
           where: { id },
           data: {
-            tipo: data.tipo,
+            tipo: data.tipo ? convertTipoDocumento(data.tipo) as any : undefined,
             nombre: data.nombre,
             version: data.version,
             hash: data.hash,
@@ -368,7 +391,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
           },
         });
 
-        return reply.status(200).send(documento);
+        return reply.status(200).send(normalizeDocumento(documento));
       } catch (error) {
         return reply.status(500).send({ error: "Internal server error" });
       }

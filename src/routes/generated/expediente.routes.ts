@@ -10,6 +10,29 @@ function snakeToCamelValue(value: string | null | undefined): string | null {
 }
 
 /**
+ * Convert camelCase enum value to snake_case for frontend
+ */
+function camelToSnakeValue(value: string | null | undefined): string | null {
+  if (!value) return null;
+  return value.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`);
+}
+
+/**
+ * Normalize expediente for frontend (convert enum values to snake_case)
+ */
+function normalizeExpediente(exp: any): any {
+  if (!exp) return exp;
+  return {
+    ...exp,
+    estado: camelToSnakeValue(exp.estado),
+    tipo_contrato: camelToSnakeValue(exp.tipoContrato),
+    procedimiento_propuesto: camelToSnakeValue(exp.procedimientoPropuesto),
+    procedimiento_seleccionado: camelToSnakeValue(exp.procedimientoSeleccionado),
+    nivel_riesgo: exp.nivelRiesgo,
+  };
+}
+
+/**
  * Map of valid enum values (both snake_case and camelCase accepted)
  */
 const PROCEDIMIENTO_VALUES = [
@@ -100,7 +123,7 @@ const expedienteSchema = {
     esEmergencia: { type: "boolean" },
     justificacionUrgencia: { type: "string" },
     porcentajeCompletitud: { type: "integer", minimum: 0, maximum: 100 },
-    nivelRiesgo: { type: "string", enum: ["verde", "amarillo", "rojo"] },
+    nivelRiesgo: { type: "string", enum: ["verde", "ambar", "amarillo", "rojo"] },
     ultimaAccionPendiente: { type: "string" },
     fechaVencimiento: { type: "string", format: "date-time" },
     metadatos: { type: "object" },
@@ -179,7 +202,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
         const totalPages = Math.ceil(total / limit);
 
         return reply.status(200).send({
-          data: expedientes,
+          data: expedientes.map(normalizeExpediente),
           total,
           page,
           limit,
@@ -229,7 +252,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
           return reply.status(404).send({ error: "Expediente not found" });
         }
 
-        return reply.status(200).send(expediente);
+        return reply.status(200).send(normalizeExpediente(expediente));
       } catch (error) {
         return reply.status(500).send({ error: "Internal server error" });
       }
@@ -294,7 +317,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
           },
         });
 
-        return reply.status(201).send(expediente);
+        return reply.status(201).send(normalizeExpediente(expediente));
       } catch (error: any) {
         if (error.code === "P2002") {
           return reply
@@ -324,6 +347,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
         body: {
           type: "object",
           properties: expedienteSchema.properties,
+          additionalProperties: true,
         },
         response: {
           200: expedienteResponseSchema,
@@ -347,6 +371,8 @@ const routes: FastifyPluginAsync = async (fastify) => {
         const { id } = request.params as { id: string };
         const data = request.body as any;
 
+        fastify.log.info({ body: data }, "Updating expediente");
+
         const existingExpediente = await prisma.expediente.findUnique({
           where: { id },
         });
@@ -355,37 +381,83 @@ const routes: FastifyPluginAsync = async (fastify) => {
           return reply.status(404).send({ error: "Expediente not found" });
         }
 
+        // Build update data excluding non-updatable fields
+        const updateData: Record<string, unknown> = {};
+
+        const allowedFields = [
+          "codigo", "unidad", "organo", "objeto", "descripcion",
+          "cpvElegido", "tieneLotes", "justificacionLotes", "numLotes",
+          "esUrgente", "esEmergencia", "justificacionUrgencia",
+          "porcentajeCompletitud", "ultimaAccionPendiente", "metadatos",
+        ];
+
+        for (const field of allowedFields) {
+          if (data[field] !== undefined) {
+            updateData[field] = data[field];
+          }
+        }
+
+        // Handle enum fields with conversion
+        if (data.estado !== undefined) {
+          updateData.estado = snakeToCamelValue(data.estado);
+        }
+        if (data.tipoContrato !== undefined) {
+          updateData.tipoContrato = snakeToCamelValue(data.tipoContrato);
+        }
+        if (data.procedimientoPropuesto !== undefined) {
+          updateData.procedimientoPropuesto = snakeToCamelValue(data.procedimientoPropuesto);
+        }
+        if (data.procedimientoSeleccionado !== undefined) {
+          updateData.procedimientoSeleccionado = snakeToCamelValue(data.procedimientoSeleccionado);
+        }
+        if (data.nivelRiesgo !== undefined) {
+          fastify.log.info({ nivelRiesgo: data.nivelRiesgo }, "nivelRiesgo from camelCase");
+          updateData.nivelRiesgo = data.nivelRiesgo;
+        }
+        // Also handle snake_case from frontend
+        if (data.nivel_riesgo !== undefined) {
+          fastify.log.info({ nivel_riesgo: data.nivel_riesgo }, "nivel_riesgo from snake_case");
+          updateData.nivelRiesgo = data.nivel_riesgo;
+        }
+
+        // Handle numeric fields
+        if (data.valorEstimadoContrato !== undefined) {
+          updateData.valorEstimadoContrato = parseFloat(data.valorEstimadoContrato);
+        }
+        if (data.presupuestoBaseLicitacion !== undefined) {
+          updateData.presupuestoBaseLicitacion = parseFloat(data.presupuestoBaseLicitacion);
+        }
+        if (data.iva !== undefined) {
+          updateData.iva = parseFloat(data.iva);
+        }
+        if (data.importeProrrogas !== undefined) {
+          updateData.importeProrrogas = parseFloat(data.importeProrrogas);
+        }
+        if (data.importeModificados !== undefined) {
+          updateData.importeModificados = parseFloat(data.importeModificados);
+        }
+
+        // Handle date field
+        if (data.fechaVencimiento !== undefined) {
+          updateData.fechaVencimiento = new Date(data.fechaVencimiento);
+        }
+
+        fastify.log.info({ updateData }, "Prepared update data");
+
         const expediente = await prisma.expediente.update({
           where: { id },
-          data: {
-            ...data,
-            valorEstimadoContrato: data.valorEstimadoContrato
-              ? parseFloat(data.valorEstimadoContrato)
-              : undefined,
-            presupuestoBaseLicitacion: data.presupuestoBaseLicitacion
-              ? parseFloat(data.presupuestoBaseLicitacion)
-              : undefined,
-            iva: data.iva ? parseFloat(data.iva) : undefined,
-            importeProrrogas: data.importeProrrogas
-              ? parseFloat(data.importeProrrogas)
-              : undefined,
-            importeModificados: data.importeModificados
-              ? parseFloat(data.importeModificados)
-              : undefined,
-            fechaVencimiento: data.fechaVencimiento
-              ? new Date(data.fechaVencimiento)
-              : undefined,
-          },
+          data: updateData,
         });
 
-        return reply.status(200).send(expediente);
+        return reply.status(200).send(normalizeExpediente(expediente));
       } catch (error: any) {
+        fastify.log.error({ error: error.message, code: error.code }, "Error updating expediente");
         if (error.code === "P2002") {
           return reply
             .status(400)
             .send({ error: "Expediente with this codigo already exists" });
         }
-        return reply.status(500).send({ error: "Internal server error" });
+        return reply.status(500).send({ error: error.message || "Internal server error" });
       }
     },
   );
