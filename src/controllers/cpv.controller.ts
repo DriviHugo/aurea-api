@@ -3,8 +3,7 @@
  */
 
 import type { FastifyRequest, FastifyReply } from "fastify";
-import type { CpvService } from "../services/cpv.service.js";
-import { type CpvImportItem } from "../services/cpv.service.js";
+import type { CpvService, CpvImportItem } from "../services/cpv.service.js";
 
 interface CpvSearchBody {
   query: string;

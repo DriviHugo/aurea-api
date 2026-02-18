@@ -2,8 +2,7 @@
  * Admin Service - User management business logic
  */
 
-import type { PrismaClient } from "@prisma/client";
-import type { RolUsuario } from "@prisma/client";
+import type { PrismaClient, RolUsuario } from "@prisma/client";
 import bcrypt from "bcryptjs";
 
 export interface CreateUserInput {

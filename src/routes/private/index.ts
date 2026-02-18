@@ -2,7 +2,33 @@
 // import userRoutes from "./user.js";
 // import authRoutes from "./auth.js";
 // import apiKeyRoutes from "./apikey.js";
-import generatedRoutes from "../generated/index.js";
+
+// Entity CRUD routes (previously auto-generated)
+import profileRoutes from "./profile.routes.js";
+import userroleRoutes from "./userrole.routes.js";
+import expedienteRoutes from "./expediente.routes.js";
+import alternativaprocedimientoRoutes from "./alternativaprocedimiento.routes.js";
+import cpvrecomendadoRoutes from "./cpvrecomendado.routes.js";
+import cpvcodigoRoutes from "./cpvcodigo.routes.js";
+import evidenciaRoutes from "./evidencia.routes.js";
+import reglaRoutes from "./regla.routes.js";
+import documentoRoutes from "./documento.routes.js";
+import documentoseccionRoutes from "./documentoseccion.routes.js";
+import documentogeneracionRoutes from "./documentogeneracion.routes.js";
+import documentoversionRoutes from "./documentoversion.routes.js";
+import documentoevidenciaRoutes from "./documentoevidencia.routes.js";
+import validacionRoutes from "./validacion.routes.js";
+import validacionevidenciaRoutes from "./validacionevidencia.routes.js";
+import revisionRoutes from "./revision.routes.js";
+import comentarioRoutes from "./comentario.routes.js";
+import auditlogRoutes from "./auditlog.routes.js";
+import aiproviderRoutes from "./aiprovider.routes.js";
+import aifunctionRoutes from "./aifunction.routes.js";
+import aifunctionversionRoutes from "./aifunctionversion.routes.js";
+import aifunctionlogRoutes from "./aifunctionlog.routes.js";
+import incidenciaRoutes from "./incidencia.routes.js";
+
+// Custom routes
 import adminRoutes from "./admin.js";
 import cpvRoutes from "./cpv.js";
 import aiDocumentRoutes from "./ai-document.js";
@@ -14,15 +40,45 @@ export default async (fastify: FastifyInstance): Promise<void> => {
   // fastify.register(authRoutes, { prefix: "/auth" });
   // fastify.register(apiKeyRoutes, { prefix: "/apikeys" });
 
-  // Auto-generated CRUD routes
-  fastify.register(generatedRoutes);
+  // Entity CRUD routes
+  fastify.register(profileRoutes, { prefix: "/profile" });
+  fastify.register(userroleRoutes, { prefix: "/user-role" });
+  fastify.register(expedienteRoutes, { prefix: "/expediente" });
+  fastify.register(alternativaprocedimientoRoutes, {
+    prefix: "/alternativa-procedimiento",
+  });
+  fastify.register(cpvrecomendadoRoutes, { prefix: "/cpv-recomendado" });
+  fastify.register(cpvcodigoRoutes, { prefix: "/cpv-codigo" });
+  fastify.register(evidenciaRoutes, { prefix: "/evidencia" });
+  fastify.register(reglaRoutes, { prefix: "/regla" });
+  fastify.register(documentoRoutes, { prefix: "/documento" });
+  fastify.register(documentoseccionRoutes, { prefix: "/documento-seccion" });
+  fastify.register(documentogeneracionRoutes, {
+    prefix: "/documento-generacion",
+  });
+  fastify.register(documentoversionRoutes, { prefix: "/documento-version" });
+  fastify.register(documentoevidenciaRoutes, {
+    prefix: "/documento-evidencia",
+  });
+  fastify.register(validacionRoutes, { prefix: "/validacion" });
+  fastify.register(validacionevidenciaRoutes, {
+    prefix: "/validacion-evidencia",
+  });
+  fastify.register(revisionRoutes, { prefix: "/revision" });
+  fastify.register(comentarioRoutes, { prefix: "/comentario" });
+  fastify.register(auditlogRoutes, { prefix: "/audit-log" });
+  fastify.register(aiproviderRoutes, { prefix: "/ai-provider" });
+  fastify.register(aifunctionRoutes, { prefix: "/ai-function" });
+  fastify.register(aifunctionversionRoutes, { prefix: "/ai-function-version" });
+  fastify.register(aifunctionlogRoutes, { prefix: "/ai-function-log" });
+  fastify.register(incidenciaRoutes, { prefix: "/incidencia" });
 
-  // Admin user management
+  // Custom routes - Admin user management
   fastify.register(adminRoutes);
 
-  // CPV code search and import
+  // Custom routes - CPV code search and import
   fastify.register(cpvRoutes);
 
-  // AI document operations
+  // Custom routes - AI document operations
   fastify.register(aiDocumentRoutes);
 };
