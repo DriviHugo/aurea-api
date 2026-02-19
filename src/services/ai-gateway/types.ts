@@ -10,6 +10,7 @@ export enum AIProvider {
   GEMINI = "gemini",
   OLLAMA = "ollama",
   DEEPSEEK = "deepseek",
+  ALIA = "alia", // BSC ALIA-40B - Spanish sovereign model (on-premise)
 }
 
 export interface AIConfig {

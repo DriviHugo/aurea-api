@@ -15,6 +15,7 @@ import { OpenAIAdapter } from "./adapters/openai.adapter.js";
 import { AzureOpenAIAdapter } from "./adapters/azure-openai.adapter.js";
 import { GeminiAdapter } from "./adapters/gemini.adapter.js";
 import { AnthropicAdapter } from "./adapters/anthropic.adapter.js";
+import { ALIAAdapter } from "./adapters/alia.adapter.js";
 
 export class AIGatewayService {
   private adapter: AIProviderAdapter;
@@ -90,6 +91,8 @@ export class AIGatewayService {
         return new AnthropicAdapter(config);
       case AIProvider.DEEPSEEK:
         return new OllamaAdapter(config);
+      case AIProvider.ALIA:
+        return new ALIAAdapter(config);
       default:
         throw new Error(`Unsupported AI provider: ${config.provider}`);
     }
@@ -130,6 +133,8 @@ function getDefaultModel(provider: AIProvider): string {
       return "claude-3-5-sonnet-20241022";
     case AIProvider.DEEPSEEK:
       return "deepseek-chat";
+    case AIProvider.ALIA:
+      return "BSC-LT/ALIA-40b-instruct_Q8_0"; // Quantized version for production
   }
 }
 

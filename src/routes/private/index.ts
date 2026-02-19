@@ -32,6 +32,7 @@ import incidenciaRoutes from "./incidencia.routes.js";
 import adminRoutes from "./admin.js";
 import cpvRoutes from "./cpv.js";
 import aiDocumentRoutes from "./ai-document.js";
+import storageRoutes from "./storage.js";
 import type { FastifyInstance } from "fastify";
 
 export default async (fastify: FastifyInstance): Promise<void> => {
@@ -81,4 +82,7 @@ export default async (fastify: FastifyInstance): Promise<void> => {
 
   // Custom routes - AI document operations
   fastify.register(aiDocumentRoutes);
+
+  // Custom routes - File storage (MinIO/S3)
+  fastify.register(storageRoutes);
 };
