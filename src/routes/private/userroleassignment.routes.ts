@@ -4,22 +4,21 @@ import type { PrismaClient } from "@prisma/client";
 const routes: FastifyPluginAsync = async (fastify) => {
   const prisma: PrismaClient = fastify.prisma;
 
-  // List CpvCodigos with pagination
+  // List UserRoles with pagination
   fastify.get(
     "/",
     {
       preValidation: [fastify.authAccessToken],
       schema: {
-        tags: ["CpvCodigo"],
-        description: "Get list of CPV codes with pagination",
+        tags: ["UserRoles"],
+        description: "Get paginated list of user roles",
         querystring: {
           type: "object",
           properties: {
             page: { type: "integer", minimum: 1, default: 1 },
             limit: { type: "integer", minimum: 1, maximum: 100, default: 10 },
-            activo: { type: "boolean" },
-            nivel: { type: "integer", minimum: 1 },
-            codigo: { type: "string" },
+            userId: { type: "string", format: "uuid" },
+            role: { type: "string" },
           },
         },
         response: {
@@ -31,13 +30,9 @@ const routes: FastifyPluginAsync = async (fastify) => {
                 items: {
                   type: "object",
                   properties: {
-                    id: { type: "string" },
-                    codigo: { type: "string" },
-                    descripcion: { type: "string" },
-                    descripcionEn: { type: "string", nullable: true },
-                    nivel: { type: "integer" },
-                    codigoPadre: { type: "string", nullable: true },
-                    activo: { type: "boolean" },
+                    id: { type: "string", format: "uuid" },
+                    userId: { type: "string", format: "uuid" },
+                    role: { type: "string" },
                     createdAt: { type: "string", format: "date-time" },
                   },
                 },
@@ -53,34 +48,27 @@ const routes: FastifyPluginAsync = async (fastify) => {
     },
     async (request, reply) => {
       try {
-        const {
-          page = 1,
-          limit = 10,
-          activo,
-          nivel,
-          codigo,
-        } = request.query as any;
+        const { page = 1, limit = 10, userId, role } = request.query as any;
         const skip = (page - 1) * limit;
 
         const where: any = {};
-        if (activo !== undefined) where.activo = activo;
-        if (nivel !== undefined) where.nivel = nivel;
-        if (codigo) where.codigo = { contains: codigo, mode: "insensitive" };
+        if (userId) where.userId = userId;
+        if (role) where.role = role;
 
-        const [data, total] = await Promise.all([
-          prisma.cpvCodigo.findMany({
+        const [userRoles, total] = await Promise.all([
+          prisma.userRoleAssignment.findMany({
             where,
             skip,
             take: limit,
-            orderBy: { codigo: "asc" },
+            orderBy: { createdAt: "desc" },
           }),
-          prisma.cpvCodigo.count({ where }),
+          prisma.userRoleAssignment.count({ where }),
         ]);
 
         const totalPages = Math.ceil(total / limit);
 
         return reply.status(200).send({
-          data,
+          data: userRoles,
           total,
           page,
           limit,
@@ -92,14 +80,14 @@ const routes: FastifyPluginAsync = async (fastify) => {
     },
   );
 
-  // Get CpvCodigo by ID
+  // Get UserRole by ID
   fastify.get(
     "/:id",
     {
       preValidation: [fastify.authAccessToken],
       schema: {
-        tags: ["CpvCodigo"],
-        description: "Get CPV code by ID",
+        tags: ["UserRoles"],
+        description: "Get user role by ID",
         params: {
           type: "object",
           required: ["id"],
@@ -111,13 +99,9 @@ const routes: FastifyPluginAsync = async (fastify) => {
           200: {
             type: "object",
             properties: {
-              id: { type: "string" },
-              codigo: { type: "string" },
-              descripcion: { type: "string" },
-              descripcionEn: { type: "string", nullable: true },
-              nivel: { type: "integer" },
-              codigoPadre: { type: "string", nullable: true },
-              activo: { type: "boolean" },
+              id: { type: "string", format: "uuid" },
+              userId: { type: "string", format: "uuid" },
+              role: { type: "string" },
               createdAt: { type: "string", format: "date-time" },
             },
           },
@@ -134,52 +118,44 @@ const routes: FastifyPluginAsync = async (fastify) => {
       try {
         const { id } = request.params as { id: string };
 
-        const cpvCodigo = await prisma.cpvCodigo.findUnique({
+        const userRole = await prisma.userRoleAssignment.findUnique({
           where: { id },
         });
 
-        if (!cpvCodigo) {
-          return reply.status(404).send({ error: "CPV code not found" });
+        if (!userRole) {
+          return reply.status(404).send({ error: "User role not found" });
         }
 
-        return reply.status(200).send(cpvCodigo);
+        return reply.status(200).send(userRole);
       } catch (error) {
         return reply.status(500).send({ error: "Internal server error" });
       }
     },
   );
 
-  // Create CpvCodigo
+  // Create UserRole
   fastify.post(
     "/",
     {
       preValidation: [fastify.authAccessToken],
       schema: {
-        tags: ["CpvCodigo"],
-        description: "Create new CPV code",
+        tags: ["UserRoles"],
+        description: "Create a new user role",
         body: {
           type: "object",
-          required: ["codigo", "descripcion", "nivel"],
+          required: ["userId", "role"],
           properties: {
-            codigo: { type: "string", minLength: 1 },
-            descripcion: { type: "string", minLength: 1 },
-            descripcionEn: { type: "string", nullable: true },
-            nivel: { type: "integer", minimum: 1 },
-            codigoPadre: { type: "string", nullable: true },
-            activo: { type: "boolean", default: true },
+            userId: { type: "string", format: "uuid" },
+            role: { type: "string" },
           },
         },
         response: {
           201: {
             type: "object",
             properties: {
-              id: { type: "string" },
-              codigo: { type: "string" },
-              descripcion: { type: "string" },
-              descripcionEn: { type: "string", nullable: true },
-              nivel: { type: "integer" },
-              codigoPadre: { type: "string", nullable: true },
-              activo: { type: "boolean" },
+              id: { type: "string", format: "uuid" },
+              userId: { type: "string", format: "uuid" },
+              role: { type: "string" },
               createdAt: { type: "string", format: "date-time" },
             },
           },
@@ -194,30 +170,38 @@ const routes: FastifyPluginAsync = async (fastify) => {
     },
     async (request, reply) => {
       try {
-        const data = request.body as any;
+        const { userId, role } = request.body as {
+          userId: string;
+          role: string;
+        };
 
-        const cpvCodigo = await prisma.cpvCodigo.create({
-          data,
+        const userRole = await prisma.userRoleAssignment.create({
+          data: {
+            userId,
+            role: role as any,
+          },
         });
 
-        return reply.status(201).send(cpvCodigo);
+        return reply.status(201).send(userRole);
       } catch (error: any) {
         if (error.code === "P2002") {
-          return reply.status(400).send({ error: "CPV code already exists" });
+          return reply
+            .status(400)
+            .send({ error: "User role combination already exists" });
         }
         return reply.status(500).send({ error: "Internal server error" });
       }
     },
   );
 
-  // Update CpvCodigo
+  // Update UserRole
   fastify.put(
     "/:id",
     {
       preValidation: [fastify.authAccessToken],
       schema: {
-        tags: ["CpvCodigo"],
-        description: "Update CPV code by ID",
+        tags: ["UserRoles"],
+        description: "Update user role by ID",
         params: {
           type: "object",
           required: ["id"],
@@ -228,25 +212,17 @@ const routes: FastifyPluginAsync = async (fastify) => {
         body: {
           type: "object",
           properties: {
-            codigo: { type: "string", minLength: 1 },
-            descripcion: { type: "string", minLength: 1 },
-            descripcionEn: { type: "string", nullable: true },
-            nivel: { type: "integer", minimum: 1 },
-            codigoPadre: { type: "string", nullable: true },
-            activo: { type: "boolean" },
+            userId: { type: "string", format: "uuid" },
+            role: { type: "string" },
           },
         },
         response: {
           200: {
             type: "object",
             properties: {
-              id: { type: "string" },
-              codigo: { type: "string" },
-              descripcion: { type: "string" },
-              descripcionEn: { type: "string", nullable: true },
-              nivel: { type: "integer" },
-              codigoPadre: { type: "string", nullable: true },
-              activo: { type: "boolean" },
+              id: { type: "string", format: "uuid" },
+              userId: { type: "string", format: "uuid" },
+              role: { type: "string" },
               createdAt: { type: "string", format: "date-time" },
             },
           },
@@ -268,39 +244,45 @@ const routes: FastifyPluginAsync = async (fastify) => {
     async (request, reply) => {
       try {
         const { id } = request.params as { id: string };
-        const data = request.body as any;
+        const updateData = request.body as { userId?: string; role?: string };
 
-        const existingCpvCodigo = await prisma.cpvCodigo.findUnique({
+        const existingUserRole = await prisma.userRoleAssignment.findUnique({
           where: { id },
         });
 
-        if (!existingCpvCodigo) {
-          return reply.status(404).send({ error: "CPV code not found" });
+        if (!existingUserRole) {
+          return reply.status(404).send({ error: "User role not found" });
         }
 
-        const cpvCodigo = await prisma.cpvCodigo.update({
+        const data: any = {};
+        if (updateData.userId) data.userId = updateData.userId;
+        if (updateData.role) data.role = updateData.role;
+
+        const userRole = await prisma.userRoleAssignment.update({
           where: { id },
           data,
         });
 
-        return reply.status(200).send(cpvCodigo);
+        return reply.status(200).send(userRole);
       } catch (error: any) {
         if (error.code === "P2002") {
-          return reply.status(400).send({ error: "CPV code already exists" });
+          return reply
+            .status(400)
+            .send({ error: "User role combination already exists" });
         }
         return reply.status(500).send({ error: "Internal server error" });
       }
     },
   );
 
-  // Delete CpvCodigo
+  // Delete UserRole
   fastify.delete(
     "/:id",
     {
       preValidation: [fastify.authAccessToken],
       schema: {
-        tags: ["CpvCodigo"],
-        description: "Delete CPV code by ID",
+        tags: ["UserRoles"],
+        description: "Delete user role by ID",
         params: {
           type: "object",
           required: ["id"],
@@ -328,21 +310,21 @@ const routes: FastifyPluginAsync = async (fastify) => {
       try {
         const { id } = request.params as { id: string };
 
-        const existingCpvCodigo = await prisma.cpvCodigo.findUnique({
+        const existingUserRole = await prisma.userRoleAssignment.findUnique({
           where: { id },
         });
 
-        if (!existingCpvCodigo) {
-          return reply.status(404).send({ error: "CPV code not found" });
+        if (!existingUserRole) {
+          return reply.status(404).send({ error: "User role not found" });
         }
 
-        await prisma.cpvCodigo.delete({
+        await prisma.userRoleAssignment.delete({
           where: { id },
         });
 
         return reply
           .status(200)
-          .send({ message: "CPV code deleted successfully" });
+          .send({ message: "User role deleted successfully" });
       } catch (error) {
         return reply.status(500).send({ error: "Internal server error" });
       }

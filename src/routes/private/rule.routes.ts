@@ -64,12 +64,12 @@ const routes: FastifyPluginAsync = async (fastify) => {
         const skip = (page - 1) * limit;
 
         const [reglas, total] = await Promise.all([
-          prisma.regla.findMany({
+          prisma.rule.findMany({
             skip,
             take: limit,
             orderBy: { createdAt: "desc" },
           }),
-          prisma.regla.count(),
+          prisma.rule.count(),
         ]);
 
         const totalPages = Math.ceil(total / limit);
@@ -136,7 +136,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
       try {
         const { id } = request.params as { id: string };
 
-        const regla = await prisma.regla.findUnique({
+        const regla = await prisma.rule.findUnique({
           where: { id },
         });
 
@@ -237,7 +237,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
           fechaAprobacion?: string;
         };
 
-        const regla = await prisma.regla.create({
+        const regla = await prisma.rule.create({
           data: {
             codigo: data.codigo,
             nombre: data.nombre,
@@ -352,7 +352,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
           fechaAprobacion?: string | null;
         };
 
-        const existingRegla = await prisma.regla.findUnique({
+        const existingRegla = await prisma.rule.findUnique({
           where: { id },
         });
 
@@ -360,7 +360,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
           return reply.status(404).send({ error: "Regla not found" });
         }
 
-        const regla = await prisma.regla.update({
+        const regla = await prisma.rule.update({
           where: { id },
           data: {
             codigo: data.codigo,
@@ -425,7 +425,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
       try {
         const { id } = request.params as { id: string };
 
-        const existingRegla = await prisma.regla.findUnique({
+        const existingRegla = await prisma.rule.findUnique({
           where: { id },
         });
 
@@ -433,7 +433,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
           return reply.status(404).send({ error: "Regla not found" });
         }
 
-        await prisma.regla.delete({
+        await prisma.rule.delete({
           where: { id },
         });
 

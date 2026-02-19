@@ -5,28 +5,28 @@
 
 // Entity CRUD routes (previously auto-generated)
 import profileRoutes from "./profile.routes.js";
-import userroleRoutes from "./userrole.routes.js";
-import expedienteRoutes from "./expediente.routes.js";
-import alternativaprocedimientoRoutes from "./alternativaprocedimiento.routes.js";
-import cpvrecomendadoRoutes from "./cpvrecomendado.routes.js";
-import cpvcodigoRoutes from "./cpvcodigo.routes.js";
-import evidenciaRoutes from "./evidencia.routes.js";
-import reglaRoutes from "./regla.routes.js";
-import documentoRoutes from "./documento.routes.js";
-import documentoseccionRoutes from "./documentoseccion.routes.js";
-import documentogeneracionRoutes from "./documentogeneracion.routes.js";
-import documentoversionRoutes from "./documentoversion.routes.js";
-import documentoevidenciaRoutes from "./documentoevidencia.routes.js";
-import validacionRoutes from "./validacion.routes.js";
-import validacionevidenciaRoutes from "./validacionevidencia.routes.js";
-import revisionRoutes from "./revision.routes.js";
-import comentarioRoutes from "./comentario.routes.js";
+import userroleRoutes from "./userroleassignment.routes.js";
+import expedienteRoutes from "./case.routes.js";
+import alternativaprocedimientoRoutes from "./procedurealternative.routes.js";
+import cpvrecomendadoRoutes from "./recommendedcpv.routes.js";
+import cpvcodigoRoutes from "./cpvcode.routes.js";
+import evidenciaRoutes from "./evidence.routes.js";
+import reglaRoutes from "./rule.routes.js";
+import documentoRoutes from "./document.routes.js";
+import documentoseccionRoutes from "./documentsection.routes.js";
+import documentogeneracionRoutes from "./documentgeneration.routes.js";
+import documentoversionRoutes from "./documentversion.routes.js";
+import documentoevidenciaRoutes from "./documentevidence.routes.js";
+import validacionRoutes from "./validation.routes.js";
+import validacionevidenciaRoutes from "./validationevidence.routes.js";
+import revisionRoutes from "./review.routes.js";
+import comentarioRoutes from "./comment.routes.js";
 import auditlogRoutes from "./auditlog.routes.js";
 import aiproviderRoutes from "./aiprovider.routes.js";
 import aifunctionRoutes from "./aifunction.routes.js";
 import aifunctionversionRoutes from "./aifunctionversion.routes.js";
 import aifunctionlogRoutes from "./aifunctionlog.routes.js";
-import incidenciaRoutes from "./incidencia.routes.js";
+import incidenciaRoutes from "./issue.routes.js";
 
 // Custom routes
 import adminRoutes from "./admin.js";

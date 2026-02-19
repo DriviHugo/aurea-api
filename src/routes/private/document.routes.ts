@@ -110,13 +110,13 @@ const routes: FastifyPluginAsync = async (fastify) => {
         if (estado) where.estado = estado;
 
         const [documentos, total] = await Promise.all([
-          prisma.documento.findMany({
+          prisma.document.findMany({
             where,
             skip,
             take: limit,
             orderBy: { createdAt: "desc" },
           }),
-          prisma.documento.count({ where }),
+          prisma.document.count({ where }),
         ]);
 
         const totalPages = Math.ceil(total / limit);
@@ -183,7 +183,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
       try {
         const { id } = request.params as { id: string };
 
-        const documento = await prisma.documento.findUnique({
+        const documento = await prisma.document.findUnique({
           where: { id },
         });
 
@@ -256,7 +256,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
         fastify.log.info({ body: data }, "POST /documentos - received data");
 
         // Verify expediente exists
-        const expediente = await prisma.expediente.findUnique({
+        const expediente = await prisma.case.findUnique({
           where: { id: data.expedienteId },
         });
 
@@ -278,7 +278,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
           return reply.status(400).send({ error: "Creador not found" });
         }
 
-        const documento = await prisma.documento.create({
+        const documento = await prisma.document.create({
           data: {
             expedienteId: data.expedienteId,
             tipo: convertTipoDocumento(data.tipo) as any,
@@ -369,7 +369,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
         const { id } = request.params as { id: string };
         const data = request.body as any;
 
-        const existingDocumento = await prisma.documento.findUnique({
+        const existingDocumento = await prisma.document.findUnique({
           where: { id },
         });
 
@@ -377,7 +377,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
           return reply.status(404).send({ error: "Documento not found" });
         }
 
-        const documento = await prisma.documento.update({
+        const documento = await prisma.document.update({
           where: { id },
           data: {
             tipo: data.tipo
@@ -435,7 +435,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
       try {
         const { id } = request.params as { id: string };
 
-        const existingDocumento = await prisma.documento.findUnique({
+        const existingDocumento = await prisma.document.findUnique({
           where: { id },
         });
 
@@ -443,7 +443,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
           return reply.status(404).send({ error: "Documento not found" });
         }
 
-        await prisma.documento.delete({
+        await prisma.document.delete({
           where: { id },
         });
 

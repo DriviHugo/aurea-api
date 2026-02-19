@@ -63,7 +63,7 @@ Por favor, reescribe la sección integrando la sugerencia de manera natural.`;
     );
 
     // Update the section in the database
-    await this.prisma.documentoSeccion.update({
+    await this.prisma.documentSection.update({
       where: { id: seccionId },
       data: {
         contenido: nuevoContenido,

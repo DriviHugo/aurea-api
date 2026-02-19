@@ -71,13 +71,13 @@ const routes: FastifyPluginAsync = async (fastify) => {
         if (passed !== undefined) where.passed = passed;
 
         const [validaciones, total] = await Promise.all([
-          prisma.validacion.findMany({
+          prisma.validation.findMany({
             where,
             skip,
             take: limit,
             orderBy: { createdAt: "desc" },
           }),
-          prisma.validacion.count({ where }),
+          prisma.validation.count({ where }),
         ]);
 
         const totalPages = Math.ceil(total / limit);
@@ -140,7 +140,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
       try {
         const { id } = request.params as { id: string };
 
-        const validacion = await prisma.validacion.findUnique({
+        const validacion = await prisma.validation.findUnique({
           where: { id },
         });
 
@@ -224,11 +224,11 @@ const routes: FastifyPluginAsync = async (fastify) => {
 
         // Verify related entities exist
         const [expediente, regla, usuario, documento] = await Promise.all([
-          prisma.expediente.findUnique({ where: { id: data.expedienteId } }),
-          prisma.regla.findUnique({ where: { id: data.reglaId } }),
+          prisma.case.findUnique({ where: { id: data.expedienteId } }),
+          prisma.rule.findUnique({ where: { id: data.reglaId } }),
           prisma.profile.findUnique({ where: { id: data.usuarioId } }),
           data.documentoId
-            ? prisma.documento.findUnique({ where: { id: data.documentoId } })
+            ? prisma.document.findUnique({ where: { id: data.documentoId } })
             : null,
         ]);
 
@@ -245,7 +245,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
           return reply.status(400).send({ error: "Documento not found" });
         }
 
-        const validacion = await prisma.validacion.create({
+        const validacion = await prisma.validation.create({
           data: {
             expedienteId: data.expedienteId,
             documentoId: data.documentoId,
@@ -334,7 +334,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
         const { id } = request.params as { id: string };
         const data = request.body as any;
 
-        const existingValidacion = await prisma.validacion.findUnique({
+        const existingValidacion = await prisma.validation.findUnique({
           where: { id },
         });
 
@@ -346,14 +346,14 @@ const routes: FastifyPluginAsync = async (fastify) => {
         const verifications = [];
         if (data.expedienteId) {
           verifications.push(
-            prisma.expediente
+            prisma.case
               .findUnique({ where: { id: data.expedienteId } })
               .then((result) => ({ type: "expediente", result })),
           );
         }
         if (data.reglaId) {
           verifications.push(
-            prisma.regla
+            prisma.rule
               .findUnique({ where: { id: data.reglaId } })
               .then((result) => ({ type: "regla", result })),
           );
@@ -367,7 +367,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
         }
         if (data.documentoId) {
           verifications.push(
-            prisma.documento
+            prisma.document
               .findUnique({ where: { id: data.documentoId } })
               .then((result) => ({ type: "documento", result })),
           );
@@ -382,7 +382,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
           }
         }
 
-        const validacion = await prisma.validacion.update({
+        const validacion = await prisma.validation.update({
           where: { id },
           data: {
             ...(data.expedienteId && { expedienteId: data.expedienteId }),
@@ -447,7 +447,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
       try {
         const { id } = request.params as { id: string };
 
-        const existingValidacion = await prisma.validacion.findUnique({
+        const existingValidacion = await prisma.validation.findUnique({
           where: { id },
         });
 
@@ -455,7 +455,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
           return reply.status(404).send({ error: "Validacion not found" });
         }
 
-        await prisma.validacion.delete({
+        await prisma.validation.delete({
           where: { id },
         });
 

@@ -4,20 +4,22 @@ import type { PrismaClient } from "@prisma/client";
 const routes: FastifyPluginAsync = async (fastify) => {
   const prisma: PrismaClient = fastify.prisma;
 
-  // GET /documento-versions - List with pagination
+  // List CpvCodigos with pagination
   fastify.get(
     "/",
     {
       preValidation: [fastify.authAccessToken],
       schema: {
-        tags: ["DocumentoVersion"],
-        description: "Get paginated list of documento versions",
+        tags: ["CpvCodigo"],
+        description: "Get list of CPV codes with pagination",
         querystring: {
           type: "object",
           properties: {
             page: { type: "integer", minimum: 1, default: 1 },
             limit: { type: "integer", minimum: 1, maximum: 100, default: 10 },
-            documentoId: { type: "string", format: "uuid" },
+            activo: { type: "boolean" },
+            nivel: { type: "integer", minimum: 1 },
+            codigo: { type: "string" },
           },
         },
         response: {
@@ -29,13 +31,13 @@ const routes: FastifyPluginAsync = async (fastify) => {
                 items: {
                   type: "object",
                   properties: {
-                    id: { type: "string", format: "uuid" },
-                    documentoId: { type: "string", format: "uuid" },
-                    version: { type: "integer" },
-                    contenidoSnapshot: { type: "object" },
-                    seccionesSnapshot: { type: ["object", "null"] },
-                    descripcionCambio: { type: ["string", "null"] },
-                    usuarioId: { type: "string", format: "uuid" },
+                    id: { type: "string" },
+                    codigo: { type: "string" },
+                    descripcion: { type: "string" },
+                    descripcionEn: { type: "string", nullable: true },
+                    nivel: { type: "integer" },
+                    codigoPadre: { type: "string", nullable: true },
+                    activo: { type: "boolean" },
                     createdAt: { type: "string", format: "date-time" },
                   },
                 },
@@ -51,19 +53,28 @@ const routes: FastifyPluginAsync = async (fastify) => {
     },
     async (request, reply) => {
       try {
-        const { page = 1, limit = 10, documentoId } = request.query as any;
+        const {
+          page = 1,
+          limit = 10,
+          activo,
+          nivel,
+          codigo,
+        } = request.query as any;
         const skip = (page - 1) * limit;
 
-        const where = documentoId ? { documentoId } : {};
+        const where: any = {};
+        if (activo !== undefined) where.activo = activo;
+        if (nivel !== undefined) where.nivel = nivel;
+        if (codigo) where.codigo = { contains: codigo, mode: "insensitive" };
 
         const [data, total] = await Promise.all([
-          prisma.documentoVersion.findMany({
+          prisma.cpvCode.findMany({
             where,
             skip,
             take: limit,
-            orderBy: { createdAt: "desc" },
+            orderBy: { codigo: "asc" },
           }),
-          prisma.documentoVersion.count({ where }),
+          prisma.cpvCode.count({ where }),
         ]);
 
         const totalPages = Math.ceil(total / limit);
@@ -81,14 +92,14 @@ const routes: FastifyPluginAsync = async (fastify) => {
     },
   );
 
-  // GET /documento-versions/:id - Get by ID
+  // Get CpvCodigo by ID
   fastify.get(
     "/:id",
     {
       preValidation: [fastify.authAccessToken],
       schema: {
-        tags: ["DocumentoVersion"],
-        description: "Get documento version by ID",
+        tags: ["CpvCodigo"],
+        description: "Get CPV code by ID",
         params: {
           type: "object",
           required: ["id"],
@@ -100,13 +111,13 @@ const routes: FastifyPluginAsync = async (fastify) => {
           200: {
             type: "object",
             properties: {
-              id: { type: "string", format: "uuid" },
-              documentoId: { type: "string", format: "uuid" },
-              version: { type: "integer" },
-              contenidoSnapshot: { type: "object" },
-              seccionesSnapshot: { type: ["object", "null"] },
-              descripcionCambio: { type: ["string", "null"] },
-              usuarioId: { type: "string", format: "uuid" },
+              id: { type: "string" },
+              codigo: { type: "string" },
+              descripcion: { type: "string" },
+              descripcionEn: { type: "string", nullable: true },
+              nivel: { type: "integer" },
+              codigoPadre: { type: "string", nullable: true },
+              activo: { type: "boolean" },
               createdAt: { type: "string", format: "date-time" },
             },
           },
@@ -123,59 +134,52 @@ const routes: FastifyPluginAsync = async (fastify) => {
       try {
         const { id } = request.params as { id: string };
 
-        const documentoVersion = await prisma.documentoVersion.findUnique({
+        const cpvCodigo = await prisma.cpvCode.findUnique({
           where: { id },
         });
 
-        if (!documentoVersion) {
-          return reply
-            .status(404)
-            .send({ error: "Documento version not found" });
+        if (!cpvCodigo) {
+          return reply.status(404).send({ error: "CPV code not found" });
         }
 
-        return reply.status(200).send(documentoVersion);
+        return reply.status(200).send(cpvCodigo);
       } catch (error) {
         return reply.status(500).send({ error: "Internal server error" });
       }
     },
   );
 
-  // POST /documento-versions - Create
+  // Create CpvCodigo
   fastify.post(
     "/",
     {
       preValidation: [fastify.authAccessToken],
       schema: {
-        tags: ["DocumentoVersion"],
-        description: "Create new documento version",
+        tags: ["CpvCodigo"],
+        description: "Create new CPV code",
         body: {
           type: "object",
-          required: [
-            "documentoId",
-            "version",
-            "contenidoSnapshot",
-            "usuarioId",
-          ],
+          required: ["codigo", "descripcion", "nivel"],
           properties: {
-            documentoId: { type: "string", format: "uuid" },
-            version: { type: "integer", minimum: 1 },
-            contenidoSnapshot: { type: "object" },
-            seccionesSnapshot: { type: ["object", "null"] },
-            descripcionCambio: { type: ["string", "null"] },
-            usuarioId: { type: "string", format: "uuid" },
+            codigo: { type: "string", minLength: 1 },
+            descripcion: { type: "string", minLength: 1 },
+            descripcionEn: { type: "string", nullable: true },
+            nivel: { type: "integer", minimum: 1 },
+            codigoPadre: { type: "string", nullable: true },
+            activo: { type: "boolean", default: true },
           },
         },
         response: {
           201: {
             type: "object",
             properties: {
-              id: { type: "string", format: "uuid" },
-              documentoId: { type: "string", format: "uuid" },
-              version: { type: "integer" },
-              contenidoSnapshot: { type: "object" },
-              seccionesSnapshot: { type: ["object", "null"] },
-              descripcionCambio: { type: ["string", "null"] },
-              usuarioId: { type: "string", format: "uuid" },
+              id: { type: "string" },
+              codigo: { type: "string" },
+              descripcion: { type: "string" },
+              descripcionEn: { type: "string", nullable: true },
+              nivel: { type: "integer" },
+              codigoPadre: { type: "string", nullable: true },
+              activo: { type: "boolean" },
               createdAt: { type: "string", format: "date-time" },
             },
           },
@@ -192,35 +196,28 @@ const routes: FastifyPluginAsync = async (fastify) => {
       try {
         const data = request.body as any;
 
-        const documentoVersion = await prisma.documentoVersion.create({
+        const cpvCodigo = await prisma.cpvCode.create({
           data,
         });
 
-        return reply.status(201).send(documentoVersion);
+        return reply.status(201).send(cpvCodigo);
       } catch (error: any) {
         if (error.code === "P2002") {
-          return reply
-            .status(400)
-            .send({ error: "Version already exists for this documento" });
-        }
-        if (error.code === "P2003") {
-          return reply
-            .status(400)
-            .send({ error: "Referenced documento or usuario does not exist" });
+          return reply.status(400).send({ error: "CPV code already exists" });
         }
         return reply.status(500).send({ error: "Internal server error" });
       }
     },
   );
 
-  // PUT /documento-versions/:id - Update
+  // Update CpvCodigo
   fastify.put(
     "/:id",
     {
       preValidation: [fastify.authAccessToken],
       schema: {
-        tags: ["DocumentoVersion"],
-        description: "Update documento version by ID",
+        tags: ["CpvCodigo"],
+        description: "Update CPV code by ID",
         params: {
           type: "object",
           required: ["id"],
@@ -231,26 +228,35 @@ const routes: FastifyPluginAsync = async (fastify) => {
         body: {
           type: "object",
           properties: {
-            contenidoSnapshot: { type: "object" },
-            seccionesSnapshot: { type: ["object", "null"] },
-            descripcionCambio: { type: ["string", "null"] },
+            codigo: { type: "string", minLength: 1 },
+            descripcion: { type: "string", minLength: 1 },
+            descripcionEn: { type: "string", nullable: true },
+            nivel: { type: "integer", minimum: 1 },
+            codigoPadre: { type: "string", nullable: true },
+            activo: { type: "boolean" },
           },
         },
         response: {
           200: {
             type: "object",
             properties: {
-              id: { type: "string", format: "uuid" },
-              documentoId: { type: "string", format: "uuid" },
-              version: { type: "integer" },
-              contenidoSnapshot: { type: "object" },
-              seccionesSnapshot: { type: ["object", "null"] },
-              descripcionCambio: { type: ["string", "null"] },
-              usuarioId: { type: "string", format: "uuid" },
+              id: { type: "string" },
+              codigo: { type: "string" },
+              descripcion: { type: "string" },
+              descripcionEn: { type: "string", nullable: true },
+              nivel: { type: "integer" },
+              codigoPadre: { type: "string", nullable: true },
+              activo: { type: "boolean" },
               createdAt: { type: "string", format: "date-time" },
             },
           },
           404: {
+            type: "object",
+            properties: {
+              error: { type: "string" },
+            },
+          },
+          400: {
             type: "object",
             properties: {
               error: { type: "string" },
@@ -264,36 +270,37 @@ const routes: FastifyPluginAsync = async (fastify) => {
         const { id } = request.params as { id: string };
         const data = request.body as any;
 
-        const existingVersion = await prisma.documentoVersion.findUnique({
+        const existingCpvCodigo = await prisma.cpvCode.findUnique({
           where: { id },
         });
 
-        if (!existingVersion) {
-          return reply
-            .status(404)
-            .send({ error: "Documento version not found" });
+        if (!existingCpvCodigo) {
+          return reply.status(404).send({ error: "CPV code not found" });
         }
 
-        const documentoVersion = await prisma.documentoVersion.update({
+        const cpvCodigo = await prisma.cpvCode.update({
           where: { id },
           data,
         });
 
-        return reply.status(200).send(documentoVersion);
-      } catch (error) {
+        return reply.status(200).send(cpvCodigo);
+      } catch (error: any) {
+        if (error.code === "P2002") {
+          return reply.status(400).send({ error: "CPV code already exists" });
+        }
         return reply.status(500).send({ error: "Internal server error" });
       }
     },
   );
 
-  // DELETE /documento-versions/:id - Delete
+  // Delete CpvCodigo
   fastify.delete(
     "/:id",
     {
       preValidation: [fastify.authAccessToken],
       schema: {
-        tags: ["DocumentoVersion"],
-        description: "Delete documento version by ID",
+        tags: ["CpvCodigo"],
+        description: "Delete CPV code by ID",
         params: {
           type: "object",
           required: ["id"],
@@ -321,23 +328,21 @@ const routes: FastifyPluginAsync = async (fastify) => {
       try {
         const { id } = request.params as { id: string };
 
-        const existingVersion = await prisma.documentoVersion.findUnique({
+        const existingCpvCodigo = await prisma.cpvCode.findUnique({
           where: { id },
         });
 
-        if (!existingVersion) {
-          return reply
-            .status(404)
-            .send({ error: "Documento version not found" });
+        if (!existingCpvCodigo) {
+          return reply.status(404).send({ error: "CPV code not found" });
         }
 
-        await prisma.documentoVersion.delete({
+        await prisma.cpvCode.delete({
           where: { id },
         });
 
         return reply
           .status(200)
-          .send({ message: "Documento version deleted successfully" });
+          .send({ message: "CPV code deleted successfully" });
       } catch (error) {
         return reply.status(500).send({ error: "Internal server error" });
       }

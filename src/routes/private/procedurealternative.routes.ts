@@ -4,21 +4,20 @@ import type { PrismaClient } from "@prisma/client";
 const routes: FastifyPluginAsync = async (fastify) => {
   const prisma: PrismaClient = fastify.prisma;
 
-  // List UserRoles with pagination
+  // GET /alternativas-procedimiento - List with pagination
   fastify.get(
     "/",
     {
       preValidation: [fastify.authAccessToken],
       schema: {
-        tags: ["UserRoles"],
-        description: "Get paginated list of user roles",
+        tags: ["AlternativaProcedimiento"],
+        description: "Get list of alternativas procedimiento with pagination",
         querystring: {
           type: "object",
           properties: {
             page: { type: "integer", minimum: 1, default: 1 },
             limit: { type: "integer", minimum: 1, maximum: 100, default: 10 },
-            userId: { type: "string", format: "uuid" },
-            role: { type: "string" },
+            expedienteId: { type: "string", format: "uuid" },
           },
         },
         response: {
@@ -31,8 +30,10 @@ const routes: FastifyPluginAsync = async (fastify) => {
                   type: "object",
                   properties: {
                     id: { type: "string", format: "uuid" },
-                    userId: { type: "string", format: "uuid" },
-                    role: { type: "string" },
+                    expedienteId: { type: "string", format: "uuid" },
+                    procedimiento: { type: "string" },
+                    puntuacion: { type: ["integer", "null"] },
+                    justificacion: { type: "string" },
                     createdAt: { type: "string", format: "date-time" },
                   },
                 },
@@ -48,27 +49,25 @@ const routes: FastifyPluginAsync = async (fastify) => {
     },
     async (request, reply) => {
       try {
-        const { page = 1, limit = 10, userId, role } = request.query as any;
+        const { page = 1, limit = 10, expedienteId } = request.query as any;
         const skip = (page - 1) * limit;
 
-        const where: any = {};
-        if (userId) where.userId = userId;
-        if (role) where.role = role;
+        const where = expedienteId ? { expedienteId } : {};
 
-        const [userRoles, total] = await Promise.all([
-          prisma.userRole.findMany({
+        const [data, total] = await Promise.all([
+          prisma.procedureAlternative.findMany({
             where,
             skip,
             take: limit,
             orderBy: { createdAt: "desc" },
           }),
-          prisma.userRole.count({ where }),
+          prisma.procedureAlternative.count({ where }),
         ]);
 
         const totalPages = Math.ceil(total / limit);
 
         return reply.status(200).send({
-          data: userRoles,
+          data,
           total,
           page,
           limit,
@@ -80,14 +79,14 @@ const routes: FastifyPluginAsync = async (fastify) => {
     },
   );
 
-  // Get UserRole by ID
+  // GET /alternativas-procedimiento/:id - Get by ID
   fastify.get(
     "/:id",
     {
       preValidation: [fastify.authAccessToken],
       schema: {
-        tags: ["UserRoles"],
-        description: "Get user role by ID",
+        tags: ["AlternativaProcedimiento"],
+        description: "Get alternativa procedimiento by ID",
         params: {
           type: "object",
           required: ["id"],
@@ -100,8 +99,10 @@ const routes: FastifyPluginAsync = async (fastify) => {
             type: "object",
             properties: {
               id: { type: "string", format: "uuid" },
-              userId: { type: "string", format: "uuid" },
-              role: { type: "string" },
+              expedienteId: { type: "string", format: "uuid" },
+              procedimiento: { type: "string" },
+              puntuacion: { type: ["integer", "null"] },
+              justificacion: { type: "string" },
               createdAt: { type: "string", format: "date-time" },
             },
           },
@@ -118,35 +119,39 @@ const routes: FastifyPluginAsync = async (fastify) => {
       try {
         const { id } = request.params as { id: string };
 
-        const userRole = await prisma.userRole.findUnique({
+        const alternativa = await prisma.procedureAlternative.findUnique({
           where: { id },
         });
 
-        if (!userRole) {
-          return reply.status(404).send({ error: "User role not found" });
+        if (!alternativa) {
+          return reply
+            .status(404)
+            .send({ error: "Alternativa procedimiento not found" });
         }
 
-        return reply.status(200).send(userRole);
+        return reply.status(200).send(alternativa);
       } catch (error) {
         return reply.status(500).send({ error: "Internal server error" });
       }
     },
   );
 
-  // Create UserRole
+  // POST /alternativas-procedimiento - Create
   fastify.post(
     "/",
     {
       preValidation: [fastify.authAccessToken],
       schema: {
-        tags: ["UserRoles"],
-        description: "Create a new user role",
+        tags: ["AlternativaProcedimiento"],
+        description: "Create new alternativa procedimiento",
         body: {
           type: "object",
-          required: ["userId", "role"],
+          required: ["expedienteId", "procedimiento", "justificacion"],
           properties: {
-            userId: { type: "string", format: "uuid" },
-            role: { type: "string" },
+            expedienteId: { type: "string", format: "uuid" },
+            procedimiento: { type: "string" },
+            puntuacion: { type: ["integer", "null"] },
+            justificacion: { type: "string", minLength: 1 },
           },
         },
         response: {
@@ -154,8 +159,10 @@ const routes: FastifyPluginAsync = async (fastify) => {
             type: "object",
             properties: {
               id: { type: "string", format: "uuid" },
-              userId: { type: "string", format: "uuid" },
-              role: { type: "string" },
+              expedienteId: { type: "string", format: "uuid" },
+              procedimiento: { type: "string" },
+              puntuacion: { type: ["integer", "null"] },
+              justificacion: { type: "string" },
               createdAt: { type: "string", format: "date-time" },
             },
           },
@@ -170,38 +177,42 @@ const routes: FastifyPluginAsync = async (fastify) => {
     },
     async (request, reply) => {
       try {
-        const { userId, role } = request.body as {
-          userId: string;
-          role: string;
-        };
+        const { expedienteId, procedimiento, puntuacion, justificacion } =
+          request.body as any;
 
-        const userRole = await prisma.userRole.create({
+        // Verify expediente exists
+        const expediente = await prisma.case.findUnique({
+          where: { id: expedienteId },
+        });
+
+        if (!expediente) {
+          return reply.status(400).send({ error: "Expediente not found" });
+        }
+
+        const alternativa = await prisma.procedureAlternative.create({
           data: {
-            userId,
-            role: role as any,
+            expedienteId,
+            procedimiento,
+            puntuacion,
+            justificacion,
           },
         });
 
-        return reply.status(201).send(userRole);
-      } catch (error: any) {
-        if (error.code === "P2002") {
-          return reply
-            .status(400)
-            .send({ error: "User role combination already exists" });
-        }
+        return reply.status(201).send(alternativa);
+      } catch (error) {
         return reply.status(500).send({ error: "Internal server error" });
       }
     },
   );
 
-  // Update UserRole
+  // PUT /alternativas-procedimiento/:id - Update
   fastify.put(
     "/:id",
     {
       preValidation: [fastify.authAccessToken],
       schema: {
-        tags: ["UserRoles"],
-        description: "Update user role by ID",
+        tags: ["AlternativaProcedimiento"],
+        description: "Update alternativa procedimiento",
         params: {
           type: "object",
           required: ["id"],
@@ -212,8 +223,10 @@ const routes: FastifyPluginAsync = async (fastify) => {
         body: {
           type: "object",
           properties: {
-            userId: { type: "string", format: "uuid" },
-            role: { type: "string" },
+            expedienteId: { type: "string", format: "uuid" },
+            procedimiento: { type: "string" },
+            puntuacion: { type: ["integer", "null"] },
+            justificacion: { type: "string", minLength: 1 },
           },
         },
         response: {
@@ -221,8 +234,10 @@ const routes: FastifyPluginAsync = async (fastify) => {
             type: "object",
             properties: {
               id: { type: "string", format: "uuid" },
-              userId: { type: "string", format: "uuid" },
-              role: { type: "string" },
+              expedienteId: { type: "string", format: "uuid" },
+              procedimiento: { type: "string" },
+              puntuacion: { type: ["integer", "null"] },
+              justificacion: { type: "string" },
               createdAt: { type: "string", format: "date-time" },
             },
           },
@@ -244,45 +259,59 @@ const routes: FastifyPluginAsync = async (fastify) => {
     async (request, reply) => {
       try {
         const { id } = request.params as { id: string };
-        const updateData = request.body as { userId?: string; role?: string };
+        const { expedienteId, procedimiento, puntuacion, justificacion } =
+          request.body as any;
 
-        const existingUserRole = await prisma.userRole.findUnique({
-          where: { id },
-        });
+        const existingAlternativa =
+          await prisma.procedureAlternative.findUnique({
+            where: { id },
+          });
 
-        if (!existingUserRole) {
-          return reply.status(404).send({ error: "User role not found" });
-        }
-
-        const data: any = {};
-        if (updateData.userId) data.userId = updateData.userId;
-        if (updateData.role) data.role = updateData.role;
-
-        const userRole = await prisma.userRole.update({
-          where: { id },
-          data,
-        });
-
-        return reply.status(200).send(userRole);
-      } catch (error: any) {
-        if (error.code === "P2002") {
+        if (!existingAlternativa) {
           return reply
-            .status(400)
-            .send({ error: "User role combination already exists" });
+            .status(404)
+            .send({ error: "Alternativa procedimiento not found" });
         }
+
+        // If expedienteId is being updated, verify it exists
+        if (expedienteId && expedienteId !== existingAlternativa.expedienteId) {
+          const expediente = await prisma.case.findUnique({
+            where: { id: expedienteId },
+          });
+
+          if (!expediente) {
+            return reply.status(400).send({ error: "Expediente not found" });
+          }
+        }
+
+        const updateData: any = {};
+        if (expedienteId !== undefined) updateData.expedienteId = expedienteId;
+        if (procedimiento !== undefined)
+          updateData.procedimiento = procedimiento;
+        if (puntuacion !== undefined) updateData.puntuacion = puntuacion;
+        if (justificacion !== undefined)
+          updateData.justificacion = justificacion;
+
+        const alternativa = await prisma.procedureAlternative.update({
+          where: { id },
+          data: updateData,
+        });
+
+        return reply.status(200).send(alternativa);
+      } catch (error) {
         return reply.status(500).send({ error: "Internal server error" });
       }
     },
   );
 
-  // Delete UserRole
+  // DELETE /alternativas-procedimiento/:id - Delete
   fastify.delete(
     "/:id",
     {
       preValidation: [fastify.authAccessToken],
       schema: {
-        tags: ["UserRoles"],
-        description: "Delete user role by ID",
+        tags: ["AlternativaProcedimiento"],
+        description: "Delete alternativa procedimiento",
         params: {
           type: "object",
           required: ["id"],
@@ -310,21 +339,24 @@ const routes: FastifyPluginAsync = async (fastify) => {
       try {
         const { id } = request.params as { id: string };
 
-        const existingUserRole = await prisma.userRole.findUnique({
-          where: { id },
-        });
+        const existingAlternativa =
+          await prisma.procedureAlternative.findUnique({
+            where: { id },
+          });
 
-        if (!existingUserRole) {
-          return reply.status(404).send({ error: "User role not found" });
+        if (!existingAlternativa) {
+          return reply
+            .status(404)
+            .send({ error: "Alternativa procedimiento not found" });
         }
 
-        await prisma.userRole.delete({
+        await prisma.procedureAlternative.delete({
           where: { id },
         });
 
         return reply
           .status(200)
-          .send({ message: "User role deleted successfully" });
+          .send({ message: "Alternativa procedimiento deleted successfully" });
       } catch (error) {
         return reply.status(500).send({ error: "Internal server error" });
       }

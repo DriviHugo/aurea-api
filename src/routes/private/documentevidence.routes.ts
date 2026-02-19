@@ -4,20 +4,21 @@ import type { PrismaClient } from "@prisma/client";
 const routes: FastifyPluginAsync = async (fastify) => {
   const prisma: PrismaClient = fastify.prisma;
 
-  // List ValidacionEvidencia with pagination
+  // List DocumentoEvidencia with pagination
   fastify.get(
     "/",
     {
       preValidation: [fastify.authAccessToken],
       schema: {
-        tags: ["ValidacionEvidencia"],
-        description: "Get paginated list of validacion evidencias",
+        tags: ["DocumentoEvidencia"],
+        description:
+          "Get all documento evidencia relationships with pagination",
         querystring: {
           type: "object",
           properties: {
             page: { type: "integer", minimum: 1, default: 1 },
             limit: { type: "integer", minimum: 1, maximum: 100, default: 10 },
-            validacionId: { type: "string", format: "uuid" },
+            documentoId: { type: "string", format: "uuid" },
             evidenciaId: { type: "string", format: "uuid" },
           },
         },
@@ -31,7 +32,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
                   type: "object",
                   properties: {
                     id: { type: "string", format: "uuid" },
-                    validacionId: { type: "string", format: "uuid" },
+                    documentoId: { type: "string", format: "uuid" },
                     evidenciaId: { type: "string", format: "uuid" },
                     createdAt: { type: "string", format: "date-time" },
                   },
@@ -51,23 +52,23 @@ const routes: FastifyPluginAsync = async (fastify) => {
         const {
           page = 1,
           limit = 10,
-          validacionId,
+          documentoId,
           evidenciaId,
         } = request.query as any;
         const skip = (page - 1) * limit;
 
         const where: any = {};
-        if (validacionId) where.validacionId = validacionId;
+        if (documentoId) where.documentoId = documentoId;
         if (evidenciaId) where.evidenciaId = evidenciaId;
 
         const [data, total] = await Promise.all([
-          prisma.validacionEvidencia.findMany({
+          prisma.documentEvidence.findMany({
             where,
             skip,
             take: limit,
             orderBy: { createdAt: "desc" },
           }),
-          prisma.validacionEvidencia.count({ where }),
+          prisma.documentEvidence.count({ where }),
         ]);
 
         const totalPages = Math.ceil(total / limit);
@@ -85,27 +86,27 @@ const routes: FastifyPluginAsync = async (fastify) => {
     },
   );
 
-  // Get ValidacionEvidencia by ID
+  // Get DocumentoEvidencia by ID
   fastify.get(
     "/:id",
     {
       preValidation: [fastify.authAccessToken],
       schema: {
-        tags: ["ValidacionEvidencia"],
-        description: "Get validacion evidencia by ID",
+        tags: ["DocumentoEvidencia"],
+        description: "Get documento evidencia relationship by ID",
         params: {
           type: "object",
-          required: ["id"],
           properties: {
             id: { type: "string", format: "uuid" },
           },
+          required: ["id"],
         },
         response: {
           200: {
             type: "object",
             properties: {
               id: { type: "string", format: "uuid" },
-              validacionId: { type: "string", format: "uuid" },
+              documentoId: { type: "string", format: "uuid" },
               evidenciaId: { type: "string", format: "uuid" },
               createdAt: { type: "string", format: "date-time" },
             },
@@ -123,47 +124,45 @@ const routes: FastifyPluginAsync = async (fastify) => {
       try {
         const { id } = request.params as { id: string };
 
-        const validacionEvidencia = await prisma.validacionEvidencia.findUnique(
-          {
-            where: { id },
-          },
-        );
+        const documentoEvidencia = await prisma.documentEvidence.findUnique({
+          where: { id },
+        });
 
-        if (!validacionEvidencia) {
+        if (!documentoEvidencia) {
           return reply
             .status(404)
-            .send({ error: "ValidacionEvidencia not found" });
+            .send({ error: "DocumentoEvidencia not found" });
         }
 
-        return reply.status(200).send(validacionEvidencia);
+        return reply.status(200).send(documentoEvidencia);
       } catch (error) {
         return reply.status(500).send({ error: "Internal server error" });
       }
     },
   );
 
-  // Create ValidacionEvidencia
+  // Create DocumentoEvidencia
   fastify.post(
     "/",
     {
       preValidation: [fastify.authAccessToken],
       schema: {
-        tags: ["ValidacionEvidencia"],
-        description: "Create new validacion evidencia",
+        tags: ["DocumentoEvidencia"],
+        description: "Create a new documento evidencia relationship",
         body: {
           type: "object",
-          required: ["validacionId", "evidenciaId"],
           properties: {
-            validacionId: { type: "string", format: "uuid" },
+            documentoId: { type: "string", format: "uuid" },
             evidenciaId: { type: "string", format: "uuid" },
           },
+          required: ["documentoId", "evidenciaId"],
         },
         response: {
           201: {
             type: "object",
             properties: {
               id: { type: "string", format: "uuid" },
-              validacionId: { type: "string", format: "uuid" },
+              documentoId: { type: "string", format: "uuid" },
               evidenciaId: { type: "string", format: "uuid" },
               createdAt: { type: "string", format: "date-time" },
             },
@@ -179,74 +178,80 @@ const routes: FastifyPluginAsync = async (fastify) => {
     },
     async (request, reply) => {
       try {
-        const { validacionId, evidenciaId } = request.body as {
-          validacionId: string;
+        const { documentoId, evidenciaId } = request.body as {
+          documentoId: string;
           evidenciaId: string;
         };
 
-        // Check if validacion exists
-        const validacion = await prisma.validacion.findUnique({
-          where: { id: validacionId },
+        // Check if relationship already exists
+        const existingRelation = await prisma.documentEvidence.findUnique({
+          where: {
+            documentoId_evidenciaId: {
+              documentoId,
+              evidenciaId,
+            },
+          },
         });
-        if (!validacion) {
-          return reply.status(400).send({ error: "Validacion not found" });
+
+        if (existingRelation) {
+          return reply
+            .status(400)
+            .send({ error: "DocumentoEvidencia relationship already exists" });
         }
 
-        // Check if evidencia exists
-        const evidencia = await prisma.evidencia.findUnique({
-          where: { id: evidenciaId },
-        });
-        if (!evidencia) {
-          return reply.status(400).send({ error: "Evidencia not found" });
-        }
-
-        const validacionEvidencia = await prisma.validacionEvidencia.create({
+        const documentoEvidencia = await prisma.documentEvidence.create({
           data: {
-            validacionId,
+            documentoId,
             evidenciaId,
           },
         });
 
-        return reply.status(201).send(validacionEvidencia);
+        return reply.status(201).send(documentoEvidencia);
       } catch (error: any) {
         if (error.code === "P2002") {
           return reply
             .status(400)
-            .send({ error: "ValidacionEvidencia already exists" });
+            .send({ error: "DocumentoEvidencia relationship already exists" });
+        }
+        if (error.code === "P2003") {
+          return reply.status(400).send({
+            error: "Referenced documento or evidencia does not exist",
+          });
         }
         return reply.status(500).send({ error: "Internal server error" });
       }
     },
   );
 
-  // Update ValidacionEvidencia
+  // Update DocumentoEvidencia
   fastify.put(
     "/:id",
     {
       preValidation: [fastify.authAccessToken],
       schema: {
-        tags: ["ValidacionEvidencia"],
-        description: "Update validacion evidencia by ID",
+        tags: ["DocumentoEvidencia"],
+        description: "Update documento evidencia relationship by ID",
         params: {
           type: "object",
-          required: ["id"],
           properties: {
             id: { type: "string", format: "uuid" },
           },
+          required: ["id"],
         },
         body: {
           type: "object",
           properties: {
-            validacionId: { type: "string", format: "uuid" },
+            documentoId: { type: "string", format: "uuid" },
             evidenciaId: { type: "string", format: "uuid" },
           },
+          required: ["documentoId", "evidenciaId"],
         },
         response: {
           200: {
             type: "object",
             properties: {
               id: { type: "string", format: "uuid" },
-              validacionId: { type: "string", format: "uuid" },
+              documentoId: { type: "string", format: "uuid" },
               evidenciaId: { type: "string", format: "uuid" },
               createdAt: { type: "string", format: "date-time" },
             },
@@ -269,75 +274,76 @@ const routes: FastifyPluginAsync = async (fastify) => {
     async (request, reply) => {
       try {
         const { id } = request.params as { id: string };
-        const { validacionId, evidenciaId } = request.body as {
-          validacionId?: string;
-          evidenciaId?: string;
+        const { documentoId, evidenciaId } = request.body as {
+          documentoId: string;
+          evidenciaId: string;
         };
 
-        const existingValidacionEvidencia =
-          await prisma.validacionEvidencia.findUnique({
+        const existingDocumentoEvidencia =
+          await prisma.documentEvidence.findUnique({
             where: { id },
           });
 
-        if (!existingValidacionEvidencia) {
+        if (!existingDocumentoEvidencia) {
           return reply
             .status(404)
-            .send({ error: "ValidacionEvidencia not found" });
+            .send({ error: "DocumentoEvidencia not found" });
         }
 
-        const updateData: any = {};
-
-        if (validacionId) {
-          const validacion = await prisma.validacion.findUnique({
-            where: { id: validacionId },
-          });
-          if (!validacion) {
-            return reply.status(400).send({ error: "Validacion not found" });
-          }
-          updateData.validacionId = validacionId;
-        }
-
-        if (evidenciaId) {
-          const evidencia = await prisma.evidencia.findUnique({
-            where: { id: evidenciaId },
-          });
-          if (!evidencia) {
-            return reply.status(400).send({ error: "Evidencia not found" });
-          }
-          updateData.evidenciaId = evidenciaId;
-        }
-
-        const validacionEvidencia = await prisma.validacionEvidencia.update({
-          where: { id },
-          data: updateData,
+        // Check if new relationship already exists (excluding current record)
+        const duplicateRelation = await prisma.documentEvidence.findFirst({
+          where: {
+            documentoId,
+            evidenciaId,
+            NOT: { id },
+          },
         });
 
-        return reply.status(200).send(validacionEvidencia);
+        if (duplicateRelation) {
+          return reply
+            .status(400)
+            .send({ error: "DocumentoEvidencia relationship already exists" });
+        }
+
+        const documentoEvidencia = await prisma.documentEvidence.update({
+          where: { id },
+          data: {
+            documentoId,
+            evidenciaId,
+          },
+        });
+
+        return reply.status(200).send(documentoEvidencia);
       } catch (error: any) {
         if (error.code === "P2002") {
           return reply
             .status(400)
-            .send({ error: "ValidacionEvidencia already exists" });
+            .send({ error: "DocumentoEvidencia relationship already exists" });
+        }
+        if (error.code === "P2003") {
+          return reply.status(400).send({
+            error: "Referenced documento or evidencia does not exist",
+          });
         }
         return reply.status(500).send({ error: "Internal server error" });
       }
     },
   );
 
-  // Delete ValidacionEvidencia
+  // Delete DocumentoEvidencia
   fastify.delete(
     "/:id",
     {
       preValidation: [fastify.authAccessToken],
       schema: {
-        tags: ["ValidacionEvidencia"],
-        description: "Delete validacion evidencia by ID",
+        tags: ["DocumentoEvidencia"],
+        description: "Delete documento evidencia relationship by ID",
         params: {
           type: "object",
-          required: ["id"],
           properties: {
             id: { type: "string", format: "uuid" },
           },
+          required: ["id"],
         },
         response: {
           200: {
@@ -359,25 +365,24 @@ const routes: FastifyPluginAsync = async (fastify) => {
       try {
         const { id } = request.params as { id: string };
 
-        const validacionEvidencia = await prisma.validacionEvidencia.findUnique(
-          {
+        const existingDocumentoEvidencia =
+          await prisma.documentEvidence.findUnique({
             where: { id },
-          },
-        );
+          });
 
-        if (!validacionEvidencia) {
+        if (!existingDocumentoEvidencia) {
           return reply
             .status(404)
-            .send({ error: "ValidacionEvidencia not found" });
+            .send({ error: "DocumentoEvidencia not found" });
         }
 
-        await prisma.validacionEvidencia.delete({
+        await prisma.documentEvidence.delete({
           where: { id },
         });
 
         return reply
           .status(200)
-          .send({ message: "ValidacionEvidencia deleted successfully" });
+          .send({ message: "DocumentoEvidencia deleted successfully" });
       } catch (error) {
         return reply.status(500).send({ error: "Internal server error" });
       }

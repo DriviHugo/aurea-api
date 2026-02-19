@@ -29,7 +29,7 @@ export class AdminService {
   constructor(private prisma: PrismaClient) {}
 
   async isAdmin(userId: string): Promise<boolean> {
-    const adminRole = await this.prisma.userRole.findFirst({
+    const adminRole = await this.prisma.userRoleAssignment.findFirst({
       where: { userId, role: "admin" },
     });
     return adminRole !== null;
@@ -74,7 +74,7 @@ export class AdminService {
 
       // Create roles
       for (const role of roles) {
-        await tx.userRole.create({
+        await tx.userRoleAssignment.create({
           data: {
             userId: profile.id,
             role,
@@ -112,31 +112,31 @@ export class AdminService {
       throw new Error("No puedes eliminarte a ti mismo");
     }
 
-    // Check if user has expedientes (using creadorId field)
-    const expedientes = await this.prisma.expediente.findMany({
+    // Check if user has cases (using creadorId field)
+    const cases = await this.prisma.case.findMany({
       where: { creadorId: userId },
       select: { id: true },
     });
 
-    if (expedientes.length > 0 && !reassignToUserId) {
+    if (cases.length > 0 && !reassignToUserId) {
       return {
         success: false,
         code: "NEEDS_REASSIGN",
-        expedientesCount: expedientes.length,
+        expedientesCount: cases.length,
       };
     }
 
     await this.prisma.$transaction(async (tx) => {
-      // Reassign expedientes if needed
-      if (expedientes.length > 0 && reassignToUserId) {
-        await tx.expediente.updateMany({
+      // Reassign cases if needed
+      if (cases.length > 0 && reassignToUserId) {
+        await tx.case.updateMany({
           where: { creadorId: userId },
           data: { creadorId: reassignToUserId },
         });
       }
 
       // Delete user roles
-      await tx.userRole.deleteMany({
+      await tx.userRoleAssignment.deleteMany({
         where: { userId },
       });
 

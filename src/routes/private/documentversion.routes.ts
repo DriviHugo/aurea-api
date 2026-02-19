@@ -4,22 +4,20 @@ import type { PrismaClient } from "@prisma/client";
 const routes: FastifyPluginAsync = async (fastify) => {
   const prisma: PrismaClient = fastify.prisma;
 
-  // List DocumentoEvidencia with pagination
+  // GET /documento-versions - List with pagination
   fastify.get(
     "/",
     {
       preValidation: [fastify.authAccessToken],
       schema: {
-        tags: ["DocumentoEvidencia"],
-        description:
-          "Get all documento evidencia relationships with pagination",
+        tags: ["DocumentoVersion"],
+        description: "Get paginated list of documento versions",
         querystring: {
           type: "object",
           properties: {
             page: { type: "integer", minimum: 1, default: 1 },
             limit: { type: "integer", minimum: 1, maximum: 100, default: 10 },
             documentoId: { type: "string", format: "uuid" },
-            evidenciaId: { type: "string", format: "uuid" },
           },
         },
         response: {
@@ -33,7 +31,11 @@ const routes: FastifyPluginAsync = async (fastify) => {
                   properties: {
                     id: { type: "string", format: "uuid" },
                     documentoId: { type: "string", format: "uuid" },
-                    evidenciaId: { type: "string", format: "uuid" },
+                    version: { type: "integer" },
+                    contenidoSnapshot: { type: "object" },
+                    seccionesSnapshot: { type: ["object", "null"] },
+                    descripcionCambio: { type: ["string", "null"] },
+                    usuarioId: { type: "string", format: "uuid" },
                     createdAt: { type: "string", format: "date-time" },
                   },
                 },
@@ -49,26 +51,19 @@ const routes: FastifyPluginAsync = async (fastify) => {
     },
     async (request, reply) => {
       try {
-        const {
-          page = 1,
-          limit = 10,
-          documentoId,
-          evidenciaId,
-        } = request.query as any;
+        const { page = 1, limit = 10, documentoId } = request.query as any;
         const skip = (page - 1) * limit;
 
-        const where: any = {};
-        if (documentoId) where.documentoId = documentoId;
-        if (evidenciaId) where.evidenciaId = evidenciaId;
+        const where = documentoId ? { documentoId } : {};
 
         const [data, total] = await Promise.all([
-          prisma.documentoEvidencia.findMany({
+          prisma.documentVersion.findMany({
             where,
             skip,
             take: limit,
             orderBy: { createdAt: "desc" },
           }),
-          prisma.documentoEvidencia.count({ where }),
+          prisma.documentVersion.count({ where }),
         ]);
 
         const totalPages = Math.ceil(total / limit);
@@ -86,20 +81,20 @@ const routes: FastifyPluginAsync = async (fastify) => {
     },
   );
 
-  // Get DocumentoEvidencia by ID
+  // GET /documento-versions/:id - Get by ID
   fastify.get(
     "/:id",
     {
       preValidation: [fastify.authAccessToken],
       schema: {
-        tags: ["DocumentoEvidencia"],
-        description: "Get documento evidencia relationship by ID",
+        tags: ["DocumentoVersion"],
+        description: "Get documento version by ID",
         params: {
           type: "object",
+          required: ["id"],
           properties: {
             id: { type: "string", format: "uuid" },
           },
-          required: ["id"],
         },
         response: {
           200: {
@@ -107,7 +102,11 @@ const routes: FastifyPluginAsync = async (fastify) => {
             properties: {
               id: { type: "string", format: "uuid" },
               documentoId: { type: "string", format: "uuid" },
-              evidenciaId: { type: "string", format: "uuid" },
+              version: { type: "integer" },
+              contenidoSnapshot: { type: "object" },
+              seccionesSnapshot: { type: ["object", "null"] },
+              descripcionCambio: { type: ["string", "null"] },
+              usuarioId: { type: "string", format: "uuid" },
               createdAt: { type: "string", format: "date-time" },
             },
           },
@@ -124,38 +123,47 @@ const routes: FastifyPluginAsync = async (fastify) => {
       try {
         const { id } = request.params as { id: string };
 
-        const documentoEvidencia = await prisma.documentoEvidencia.findUnique({
+        const documentoVersion = await prisma.documentVersion.findUnique({
           where: { id },
         });
 
-        if (!documentoEvidencia) {
+        if (!documentoVersion) {
           return reply
             .status(404)
-            .send({ error: "DocumentoEvidencia not found" });
+            .send({ error: "Documento version not found" });
         }
 
-        return reply.status(200).send(documentoEvidencia);
+        return reply.status(200).send(documentoVersion);
       } catch (error) {
         return reply.status(500).send({ error: "Internal server error" });
       }
     },
   );
 
-  // Create DocumentoEvidencia
+  // POST /documento-versions - Create
   fastify.post(
     "/",
     {
       preValidation: [fastify.authAccessToken],
       schema: {
-        tags: ["DocumentoEvidencia"],
-        description: "Create a new documento evidencia relationship",
+        tags: ["DocumentoVersion"],
+        description: "Create new documento version",
         body: {
           type: "object",
+          required: [
+            "documentoId",
+            "version",
+            "contenidoSnapshot",
+            "usuarioId",
+          ],
           properties: {
             documentoId: { type: "string", format: "uuid" },
-            evidenciaId: { type: "string", format: "uuid" },
+            version: { type: "integer", minimum: 1 },
+            contenidoSnapshot: { type: "object" },
+            seccionesSnapshot: { type: ["object", "null"] },
+            descripcionCambio: { type: ["string", "null"] },
+            usuarioId: { type: "string", format: "uuid" },
           },
-          required: ["documentoId", "evidenciaId"],
         },
         response: {
           201: {
@@ -163,7 +171,11 @@ const routes: FastifyPluginAsync = async (fastify) => {
             properties: {
               id: { type: "string", format: "uuid" },
               documentoId: { type: "string", format: "uuid" },
-              evidenciaId: { type: "string", format: "uuid" },
+              version: { type: "integer" },
+              contenidoSnapshot: { type: "object" },
+              seccionesSnapshot: { type: ["object", "null"] },
+              descripcionCambio: { type: ["string", "null"] },
+              usuarioId: { type: "string", format: "uuid" },
               createdAt: { type: "string", format: "date-time" },
             },
           },
@@ -178,73 +190,51 @@ const routes: FastifyPluginAsync = async (fastify) => {
     },
     async (request, reply) => {
       try {
-        const { documentoId, evidenciaId } = request.body as {
-          documentoId: string;
-          evidenciaId: string;
-        };
+        const data = request.body as any;
 
-        // Check if relationship already exists
-        const existingRelation = await prisma.documentoEvidencia.findUnique({
-          where: {
-            documentoId_evidenciaId: {
-              documentoId,
-              evidenciaId,
-            },
-          },
+        const documentoVersion = await prisma.documentVersion.create({
+          data,
         });
 
-        if (existingRelation) {
-          return reply
-            .status(400)
-            .send({ error: "DocumentoEvidencia relationship already exists" });
-        }
-
-        const documentoEvidencia = await prisma.documentoEvidencia.create({
-          data: {
-            documentoId,
-            evidenciaId,
-          },
-        });
-
-        return reply.status(201).send(documentoEvidencia);
+        return reply.status(201).send(documentoVersion);
       } catch (error: any) {
         if (error.code === "P2002") {
           return reply
             .status(400)
-            .send({ error: "DocumentoEvidencia relationship already exists" });
+            .send({ error: "Version already exists for this documento" });
         }
         if (error.code === "P2003") {
-          return reply.status(400).send({
-            error: "Referenced documento or evidencia does not exist",
-          });
+          return reply
+            .status(400)
+            .send({ error: "Referenced documento or usuario does not exist" });
         }
         return reply.status(500).send({ error: "Internal server error" });
       }
     },
   );
 
-  // Update DocumentoEvidencia
+  // PUT /documento-versions/:id - Update
   fastify.put(
     "/:id",
     {
       preValidation: [fastify.authAccessToken],
       schema: {
-        tags: ["DocumentoEvidencia"],
-        description: "Update documento evidencia relationship by ID",
+        tags: ["DocumentoVersion"],
+        description: "Update documento version by ID",
         params: {
           type: "object",
+          required: ["id"],
           properties: {
             id: { type: "string", format: "uuid" },
           },
-          required: ["id"],
         },
         body: {
           type: "object",
           properties: {
-            documentoId: { type: "string", format: "uuid" },
-            evidenciaId: { type: "string", format: "uuid" },
+            contenidoSnapshot: { type: "object" },
+            seccionesSnapshot: { type: ["object", "null"] },
+            descripcionCambio: { type: ["string", "null"] },
           },
-          required: ["documentoId", "evidenciaId"],
         },
         response: {
           200: {
@@ -252,17 +242,15 @@ const routes: FastifyPluginAsync = async (fastify) => {
             properties: {
               id: { type: "string", format: "uuid" },
               documentoId: { type: "string", format: "uuid" },
-              evidenciaId: { type: "string", format: "uuid" },
+              version: { type: "integer" },
+              contenidoSnapshot: { type: "object" },
+              seccionesSnapshot: { type: ["object", "null"] },
+              descripcionCambio: { type: ["string", "null"] },
+              usuarioId: { type: "string", format: "uuid" },
               createdAt: { type: "string", format: "date-time" },
             },
           },
           404: {
-            type: "object",
-            properties: {
-              error: { type: "string" },
-            },
-          },
-          400: {
             type: "object",
             properties: {
               error: { type: "string" },
@@ -274,76 +262,44 @@ const routes: FastifyPluginAsync = async (fastify) => {
     async (request, reply) => {
       try {
         const { id } = request.params as { id: string };
-        const { documentoId, evidenciaId } = request.body as {
-          documentoId: string;
-          evidenciaId: string;
-        };
+        const data = request.body as any;
 
-        const existingDocumentoEvidencia =
-          await prisma.documentoEvidencia.findUnique({
-            where: { id },
-          });
+        const existingVersion = await prisma.documentVersion.findUnique({
+          where: { id },
+        });
 
-        if (!existingDocumentoEvidencia) {
+        if (!existingVersion) {
           return reply
             .status(404)
-            .send({ error: "DocumentoEvidencia not found" });
+            .send({ error: "Documento version not found" });
         }
 
-        // Check if new relationship already exists (excluding current record)
-        const duplicateRelation = await prisma.documentoEvidencia.findFirst({
-          where: {
-            documentoId,
-            evidenciaId,
-            NOT: { id },
-          },
-        });
-
-        if (duplicateRelation) {
-          return reply
-            .status(400)
-            .send({ error: "DocumentoEvidencia relationship already exists" });
-        }
-
-        const documentoEvidencia = await prisma.documentoEvidencia.update({
+        const documentoVersion = await prisma.documentVersion.update({
           where: { id },
-          data: {
-            documentoId,
-            evidenciaId,
-          },
+          data,
         });
 
-        return reply.status(200).send(documentoEvidencia);
-      } catch (error: any) {
-        if (error.code === "P2002") {
-          return reply
-            .status(400)
-            .send({ error: "DocumentoEvidencia relationship already exists" });
-        }
-        if (error.code === "P2003") {
-          return reply.status(400).send({
-            error: "Referenced documento or evidencia does not exist",
-          });
-        }
+        return reply.status(200).send(documentoVersion);
+      } catch (error) {
         return reply.status(500).send({ error: "Internal server error" });
       }
     },
   );
 
-  // Delete DocumentoEvidencia
+  // DELETE /documento-versions/:id - Delete
   fastify.delete(
     "/:id",
     {
       preValidation: [fastify.authAccessToken],
       schema: {
-        tags: ["DocumentoEvidencia"],
-        description: "Delete documento evidencia relationship by ID",
+        tags: ["DocumentoVersion"],
+        description: "Delete documento version by ID",
         params: {
           type: "object",
+          required: ["id"],
           properties: {
             id: { type: "string", format: "uuid" },
           },
-          required: ["id"],
         },
         response: {
           200: {
@@ -365,24 +321,23 @@ const routes: FastifyPluginAsync = async (fastify) => {
       try {
         const { id } = request.params as { id: string };
 
-        const existingDocumentoEvidencia =
-          await prisma.documentoEvidencia.findUnique({
-            where: { id },
-          });
+        const existingVersion = await prisma.documentVersion.findUnique({
+          where: { id },
+        });
 
-        if (!existingDocumentoEvidencia) {
+        if (!existingVersion) {
           return reply
             .status(404)
-            .send({ error: "DocumentoEvidencia not found" });
+            .send({ error: "Documento version not found" });
         }
 
-        await prisma.documentoEvidencia.delete({
+        await prisma.documentVersion.delete({
           where: { id },
         });
 
         return reply
           .status(200)
-          .send({ message: "DocumentoEvidencia deleted successfully" });
+          .send({ message: "Documento version deleted successfully" });
       } catch (error) {
         return reply.status(500).send({ error: "Internal server error" });
       }

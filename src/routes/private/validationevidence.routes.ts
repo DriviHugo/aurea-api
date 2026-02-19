@@ -4,20 +4,21 @@ import type { PrismaClient } from "@prisma/client";
 const routes: FastifyPluginAsync = async (fastify) => {
   const prisma: PrismaClient = fastify.prisma;
 
-  // GET /alternativas-procedimiento - List with pagination
+  // List ValidacionEvidencia with pagination
   fastify.get(
     "/",
     {
       preValidation: [fastify.authAccessToken],
       schema: {
-        tags: ["AlternativaProcedimiento"],
-        description: "Get list of alternativas procedimiento with pagination",
+        tags: ["ValidacionEvidencia"],
+        description: "Get paginated list of validacion evidencias",
         querystring: {
           type: "object",
           properties: {
             page: { type: "integer", minimum: 1, default: 1 },
             limit: { type: "integer", minimum: 1, maximum: 100, default: 10 },
-            expedienteId: { type: "string", format: "uuid" },
+            validacionId: { type: "string", format: "uuid" },
+            evidenciaId: { type: "string", format: "uuid" },
           },
         },
         response: {
@@ -30,10 +31,8 @@ const routes: FastifyPluginAsync = async (fastify) => {
                   type: "object",
                   properties: {
                     id: { type: "string", format: "uuid" },
-                    expedienteId: { type: "string", format: "uuid" },
-                    procedimiento: { type: "string" },
-                    puntuacion: { type: ["integer", "null"] },
-                    justificacion: { type: "string" },
+                    validacionId: { type: "string", format: "uuid" },
+                    evidenciaId: { type: "string", format: "uuid" },
                     createdAt: { type: "string", format: "date-time" },
                   },
                 },
@@ -49,19 +48,26 @@ const routes: FastifyPluginAsync = async (fastify) => {
     },
     async (request, reply) => {
       try {
-        const { page = 1, limit = 10, expedienteId } = request.query as any;
+        const {
+          page = 1,
+          limit = 10,
+          validacionId,
+          evidenciaId,
+        } = request.query as any;
         const skip = (page - 1) * limit;
 
-        const where = expedienteId ? { expedienteId } : {};
+        const where: any = {};
+        if (validacionId) where.validacionId = validacionId;
+        if (evidenciaId) where.evidenciaId = evidenciaId;
 
         const [data, total] = await Promise.all([
-          prisma.alternativaProcedimiento.findMany({
+          prisma.validationEvidence.findMany({
             where,
             skip,
             take: limit,
             orderBy: { createdAt: "desc" },
           }),
-          prisma.alternativaProcedimiento.count({ where }),
+          prisma.validationEvidence.count({ where }),
         ]);
 
         const totalPages = Math.ceil(total / limit);
@@ -79,14 +85,14 @@ const routes: FastifyPluginAsync = async (fastify) => {
     },
   );
 
-  // GET /alternativas-procedimiento/:id - Get by ID
+  // Get ValidacionEvidencia by ID
   fastify.get(
     "/:id",
     {
       preValidation: [fastify.authAccessToken],
       schema: {
-        tags: ["AlternativaProcedimiento"],
-        description: "Get alternativa procedimiento by ID",
+        tags: ["ValidacionEvidencia"],
+        description: "Get validacion evidencia by ID",
         params: {
           type: "object",
           required: ["id"],
@@ -99,10 +105,8 @@ const routes: FastifyPluginAsync = async (fastify) => {
             type: "object",
             properties: {
               id: { type: "string", format: "uuid" },
-              expedienteId: { type: "string", format: "uuid" },
-              procedimiento: { type: "string" },
-              puntuacion: { type: ["integer", "null"] },
-              justificacion: { type: "string" },
+              validacionId: { type: "string", format: "uuid" },
+              evidenciaId: { type: "string", format: "uuid" },
               createdAt: { type: "string", format: "date-time" },
             },
           },
@@ -119,39 +123,39 @@ const routes: FastifyPluginAsync = async (fastify) => {
       try {
         const { id } = request.params as { id: string };
 
-        const alternativa = await prisma.alternativaProcedimiento.findUnique({
-          where: { id },
-        });
+        const validacionEvidencia = await prisma.validationEvidence.findUnique(
+          {
+            where: { id },
+          },
+        );
 
-        if (!alternativa) {
+        if (!validacionEvidencia) {
           return reply
             .status(404)
-            .send({ error: "Alternativa procedimiento not found" });
+            .send({ error: "ValidacionEvidencia not found" });
         }
 
-        return reply.status(200).send(alternativa);
+        return reply.status(200).send(validacionEvidencia);
       } catch (error) {
         return reply.status(500).send({ error: "Internal server error" });
       }
     },
   );
 
-  // POST /alternativas-procedimiento - Create
+  // Create ValidacionEvidencia
   fastify.post(
     "/",
     {
       preValidation: [fastify.authAccessToken],
       schema: {
-        tags: ["AlternativaProcedimiento"],
-        description: "Create new alternativa procedimiento",
+        tags: ["ValidacionEvidencia"],
+        description: "Create new validacion evidencia",
         body: {
           type: "object",
-          required: ["expedienteId", "procedimiento", "justificacion"],
+          required: ["validacionId", "evidenciaId"],
           properties: {
-            expedienteId: { type: "string", format: "uuid" },
-            procedimiento: { type: "string" },
-            puntuacion: { type: ["integer", "null"] },
-            justificacion: { type: "string", minLength: 1 },
+            validacionId: { type: "string", format: "uuid" },
+            evidenciaId: { type: "string", format: "uuid" },
           },
         },
         response: {
@@ -159,10 +163,8 @@ const routes: FastifyPluginAsync = async (fastify) => {
             type: "object",
             properties: {
               id: { type: "string", format: "uuid" },
-              expedienteId: { type: "string", format: "uuid" },
-              procedimiento: { type: "string" },
-              puntuacion: { type: ["integer", "null"] },
-              justificacion: { type: "string" },
+              validacionId: { type: "string", format: "uuid" },
+              evidenciaId: { type: "string", format: "uuid" },
               createdAt: { type: "string", format: "date-time" },
             },
           },
@@ -177,42 +179,54 @@ const routes: FastifyPluginAsync = async (fastify) => {
     },
     async (request, reply) => {
       try {
-        const { expedienteId, procedimiento, puntuacion, justificacion } =
-          request.body as any;
+        const { validacionId, evidenciaId } = request.body as {
+          validacionId: string;
+          evidenciaId: string;
+        };
 
-        // Verify expediente exists
-        const expediente = await prisma.expediente.findUnique({
-          where: { id: expedienteId },
+        // Check if validacion exists
+        const validacion = await prisma.validation.findUnique({
+          where: { id: validacionId },
         });
-
-        if (!expediente) {
-          return reply.status(400).send({ error: "Expediente not found" });
+        if (!validacion) {
+          return reply.status(400).send({ error: "Validacion not found" });
         }
 
-        const alternativa = await prisma.alternativaProcedimiento.create({
+        // Check if evidencia exists
+        const evidencia = await prisma.evidence.findUnique({
+          where: { id: evidenciaId },
+        });
+        if (!evidencia) {
+          return reply.status(400).send({ error: "Evidencia not found" });
+        }
+
+        const validacionEvidencia = await prisma.validationEvidence.create({
           data: {
-            expedienteId,
-            procedimiento,
-            puntuacion,
-            justificacion,
+            validacionId,
+            evidenciaId,
           },
         });
 
-        return reply.status(201).send(alternativa);
-      } catch (error) {
+        return reply.status(201).send(validacionEvidencia);
+      } catch (error: any) {
+        if (error.code === "P2002") {
+          return reply
+            .status(400)
+            .send({ error: "ValidacionEvidencia already exists" });
+        }
         return reply.status(500).send({ error: "Internal server error" });
       }
     },
   );
 
-  // PUT /alternativas-procedimiento/:id - Update
+  // Update ValidacionEvidencia
   fastify.put(
     "/:id",
     {
       preValidation: [fastify.authAccessToken],
       schema: {
-        tags: ["AlternativaProcedimiento"],
-        description: "Update alternativa procedimiento",
+        tags: ["ValidacionEvidencia"],
+        description: "Update validacion evidencia by ID",
         params: {
           type: "object",
           required: ["id"],
@@ -223,10 +237,8 @@ const routes: FastifyPluginAsync = async (fastify) => {
         body: {
           type: "object",
           properties: {
-            expedienteId: { type: "string", format: "uuid" },
-            procedimiento: { type: "string" },
-            puntuacion: { type: ["integer", "null"] },
-            justificacion: { type: "string", minLength: 1 },
+            validacionId: { type: "string", format: "uuid" },
+            evidenciaId: { type: "string", format: "uuid" },
           },
         },
         response: {
@@ -234,10 +246,8 @@ const routes: FastifyPluginAsync = async (fastify) => {
             type: "object",
             properties: {
               id: { type: "string", format: "uuid" },
-              expedienteId: { type: "string", format: "uuid" },
-              procedimiento: { type: "string" },
-              puntuacion: { type: ["integer", "null"] },
-              justificacion: { type: "string" },
+              validacionId: { type: "string", format: "uuid" },
+              evidenciaId: { type: "string", format: "uuid" },
               createdAt: { type: "string", format: "date-time" },
             },
           },
@@ -259,59 +269,69 @@ const routes: FastifyPluginAsync = async (fastify) => {
     async (request, reply) => {
       try {
         const { id } = request.params as { id: string };
-        const { expedienteId, procedimiento, puntuacion, justificacion } =
-          request.body as any;
+        const { validacionId, evidenciaId } = request.body as {
+          validacionId?: string;
+          evidenciaId?: string;
+        };
 
-        const existingAlternativa =
-          await prisma.alternativaProcedimiento.findUnique({
+        const existingValidacionEvidencia =
+          await prisma.validationEvidence.findUnique({
             where: { id },
           });
 
-        if (!existingAlternativa) {
+        if (!existingValidacionEvidencia) {
           return reply
             .status(404)
-            .send({ error: "Alternativa procedimiento not found" });
-        }
-
-        // If expedienteId is being updated, verify it exists
-        if (expedienteId && expedienteId !== existingAlternativa.expedienteId) {
-          const expediente = await prisma.expediente.findUnique({
-            where: { id: expedienteId },
-          });
-
-          if (!expediente) {
-            return reply.status(400).send({ error: "Expediente not found" });
-          }
+            .send({ error: "ValidacionEvidencia not found" });
         }
 
         const updateData: any = {};
-        if (expedienteId !== undefined) updateData.expedienteId = expedienteId;
-        if (procedimiento !== undefined)
-          updateData.procedimiento = procedimiento;
-        if (puntuacion !== undefined) updateData.puntuacion = puntuacion;
-        if (justificacion !== undefined)
-          updateData.justificacion = justificacion;
 
-        const alternativa = await prisma.alternativaProcedimiento.update({
+        if (validacionId) {
+          const validacion = await prisma.validation.findUnique({
+            where: { id: validacionId },
+          });
+          if (!validacion) {
+            return reply.status(400).send({ error: "Validacion not found" });
+          }
+          updateData.validacionId = validacionId;
+        }
+
+        if (evidenciaId) {
+          const evidencia = await prisma.evidence.findUnique({
+            where: { id: evidenciaId },
+          });
+          if (!evidencia) {
+            return reply.status(400).send({ error: "Evidencia not found" });
+          }
+          updateData.evidenciaId = evidenciaId;
+        }
+
+        const validacionEvidencia = await prisma.validationEvidence.update({
           where: { id },
           data: updateData,
         });
 
-        return reply.status(200).send(alternativa);
-      } catch (error) {
+        return reply.status(200).send(validacionEvidencia);
+      } catch (error: any) {
+        if (error.code === "P2002") {
+          return reply
+            .status(400)
+            .send({ error: "ValidacionEvidencia already exists" });
+        }
         return reply.status(500).send({ error: "Internal server error" });
       }
     },
   );
 
-  // DELETE /alternativas-procedimiento/:id - Delete
+  // Delete ValidacionEvidencia
   fastify.delete(
     "/:id",
     {
       preValidation: [fastify.authAccessToken],
       schema: {
-        tags: ["AlternativaProcedimiento"],
-        description: "Delete alternativa procedimiento",
+        tags: ["ValidacionEvidencia"],
+        description: "Delete validacion evidencia by ID",
         params: {
           type: "object",
           required: ["id"],
@@ -339,24 +359,25 @@ const routes: FastifyPluginAsync = async (fastify) => {
       try {
         const { id } = request.params as { id: string };
 
-        const existingAlternativa =
-          await prisma.alternativaProcedimiento.findUnique({
+        const validacionEvidencia = await prisma.validationEvidence.findUnique(
+          {
             where: { id },
-          });
+          },
+        );
 
-        if (!existingAlternativa) {
+        if (!validacionEvidencia) {
           return reply
             .status(404)
-            .send({ error: "Alternativa procedimiento not found" });
+            .send({ error: "ValidacionEvidencia not found" });
         }
 
-        await prisma.alternativaProcedimiento.delete({
+        await prisma.validationEvidence.delete({
           where: { id },
         });
 
         return reply
           .status(200)
-          .send({ message: "Alternativa procedimiento deleted successfully" });
+          .send({ message: "ValidacionEvidencia deleted successfully" });
       } catch (error) {
         return reply.status(500).send({ error: "Internal server error" });
       }

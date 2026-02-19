@@ -4,20 +4,20 @@ import type { PrismaClient } from "@prisma/client";
 const routes: FastifyPluginAsync = async (fastify) => {
   const prisma: PrismaClient = fastify.prisma;
 
-  // GET /revisions - List revisions with pagination
+  // GET /comentarios - List comentarios with pagination
   fastify.get(
     "/",
     {
       preValidation: [fastify.authAccessToken],
       schema: {
-        tags: ["Revisions"],
-        description: "Get paginated list of revisions",
+        tags: ["Comentarios"],
+        description: "Get paginated list of comentarios",
         querystring: {
           type: "object",
           properties: {
             page: { type: "integer", minimum: 1, default: 1 },
             limit: { type: "integer", minimum: 1, maximum: 100, default: 10 },
-            expedienteId: { type: "string", format: "uuid" },
+            revisionId: { type: "string", format: "uuid" },
             usuarioId: { type: "string", format: "uuid" },
           },
         },
@@ -31,13 +31,13 @@ const routes: FastifyPluginAsync = async (fastify) => {
                   type: "object",
                   properties: {
                     id: { type: "string" },
-                    expedienteId: { type: "string" },
-                    documentoId: { type: ["string", "null"] },
+                    revisionId: { type: "string" },
                     usuarioId: { type: "string" },
-                    rol: { type: "string" },
-                    cambioDescripcion: { type: "string" },
-                    decision: { type: "string" },
-                    motivo: { type: ["string", "null"] },
+                    rol: {
+                      type: "string",
+                      enum: ["ADMIN", "REVISOR", "USUARIO"],
+                    },
+                    texto: { type: "string" },
                     createdAt: { type: "string", format: "date-time" },
                   },
                 },
@@ -56,29 +56,29 @@ const routes: FastifyPluginAsync = async (fastify) => {
         const {
           page = 1,
           limit = 10,
-          expedienteId,
+          revisionId,
           usuarioId,
         } = request.query as any;
         const skip = (page - 1) * limit;
 
         const where: any = {};
-        if (expedienteId) where.expedienteId = expedienteId;
+        if (revisionId) where.revisionId = revisionId;
         if (usuarioId) where.usuarioId = usuarioId;
 
-        const [revisions, total] = await Promise.all([
-          prisma.revision.findMany({
+        const [comentarios, total] = await Promise.all([
+          prisma.comment.findMany({
             where,
             skip,
             take: limit,
             orderBy: { createdAt: "desc" },
           }),
-          prisma.revision.count({ where }),
+          prisma.comment.count({ where }),
         ]);
 
         const totalPages = Math.ceil(total / limit);
 
         return reply.status(200).send({
-          data: revisions,
+          data: comentarios,
           total,
           page,
           limit,
@@ -90,14 +90,14 @@ const routes: FastifyPluginAsync = async (fastify) => {
     },
   );
 
-  // GET /revisions/:id - Get revision by ID
+  // GET /comentarios/:id - Get comentario by ID
   fastify.get(
     "/:id",
     {
       preValidation: [fastify.authAccessToken],
       schema: {
-        tags: ["Revisions"],
-        description: "Get revision by ID",
+        tags: ["Comentarios"],
+        description: "Get comentario by ID",
         params: {
           type: "object",
           required: ["id"],
@@ -110,14 +110,26 @@ const routes: FastifyPluginAsync = async (fastify) => {
             type: "object",
             properties: {
               id: { type: "string" },
-              expedienteId: { type: "string" },
-              documentoId: { type: ["string", "null"] },
+              revisionId: { type: "string" },
               usuarioId: { type: "string" },
-              rol: { type: "string" },
-              cambioDescripcion: { type: "string" },
-              decision: { type: "string" },
-              motivo: { type: ["string", "null"] },
+              rol: { type: "string", enum: ["ADMIN", "REVISOR", "USUARIO"] },
+              texto: { type: "string" },
               createdAt: { type: "string", format: "date-time" },
+              revision: {
+                type: "object",
+                properties: {
+                  id: { type: "string" },
+                  titulo: { type: "string" },
+                },
+              },
+              usuario: {
+                type: "object",
+                properties: {
+                  id: { type: "string" },
+                  nombre: { type: "string" },
+                  email: { type: "string" },
+                },
+              },
             },
           },
           404: {
@@ -133,56 +145,37 @@ const routes: FastifyPluginAsync = async (fastify) => {
       try {
         const { id } = request.params as { id: string };
 
-        const revision = await prisma.revision.findUnique({
+        const comentario = await prisma.comment.findUnique({
           where: { id },
         });
 
-        if (!revision) {
-          return reply.status(404).send({ error: "Revision not found" });
+        if (!comentario) {
+          return reply.status(404).send({ error: "Comentario not found" });
         }
 
-        return reply.status(200).send(revision);
+        return reply.status(200).send(comentario);
       } catch (error) {
         return reply.status(500).send({ error: "Internal server error" });
       }
     },
   );
 
-  // POST /revisions - Create new revision
+  // POST /comentarios - Create new comentario
   fastify.post(
     "/",
     {
       preValidation: [fastify.authAccessToken],
       schema: {
-        tags: ["Revisions"],
-        description: "Create new revision",
+        tags: ["Comentarios"],
+        description: "Create new comentario",
         body: {
           type: "object",
-          required: [
-            "expedienteId",
-            "usuarioId",
-            "rol",
-            "cambioDescripcion",
-            "decision",
-          ],
+          required: ["revisionId", "usuarioId", "rol", "texto"],
           properties: {
-            expedienteId: { type: "string", format: "uuid" },
-            documentoId: { type: "string", format: "uuid" },
+            revisionId: { type: "string", format: "uuid" },
             usuarioId: { type: "string", format: "uuid" },
-            rol: {
-              type: "string",
-              enum: ["ADMINISTRADOR", "COORDINADOR", "ANALISTA", "CONSULTOR"],
-            },
-            cambioDescripcion: {
-              type: "string",
-              minLength: 1,
-              maxLength: 1000,
-            },
-            decision: {
-              type: "string",
-              enum: ["APROBADO", "RECHAZADO", "PENDIENTE", "REVISION"],
-            },
-            motivo: { type: "string", maxLength: 500 },
+            rol: { type: "string", enum: ["ADMIN", "REVISOR", "USUARIO"] },
+            texto: { type: "string", minLength: 1, maxLength: 2000 },
           },
         },
         response: {
@@ -190,13 +183,10 @@ const routes: FastifyPluginAsync = async (fastify) => {
             type: "object",
             properties: {
               id: { type: "string" },
-              expedienteId: { type: "string" },
-              documentoId: { type: ["string", "null"] },
+              revisionId: { type: "string" },
               usuarioId: { type: "string" },
               rol: { type: "string" },
-              cambioDescripcion: { type: "string" },
-              decision: { type: "string" },
-              motivo: { type: ["string", "null"] },
+              texto: { type: "string" },
               createdAt: { type: "string", format: "date-time" },
             },
           },
@@ -211,64 +201,53 @@ const routes: FastifyPluginAsync = async (fastify) => {
     },
     async (request, reply) => {
       try {
-        const data = request.body as any;
+        const { revisionId, usuarioId, rol, texto } = request.body as {
+          revisionId: string;
+          usuarioId: string;
+          rol: string;
+          texto: string;
+        };
 
-        // Verify expediente exists
-        const expediente = await prisma.expediente.findUnique({
-          where: { id: data.expedienteId },
+        // Verify revision exists
+        const revision = await prisma.review.findUnique({
+          where: { id: revisionId },
         });
-
-        if (!expediente) {
-          return reply.status(400).send({ error: "Expediente not found" });
-        }
-
-        // Verify documento exists if provided
-        if (data.documentoId) {
-          const documento = await prisma.documento.findUnique({
-            where: { id: data.documentoId },
-          });
-
-          if (!documento) {
-            return reply.status(400).send({ error: "Documento not found" });
-          }
+        if (!revision) {
+          return reply.status(400).send({ error: "Revision not found" });
         }
 
         // Verify usuario exists
         const usuario = await prisma.profile.findUnique({
-          where: { id: data.usuarioId },
+          where: { id: usuarioId },
         });
-
         if (!usuario) {
           return reply.status(400).send({ error: "Usuario not found" });
         }
 
-        const revision = await prisma.revision.create({
+        const comentario = await prisma.comment.create({
           data: {
-            expedienteId: data.expedienteId,
-            documentoId: data.documentoId || null,
-            usuarioId: data.usuarioId,
-            rol: data.rol,
-            cambioDescripcion: data.cambioDescripcion,
-            decision: data.decision,
-            motivo: data.motivo || null,
+            revisionId,
+            usuarioId,
+            rol,
+            texto,
           },
         });
 
-        return reply.status(201).send(revision);
+        return reply.status(201).send(comentario);
       } catch (error) {
         return reply.status(500).send({ error: "Internal server error" });
       }
     },
   );
 
-  // PUT /revisions/:id - Update revision
+  // PUT /comentarios/:id - Update comentario
   fastify.put(
     "/:id",
     {
       preValidation: [fastify.authAccessToken],
       schema: {
-        tags: ["Revisions"],
-        description: "Update revision by ID",
+        tags: ["Comentarios"],
+        description: "Update comentario by ID",
         params: {
           type: "object",
           required: ["id"],
@@ -279,21 +258,8 @@ const routes: FastifyPluginAsync = async (fastify) => {
         body: {
           type: "object",
           properties: {
-            documentoId: { type: "string", format: "uuid" },
-            rol: {
-              type: "string",
-              enum: ["ADMINISTRADOR", "COORDINADOR", "ANALISTA", "CONSULTOR"],
-            },
-            cambioDescripcion: {
-              type: "string",
-              minLength: 1,
-              maxLength: 1000,
-            },
-            decision: {
-              type: "string",
-              enum: ["APROBADO", "RECHAZADO", "PENDIENTE", "REVISION"],
-            },
-            motivo: { type: "string", maxLength: 500 },
+            rol: { type: "string", enum: ["ADMIN", "REVISOR", "USUARIO"] },
+            texto: { type: "string", minLength: 1, maxLength: 2000 },
           },
         },
         response: {
@@ -301,13 +267,10 @@ const routes: FastifyPluginAsync = async (fastify) => {
             type: "object",
             properties: {
               id: { type: "string" },
-              expedienteId: { type: "string" },
-              documentoId: { type: ["string", "null"] },
+              revisionId: { type: "string" },
               usuarioId: { type: "string" },
               rol: { type: "string" },
-              cambioDescripcion: { type: "string" },
-              decision: { type: "string" },
-              motivo: { type: ["string", "null"] },
+              texto: { type: "string" },
               createdAt: { type: "string", format: "date-time" },
             },
           },
@@ -323,56 +286,36 @@ const routes: FastifyPluginAsync = async (fastify) => {
     async (request, reply) => {
       try {
         const { id } = request.params as { id: string };
-        const data = request.body as any;
+        const updateData = request.body as { rol?: string; texto?: string };
 
-        const existingRevision = await prisma.revision.findUnique({
+        const existingComentario = await prisma.comment.findUnique({
           where: { id },
         });
 
-        if (!existingRevision) {
-          return reply.status(404).send({ error: "Revision not found" });
+        if (!existingComentario) {
+          return reply.status(404).send({ error: "Comentario not found" });
         }
 
-        // Verify documento exists if provided
-        if (data.documentoId) {
-          const documento = await prisma.documento.findUnique({
-            where: { id: data.documentoId },
-          });
-
-          if (!documento) {
-            return reply.status(400).send({ error: "Documento not found" });
-          }
-        }
-
-        const updateData: any = {};
-        if (data.documentoId !== undefined)
-          updateData.documentoId = data.documentoId;
-        if (data.rol !== undefined) updateData.rol = data.rol;
-        if (data.cambioDescripcion !== undefined)
-          updateData.cambioDescripcion = data.cambioDescripcion;
-        if (data.decision !== undefined) updateData.decision = data.decision;
-        if (data.motivo !== undefined) updateData.motivo = data.motivo;
-
-        const revision = await prisma.revision.update({
+        const comentario = await prisma.comment.update({
           where: { id },
           data: updateData,
         });
 
-        return reply.status(200).send(revision);
+        return reply.status(200).send(comentario);
       } catch (error) {
         return reply.status(500).send({ error: "Internal server error" });
       }
     },
   );
 
-  // DELETE /revisions/:id - Delete revision
+  // DELETE /comentarios/:id - Delete comentario
   fastify.delete(
     "/:id",
     {
       preValidation: [fastify.authAccessToken],
       schema: {
-        tags: ["Revisions"],
-        description: "Delete revision by ID",
+        tags: ["Comentarios"],
+        description: "Delete comentario by ID",
         params: {
           type: "object",
           required: ["id"],
@@ -400,21 +343,21 @@ const routes: FastifyPluginAsync = async (fastify) => {
       try {
         const { id } = request.params as { id: string };
 
-        const existingRevision = await prisma.revision.findUnique({
+        const existingComentario = await prisma.comment.findUnique({
           where: { id },
         });
 
-        if (!existingRevision) {
-          return reply.status(404).send({ error: "Revision not found" });
+        if (!existingComentario) {
+          return reply.status(404).send({ error: "Comentario not found" });
         }
 
-        await prisma.revision.delete({
+        await prisma.comment.delete({
           where: { id },
         });
 
         return reply
           .status(200)
-          .send({ message: "Revision deleted successfully" });
+          .send({ message: "Comentario deleted successfully" });
       } catch (error) {
         return reply.status(500).send({ error: "Internal server error" });
       }

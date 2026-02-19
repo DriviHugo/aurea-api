@@ -11,7 +11,7 @@ interface UploadParams {
 
 interface FileParams {
   bucket: string;
-  "*": string;  // Wildcard for key with slashes
+  "*": string; // Wildcard for key with slashes
 }
 
 // Type for multipart file when attachFieldsToBody is true
@@ -25,7 +25,9 @@ interface MultipartFile {
 }
 
 interface UploadBody {
-  file?: MultipartFile;  path?: { value: string };}
+  file?: MultipartFile;
+  path?: { value: string };
+}
 
 export default async function storageRoutes(fastify: FastifyInstance) {
   const storage = getStorageService();
@@ -33,7 +35,10 @@ export default async function storageRoutes(fastify: FastifyInstance) {
   // Upload file
   fastify.post<{ Params: UploadParams; Body: UploadBody }>(
     "/storage/:bucket/upload",
-    async (request: FastifyRequest<{ Params: UploadParams; Body: UploadBody }>, reply: FastifyReply) => {
+    async (
+      request: FastifyRequest<{ Params: UploadParams; Body: UploadBody }>,
+      reply: FastifyReply,
+    ) => {
       const { bucket } = request.params;
 
       // Get file from body (attachFieldsToBody mode)
@@ -46,7 +51,7 @@ export default async function storageRoutes(fastify: FastifyInstance) {
       }
 
       const buffer = await fileField.toBuffer();
-      
+
       // Use path from body if provided, otherwise use original filename with unique prefix
       const key = request.body?.path?.value || fileField.filename;
       const preserveKey = !!request.body?.path?.value;
@@ -62,7 +67,8 @@ export default async function storageRoutes(fastify: FastifyInstance) {
 
         return reply.status(201).send(result);
       } catch (error) {
-        const message = error instanceof Error ? error.message : "Upload failed";
+        const message =
+          error instanceof Error ? error.message : "Upload failed";
         return reply.status(500).send({
           error: "Upload failed",
           message,
@@ -74,7 +80,10 @@ export default async function storageRoutes(fastify: FastifyInstance) {
   // Download file (supports keys with slashes using wildcard)
   fastify.get<{ Params: FileParams }>(
     "/storage/:bucket/file/*",
-    async (request: FastifyRequest<{ Params: FileParams }>, reply: FastifyReply) => {
+    async (
+      request: FastifyRequest<{ Params: FileParams }>,
+      reply: FastifyReply,
+    ) => {
       const { bucket } = request.params;
       const key = request.params["*"];
 
@@ -100,7 +109,10 @@ export default async function storageRoutes(fastify: FastifyInstance) {
   // Get file info
   fastify.get<{ Params: FileParams }>(
     "/storage/:bucket/info/*",
-    async (request: FastifyRequest<{ Params: FileParams }>, reply: FastifyReply) => {
+    async (
+      request: FastifyRequest<{ Params: FileParams }>,
+      reply: FastifyReply,
+    ) => {
       const { bucket } = request.params;
       const key = request.params["*"];
 
@@ -121,7 +133,10 @@ export default async function storageRoutes(fastify: FastifyInstance) {
   fastify.get<{ Params: FileParams; Querystring: { expires?: string } }>(
     "/storage/:bucket/presigned/*",
     async (
-      request: FastifyRequest<{ Params: FileParams; Querystring: { expires?: string } }>,
+      request: FastifyRequest<{
+        Params: FileParams;
+        Querystring: { expires?: string };
+      }>,
       reply: FastifyReply,
     ) => {
       const { bucket } = request.params;
@@ -144,7 +159,10 @@ export default async function storageRoutes(fastify: FastifyInstance) {
   // Delete file
   fastify.delete<{ Params: FileParams }>(
     "/storage/:bucket/file/*",
-    async (request: FastifyRequest<{ Params: FileParams }>, reply: FastifyReply) => {
+    async (
+      request: FastifyRequest<{ Params: FileParams }>,
+      reply: FastifyReply,
+    ) => {
       const { bucket } = request.params;
       const key = request.params["*"];
 
@@ -165,7 +183,10 @@ export default async function storageRoutes(fastify: FastifyInstance) {
   fastify.get<{ Params: UploadParams; Querystring: { prefix?: string } }>(
     "/storage/:bucket",
     async (
-      request: FastifyRequest<{ Params: UploadParams; Querystring: { prefix?: string } }>,
+      request: FastifyRequest<{
+        Params: UploadParams;
+        Querystring: { prefix?: string };
+      }>,
       reply: FastifyReply,
     ) => {
       const { bucket } = request.params;

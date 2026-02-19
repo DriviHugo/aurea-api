@@ -32,7 +32,7 @@ export class CpvService {
 
     const searchTerm = query.trim().toLowerCase();
 
-    const results = await this.prisma.cpvCodigo.findMany({
+    const results = await this.prisma.cpvCode.findMany({
       where: {
         activo: true,
         OR: [
@@ -63,7 +63,7 @@ export class CpvService {
     await this.prisma.$transaction(async (tx) => {
       for (const item of cpvData) {
         try {
-          await tx.cpvCodigo.upsert({
+          await tx.cpvCode.upsert({
             where: { codigo: item.codigo },
             update: {
               descripcion: item.descripcion,

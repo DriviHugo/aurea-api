@@ -69,13 +69,13 @@ const routes: FastifyPluginAsync = async (fastify) => {
         if (estado) where.estado = estado;
 
         const [data, total] = await Promise.all([
-          prisma.documentoSeccion.findMany({
+          prisma.documentSection.findMany({
             where,
             skip,
             take: limit,
             orderBy: [{ documentoId: "asc" }, { orden: "asc" }],
           }),
-          prisma.documentoSeccion.count({ where }),
+          prisma.documentSection.count({ where }),
         ]);
 
         const totalPages = Math.ceil(total / limit);
@@ -139,7 +139,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
       try {
         const { id } = request.params as { id: string };
 
-        const documentoSeccion = await prisma.documentoSeccion.findUnique({
+        const documentoSeccion = await prisma.documentSection.findUnique({
           where: { id },
         });
 
@@ -196,7 +196,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
 
         const created = [];
         for (const data of items) {
-          const documentoSeccion = await prisma.documentoSeccion.create({
+          const documentoSeccion = await prisma.documentSection.create({
             data: {
               documentoId: data.documentoId,
               orden: data.orden,
@@ -296,7 +296,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
         const data = request.body as any;
 
         const existingDocumentoSeccion =
-          await prisma.documentoSeccion.findUnique({
+          await prisma.documentSection.findUnique({
             where: { id },
           });
 
@@ -320,7 +320,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
         if (data.articulosLcsp !== undefined)
           updateData.articulosLcsp = data.articulosLcsp;
 
-        const documentoSeccion = await prisma.documentoSeccion.update({
+        const documentoSeccion = await prisma.documentSection.update({
           where: { id },
           data: updateData,
         });
@@ -374,7 +374,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
         const { id } = request.params as { id: string };
 
         const existingDocumentoSeccion =
-          await prisma.documentoSeccion.findUnique({
+          await prisma.documentSection.findUnique({
             where: { id },
           });
 
@@ -384,7 +384,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
             .send({ error: "DocumentoSeccion not found" });
         }
 
-        await prisma.documentoSeccion.delete({
+        await prisma.documentSection.delete({
           where: { id },
         });
 

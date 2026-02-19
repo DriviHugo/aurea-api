@@ -191,7 +191,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
 
         // Validate foreign key references if provided
         if (data.expedienteId) {
-          const expediente = await prisma.expediente.findUnique({
+          const expediente = await prisma.case.findUnique({
             where: { id: data.expedienteId },
           });
           if (!expediente) {
@@ -274,7 +274,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
 
         // Validate foreign key references if provided
         if (data.expedienteId) {
-          const expediente = await prisma.expediente.findUnique({
+          const expediente = await prisma.case.findUnique({
             where: { id: data.expedienteId },
           });
           if (!expediente) {

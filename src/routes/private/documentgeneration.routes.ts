@@ -53,13 +53,13 @@ const routes: FastifyPluginAsync = async (fastify) => {
         const where = documentoId ? { documentoId } : {};
 
         const [data, total] = await Promise.all([
-          prisma.documentoGeneracion.findMany({
+          prisma.documentGeneration.findMany({
             where,
             skip,
             take: limit,
             orderBy: { version: "desc" },
           }),
-          prisma.documentoGeneracion.count({ where }),
+          prisma.documentGeneration.count({ where }),
         ]);
 
         const totalPages = Math.ceil(total / limit);
@@ -115,7 +115,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
       try {
         const { id } = request.params as { id: string };
 
-        const documentoGeneracion = await prisma.documentoGeneracion.findUnique(
+        const documentoGeneracion = await prisma.documentGeneration.findUnique(
           {
             where: { id },
           },
@@ -174,7 +174,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
           });
         }
 
-        const documentoGeneracion = await prisma.documentoGeneracion.create({
+        const documentoGeneracion = await prisma.documentGeneration.create({
           data: {
             documentoId: body.documentoId,
             usuarioId: body.usuarioId,
@@ -254,7 +254,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
         const updateData = request.body as any;
 
         const existingDocumentoGeneracion =
-          await prisma.documentoGeneracion.findUnique({
+          await prisma.documentGeneration.findUnique({
             where: { id },
           });
 
@@ -264,7 +264,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
             .send({ error: "DocumentoGeneracion not found" });
         }
 
-        const documentoGeneracion = await prisma.documentoGeneracion.update({
+        const documentoGeneracion = await prisma.documentGeneration.update({
           where: { id },
           data: updateData,
         });
@@ -312,7 +312,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
         const { id } = request.params as { id: string };
 
         const existingDocumentoGeneracion =
-          await prisma.documentoGeneracion.findUnique({
+          await prisma.documentGeneration.findUnique({
             where: { id },
           });
 
@@ -322,7 +322,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
             .send({ error: "DocumentoGeneracion not found" });
         }
 
-        await prisma.documentoGeneracion.delete({
+        await prisma.documentGeneration.delete({
           where: { id },
         });
 

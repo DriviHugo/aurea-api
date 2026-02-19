@@ -196,12 +196,12 @@ const routes: FastifyPluginAsync = async (fastify) => {
         const skip = (page - 1) * limit;
 
         const [expedientes, total] = await Promise.all([
-          prisma.expediente.findMany({
+          prisma.case.findMany({
             skip,
             take: limit,
             orderBy: { createdAt: "desc" },
           }),
-          prisma.expediente.count(),
+          prisma.case.count(),
         ]);
 
         const totalPages = Math.ceil(total / limit);
@@ -249,7 +249,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
       try {
         const { id } = request.params as { id: string };
 
-        const expediente = await prisma.expediente.findUnique({
+        const expediente = await prisma.case.findUnique({
           where: { id },
         });
 
@@ -291,7 +291,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
         const data = request.body as any;
 
         // Convert snake_case enum values to camelCase for Prisma
-        const expediente = await prisma.expediente.create({
+        const expediente = await prisma.case.create({
           data: {
             ...data,
             estado: snakeToCamelValue(data.estado) || "borrador",
@@ -378,7 +378,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
 
         fastify.log.info({ body: data }, "Updating expediente");
 
-        const existingExpediente = await prisma.expediente.findUnique({
+        const existingExpediente = await prisma.case.findUnique({
           where: { id },
         });
 
@@ -474,7 +474,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
 
         fastify.log.info({ updateData }, "Prepared update data");
 
-        const expediente = await prisma.expediente.update({
+        const expediente = await prisma.case.update({
           where: { id },
           data: updateData,
         });
@@ -532,7 +532,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
       try {
         const { id } = request.params as { id: string };
 
-        const existingExpediente = await prisma.expediente.findUnique({
+        const existingExpediente = await prisma.case.findUnique({
           where: { id },
         });
 
@@ -540,7 +540,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
           return reply.status(404).send({ error: "Expediente not found" });
         }
 
-        await prisma.expediente.delete({
+        await prisma.case.delete({
           where: { id },
         });
 

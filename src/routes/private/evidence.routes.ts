@@ -64,12 +64,12 @@ const routes: FastifyPluginAsync = async (fastify) => {
         const skip = (page - 1) * limit;
 
         const [evidencias, total] = await Promise.all([
-          prisma.evidencia.findMany({
+          prisma.evidence.findMany({
             skip,
             take: limit,
             orderBy: { fechaVigenciaInicio: "desc" },
           }),
-          prisma.evidencia.count(),
+          prisma.evidence.count(),
         ]);
 
         const totalPages = Math.ceil(total / limit);
@@ -136,7 +136,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
       try {
         const { id } = request.params as { id: string };
 
-        const evidencia = await prisma.evidencia.findUnique({
+        const evidencia = await prisma.evidence.findUnique({
           where: { id },
         });
 
@@ -236,7 +236,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
           metadatos?: object;
         };
 
-        const evidencia = await prisma.evidencia.create({
+        const evidencia = await prisma.evidence.create({
           data: {
             tipoFuente: data.tipoFuente as any,
             fuenteId: data.fuenteId,
@@ -351,7 +351,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
           metadatos?: object;
         };
 
-        const existingEvidencia = await prisma.evidencia.findUnique({
+        const existingEvidencia = await prisma.evidence.findUnique({
           where: { id },
         });
 
@@ -378,7 +378,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
           updateData.textoFragmento = data.textoFragmento;
         if (data.metadatos !== undefined) updateData.metadatos = data.metadatos;
 
-        const evidencia = await prisma.evidencia.update({
+        const evidencia = await prisma.evidence.update({
           where: { id },
           data: updateData,
         });
@@ -425,7 +425,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
       try {
         const { id } = request.params as { id: string };
 
-        const existingEvidencia = await prisma.evidencia.findUnique({
+        const existingEvidencia = await prisma.evidence.findUnique({
           where: { id },
         });
 
@@ -433,7 +433,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
           return reply.status(404).send({ error: "Evidencia not found" });
         }
 
-        await prisma.evidencia.delete({
+        await prisma.evidence.delete({
           where: { id },
         });
 

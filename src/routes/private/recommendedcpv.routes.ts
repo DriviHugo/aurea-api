@@ -1,42 +1,28 @@
 import type { FastifyPluginAsync } from "fastify";
 import type { PrismaClient } from "@prisma/client";
 
-const incidenciaSchema = {
+const cpvRecomendadoSchema = {
   type: "object",
   properties: {
-    usuarioId: { type: "string", format: "uuid" },
-    ubicacion: { type: "string", minLength: 1 },
-    funcionalidad: { type: "string", minLength: 1 },
-    descripcion: { type: "string", minLength: 1 },
-    comportamientoEsperado: { type: "string", minLength: 1 },
-    screenshotUrl: { type: "string", nullable: true },
-    estado: {
-      type: "string",
-      enum: ["pendiente", "en_proceso", "resuelto", "cerrado"],
-    },
+    expedienteId: { type: "string", format: "uuid" },
+    codigo: { type: "string" },
+    descripcion: { type: "string" },
+    puntuacion: { type: "integer", nullable: true },
+    justificacion: { type: "string", nullable: true },
   },
-  required: [
-    "usuarioId",
-    "ubicacion",
-    "funcionalidad",
-    "descripcion",
-    "comportamientoEsperado",
-  ],
+  required: ["expedienteId", "codigo", "descripcion"],
 };
 
-const incidenciaResponseSchema = {
+const cpvRecomendadoResponseSchema = {
   type: "object",
   properties: {
     id: { type: "string", format: "uuid" },
-    usuarioId: { type: "string", format: "uuid" },
-    ubicacion: { type: "string" },
-    funcionalidad: { type: "string" },
+    expedienteId: { type: "string", format: "uuid" },
+    codigo: { type: "string" },
     descripcion: { type: "string" },
-    comportamientoEsperado: { type: "string" },
-    screenshotUrl: { type: "string", nullable: true },
-    estado: { type: "string" },
+    puntuacion: { type: "integer", nullable: true },
+    justificacion: { type: "string", nullable: true },
     createdAt: { type: "string", format: "date-time" },
-    updatedAt: { type: "string", format: "date-time" },
   },
 };
 
@@ -51,14 +37,14 @@ const paginationQuerySchema = {
 const routes: FastifyPluginAsync = async (fastify) => {
   const prisma: PrismaClient = fastify.prisma;
 
-  // GET /incidencias - List with pagination
+  // GET /cpv-recomendados - List with pagination
   fastify.get(
     "/",
     {
       preValidation: [fastify.authAccessToken],
       schema: {
-        tags: ["Incidencias"],
-        description: "Get all incidencias with pagination",
+        tags: ["CpvRecomendado"],
+        description: "Get paginated list of CPV recomendados",
         querystring: paginationQuerySchema,
         response: {
           200: {
@@ -66,7 +52,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
             properties: {
               data: {
                 type: "array",
-                items: incidenciaResponseSchema,
+                items: cpvRecomendadoResponseSchema,
               },
               total: { type: "integer" },
               page: { type: "integer" },
@@ -85,19 +71,19 @@ const routes: FastifyPluginAsync = async (fastify) => {
         };
         const skip = (page - 1) * limit;
 
-        const [incidencias, total] = await Promise.all([
-          prisma.incidencia.findMany({
+        const [data, total] = await Promise.all([
+          prisma.recommendedCpv.findMany({
             skip,
             take: limit,
             orderBy: { createdAt: "desc" },
           }),
-          prisma.incidencia.count(),
+          prisma.recommendedCpv.count(),
         ]);
 
         const totalPages = Math.ceil(total / limit);
 
         return reply.status(200).send({
-          data: incidencias,
+          data,
           total,
           page,
           limit,
@@ -109,14 +95,14 @@ const routes: FastifyPluginAsync = async (fastify) => {
     },
   );
 
-  // GET /incidencias/:id - Get by ID
+  // GET /cpv-recomendados/:id - Get by ID
   fastify.get(
     "/:id",
     {
       preValidation: [fastify.authAccessToken],
       schema: {
-        tags: ["Incidencias"],
-        description: "Get incidencia by ID",
+        tags: ["CpvRecomendado"],
+        description: "Get CPV recomendado by ID",
         params: {
           type: "object",
           properties: {
@@ -125,7 +111,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
           required: ["id"],
         },
         response: {
-          200: incidenciaResponseSchema,
+          200: cpvRecomendadoResponseSchema,
           404: {
             type: "object",
             properties: {
@@ -139,32 +125,32 @@ const routes: FastifyPluginAsync = async (fastify) => {
       try {
         const { id } = request.params as { id: string };
 
-        const incidencia = await prisma.incidencia.findUnique({
+        const cpvRecomendado = await prisma.recommendedCpv.findUnique({
           where: { id },
         });
 
-        if (!incidencia) {
-          return reply.status(404).send({ error: "Incidencia not found" });
+        if (!cpvRecomendado) {
+          return reply.status(404).send({ error: "CPV recomendado not found" });
         }
 
-        return reply.status(200).send(incidencia);
+        return reply.status(200).send(cpvRecomendado);
       } catch (error) {
         return reply.status(500).send({ error: "Internal server error" });
       }
     },
   );
 
-  // POST /incidencias - Create
+  // POST /cpv-recomendados - Create
   fastify.post(
     "/",
     {
       preValidation: [fastify.authAccessToken],
       schema: {
-        tags: ["Incidencias"],
-        description: "Create new incidencia",
-        body: incidenciaSchema,
+        tags: ["CpvRecomendado"],
+        description: "Create new CPV recomendado",
+        body: cpvRecomendadoSchema,
         response: {
-          201: incidenciaResponseSchema,
+          201: cpvRecomendadoResponseSchema,
           400: {
             type: "object",
             properties: {
@@ -177,46 +163,41 @@ const routes: FastifyPluginAsync = async (fastify) => {
     async (request, reply) => {
       try {
         const data = request.body as {
-          usuarioId: string;
-          ubicacion: string;
-          funcionalidad: string;
+          expedienteId: string;
+          codigo: string;
           descripcion: string;
-          comportamientoEsperado: string;
-          screenshotUrl?: string;
-          estado?: string;
+          puntuacion?: number;
+          justificacion?: string;
         };
 
-        // Verify user exists
-        const userExists = await prisma.profile.findUnique({
-          where: { id: data.usuarioId },
+        // Verify expediente exists
+        const expediente = await prisma.case.findUnique({
+          where: { id: data.expedienteId },
         });
 
-        if (!userExists) {
-          return reply.status(400).send({ error: "User not found" });
+        if (!expediente) {
+          return reply.status(400).send({ error: "Expediente not found" });
         }
 
-        const incidencia = await prisma.incidencia.create({
-          data: {
-            ...data,
-            estado: data.estado || "pendiente",
-          },
+        const cpvRecomendado = await prisma.recommendedCpv.create({
+          data,
         });
 
-        return reply.status(201).send(incidencia);
+        return reply.status(201).send(cpvRecomendado);
       } catch (error) {
         return reply.status(500).send({ error: "Internal server error" });
       }
     },
   );
 
-  // PUT /incidencias/:id - Update
+  // PUT /cpv-recomendados/:id - Update
   fastify.put(
     "/:id",
     {
       preValidation: [fastify.authAccessToken],
       schema: {
-        tags: ["Incidencias"],
-        description: "Update incidencia by ID",
+        tags: ["CpvRecomendado"],
+        description: "Update CPV recomendado by ID",
         params: {
           type: "object",
           properties: {
@@ -224,23 +205,16 @@ const routes: FastifyPluginAsync = async (fastify) => {
           },
           required: ["id"],
         },
-        body: {
-          type: "object",
-          properties: {
-            ubicacion: { type: "string", minLength: 1 },
-            funcionalidad: { type: "string", minLength: 1 },
-            descripcion: { type: "string", minLength: 1 },
-            comportamientoEsperado: { type: "string", minLength: 1 },
-            screenshotUrl: { type: "string", nullable: true },
-            estado: {
-              type: "string",
-              enum: ["pendiente", "en_proceso", "resuelto", "cerrado"],
+        body: cpvRecomendadoSchema,
+        response: {
+          200: cpvRecomendadoResponseSchema,
+          404: {
+            type: "object",
+            properties: {
+              error: { type: "string" },
             },
           },
-        },
-        response: {
-          200: incidenciaResponseSchema,
-          404: {
+          400: {
             type: "object",
             properties: {
               error: { type: "string" },
@@ -253,42 +227,51 @@ const routes: FastifyPluginAsync = async (fastify) => {
       try {
         const { id } = request.params as { id: string };
         const data = request.body as {
-          ubicacion?: string;
-          funcionalidad?: string;
-          descripcion?: string;
-          comportamientoEsperado?: string;
-          screenshotUrl?: string;
-          estado?: string;
+          expedienteId: string;
+          codigo: string;
+          descripcion: string;
+          puntuacion?: number;
+          justificacion?: string;
         };
 
-        const existingIncidencia = await prisma.incidencia.findUnique({
+        // Check if CPV recomendado exists
+        const existingCpvRecomendado = await prisma.recommendedCpv.findUnique({
           where: { id },
         });
 
-        if (!existingIncidencia) {
-          return reply.status(404).send({ error: "Incidencia not found" });
+        if (!existingCpvRecomendado) {
+          return reply.status(404).send({ error: "CPV recomendado not found" });
         }
 
-        const incidencia = await prisma.incidencia.update({
+        // Verify expediente exists
+        const expediente = await prisma.case.findUnique({
+          where: { id: data.expedienteId },
+        });
+
+        if (!expediente) {
+          return reply.status(400).send({ error: "Expediente not found" });
+        }
+
+        const cpvRecomendado = await prisma.recommendedCpv.update({
           where: { id },
           data,
         });
 
-        return reply.status(200).send(incidencia);
+        return reply.status(200).send(cpvRecomendado);
       } catch (error) {
         return reply.status(500).send({ error: "Internal server error" });
       }
     },
   );
 
-  // DELETE /incidencias/:id - Delete
+  // DELETE /cpv-recomendados/:id - Delete
   fastify.delete(
     "/:id",
     {
       preValidation: [fastify.authAccessToken],
       schema: {
-        tags: ["Incidencias"],
-        description: "Delete incidencia by ID",
+        tags: ["CpvRecomendado"],
+        description: "Delete CPV recomendado by ID",
         params: {
           type: "object",
           properties: {
@@ -316,21 +299,22 @@ const routes: FastifyPluginAsync = async (fastify) => {
       try {
         const { id } = request.params as { id: string };
 
-        const existingIncidencia = await prisma.incidencia.findUnique({
+        // Check if CPV recomendado exists
+        const existingCpvRecomendado = await prisma.recommendedCpv.findUnique({
           where: { id },
         });
 
-        if (!existingIncidencia) {
-          return reply.status(404).send({ error: "Incidencia not found" });
+        if (!existingCpvRecomendado) {
+          return reply.status(404).send({ error: "CPV recomendado not found" });
         }
 
-        await prisma.incidencia.delete({
+        await prisma.recommendedCpv.delete({
           where: { id },
         });
 
         return reply
           .status(200)
-          .send({ message: "Incidencia deleted successfully" });
+          .send({ message: "CPV recomendado deleted successfully" });
       } catch (error) {
         return reply.status(500).send({ error: "Internal server error" });
       }

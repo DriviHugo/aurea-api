@@ -73,15 +73,15 @@ export class ALIAAdapter implements AIProviderAdapter {
       let errorMessage: string;
 
       try {
-        const errorJson = JSON.parse(errorText) as { error?: { message?: string } };
+        const errorJson = JSON.parse(errorText) as {
+          error?: { message?: string };
+        };
         errorMessage = errorJson.error?.message ?? errorText;
       } catch {
         errorMessage = errorText;
       }
 
-      throw new Error(
-        `ALIA API error: ${response.status} - ${errorMessage}`,
-      );
+      throw new Error(`ALIA API error: ${response.status} - ${errorMessage}`);
     }
 
     const data = (await response.json()) as OpenAICompatibleResponse;
