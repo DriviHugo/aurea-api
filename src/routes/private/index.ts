@@ -43,36 +43,36 @@ export default async (fastify: FastifyInstance): Promise<void> => {
 
   // Entity CRUD routes
   fastify.register(profileRoutes, { prefix: "/profile" });
-  fastify.register(userroleRoutes, { prefix: "/user-role" });
-  fastify.register(expedienteRoutes, { prefix: "/expediente" });
+  fastify.register(userroleRoutes, { prefix: "/user-role-assignment" });
+  fastify.register(expedienteRoutes, { prefix: "/case" });
   fastify.register(alternativaprocedimientoRoutes, {
-    prefix: "/alternativa-procedimiento",
+    prefix: "/procedure-alternative",
   });
-  fastify.register(cpvrecomendadoRoutes, { prefix: "/cpv-recomendado" });
-  fastify.register(cpvcodigoRoutes, { prefix: "/cpv-codigo" });
-  fastify.register(evidenciaRoutes, { prefix: "/evidencia" });
-  fastify.register(reglaRoutes, { prefix: "/regla" });
-  fastify.register(documentoRoutes, { prefix: "/documento" });
-  fastify.register(documentoseccionRoutes, { prefix: "/documento-seccion" });
+  fastify.register(cpvrecomendadoRoutes, { prefix: "/recommended-cpv" });
+  fastify.register(cpvcodigoRoutes, { prefix: "/cpv-code" });
+  fastify.register(evidenciaRoutes, { prefix: "/evidence" });
+  fastify.register(reglaRoutes, { prefix: "/rule" });
+  fastify.register(documentoRoutes, { prefix: "/document" });
+  fastify.register(documentoseccionRoutes, { prefix: "/document-section" });
   fastify.register(documentogeneracionRoutes, {
-    prefix: "/documento-generacion",
+    prefix: "/document-generation",
   });
-  fastify.register(documentoversionRoutes, { prefix: "/documento-version" });
+  fastify.register(documentoversionRoutes, { prefix: "/document-version" });
   fastify.register(documentoevidenciaRoutes, {
-    prefix: "/documento-evidencia",
+    prefix: "/document-evidence",
   });
-  fastify.register(validacionRoutes, { prefix: "/validacion" });
+  fastify.register(validacionRoutes, { prefix: "/validation" });
   fastify.register(validacionevidenciaRoutes, {
-    prefix: "/validacion-evidencia",
+    prefix: "/validation-evidence",
   });
-  fastify.register(revisionRoutes, { prefix: "/revision" });
-  fastify.register(comentarioRoutes, { prefix: "/comentario" });
+  fastify.register(revisionRoutes, { prefix: "/review" });
+  fastify.register(comentarioRoutes, { prefix: "/comment" });
   fastify.register(auditlogRoutes, { prefix: "/audit-log" });
   fastify.register(aiproviderRoutes, { prefix: "/ai-provider" });
   fastify.register(aifunctionRoutes, { prefix: "/ai-function" });
   fastify.register(aifunctionversionRoutes, { prefix: "/ai-function-version" });
   fastify.register(aifunctionlogRoutes, { prefix: "/ai-function-log" });
-  fastify.register(incidenciaRoutes, { prefix: "/incidencia" });
+  fastify.register(incidenciaRoutes, { prefix: "/issue" });
 
   // Custom routes - Admin user management
   fastify.register(adminRoutes);

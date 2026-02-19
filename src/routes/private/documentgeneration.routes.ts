@@ -115,11 +115,9 @@ const routes: FastifyPluginAsync = async (fastify) => {
       try {
         const { id } = request.params as { id: string };
 
-        const documentoGeneracion = await prisma.documentGeneration.findUnique(
-          {
-            where: { id },
-          },
-        );
+        const documentoGeneracion = await prisma.documentGeneration.findUnique({
+          where: { id },
+        });
 
         if (!documentoGeneracion) {
           return reply

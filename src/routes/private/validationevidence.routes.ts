@@ -123,11 +123,9 @@ const routes: FastifyPluginAsync = async (fastify) => {
       try {
         const { id } = request.params as { id: string };
 
-        const validacionEvidencia = await prisma.validationEvidence.findUnique(
-          {
-            where: { id },
-          },
-        );
+        const validacionEvidencia = await prisma.validationEvidence.findUnique({
+          where: { id },
+        });
 
         if (!validacionEvidencia) {
           return reply
@@ -359,11 +357,9 @@ const routes: FastifyPluginAsync = async (fastify) => {
       try {
         const { id } = request.params as { id: string };
 
-        const validacionEvidencia = await prisma.validationEvidence.findUnique(
-          {
-            where: { id },
-          },
-        );
+        const validacionEvidencia = await prisma.validationEvidence.findUnique({
+          where: { id },
+        });
 
         if (!validacionEvidencia) {
           return reply

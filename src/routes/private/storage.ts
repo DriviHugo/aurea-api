@@ -43,7 +43,7 @@ export default async function storageRoutes(fastify: FastifyInstance) {
 
       // Get file from body (attachFieldsToBody mode)
       const fileField = request.body?.file;
-      if (!fileField || fileField.type !== "file") {
+      if (fileField?.type !== "file") {
         return reply.status(400).send({
           error: "No file provided",
           message: "Request must include a file field",

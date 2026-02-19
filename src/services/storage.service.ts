@@ -6,7 +6,7 @@
  */
 
 import { Client } from "minio";
-import { Readable } from "stream";
+import type { Readable } from "stream";
 import crypto from "crypto";
 import path from "path";
 
