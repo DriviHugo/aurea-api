@@ -80,8 +80,9 @@ export class StorageService {
     fileName: string,
     buffer: Buffer,
     contentType: string,
+    options?: { preserveKey?: boolean },
   ): Promise<UploadResult> {
-    const key = this.generateKey(fileName);
+    const key = options?.preserveKey ? fileName : this.generateKey(fileName);
 
     await this.client.putObject(bucket, key, buffer, buffer.length, {
       "Content-Type": contentType,

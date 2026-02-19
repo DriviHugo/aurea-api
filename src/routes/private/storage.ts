@@ -11,58 +11,72 @@ interface UploadParams {
 
 interface FileParams {
   bucket: string;
-  key: string;
+  "*": string;  // Wildcard for key with slashes
 }
+
+// Type for multipart file when attachFieldsToBody is true
+interface MultipartFile {
+  type: "file";
+  fieldname: string;
+  filename: string;
+  encoding: string;
+  mimetype: string;
+  toBuffer: () => Promise<Buffer>;
+}
+
+interface UploadBody {
+  file?: MultipartFile;  path?: { value: string };}
 
 export default async function storageRoutes(fastify: FastifyInstance) {
   const storage = getStorageService();
 
   // Upload file
-  fastify.post<{ Params: UploadParams }>(
+  fastify.post<{ Params: UploadParams; Body: UploadBody }>(
     "/storage/:bucket/upload",
-    async (request: FastifyRequest<{ Params: UploadParams }>, reply: FastifyReply) => {
+    async (request: FastifyRequest<{ Params: UploadParams; Body: UploadBody }>, reply: FastifyReply) => {
       const { bucket } = request.params;
-      const buckets = storage.getBuckets();
 
-      // Validate bucket
-      if (!Object.values(buckets).includes(bucket)) {
-        return reply.status(400).send({
-          error: "Invalid bucket",
-          message: `Bucket must be one of: ${Object.values(buckets).join(", ")}`,
-        });
-      }
-
-      // Get file from multipart
-      const data = await request.file();
-      if (!data) {
+      // Get file from body (attachFieldsToBody mode)
+      const fileField = request.body?.file;
+      if (!fileField || fileField.type !== "file") {
         return reply.status(400).send({
           error: "No file provided",
-          message: "Request must include a file",
+          message: "Request must include a file field",
         });
       }
 
-      const chunks: Buffer[] = [];
-      for await (const chunk of data.file) {
-        chunks.push(chunk);
+      const buffer = await fileField.toBuffer();
+      
+      // Use path from body if provided, otherwise use original filename with unique prefix
+      const key = request.body?.path?.value || fileField.filename;
+      const preserveKey = !!request.body?.path?.value;
+
+      try {
+        const result = await storage.uploadBuffer(
+          bucket,
+          key,
+          buffer,
+          fileField.mimetype,
+          { preserveKey },
+        );
+
+        return reply.status(201).send(result);
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "Upload failed";
+        return reply.status(500).send({
+          error: "Upload failed",
+          message,
+        });
       }
-      const buffer = Buffer.concat(chunks);
-
-      const result = await storage.uploadBuffer(
-        bucket,
-        data.filename,
-        buffer,
-        data.mimetype,
-      );
-
-      return reply.status(201).send(result);
     },
   );
 
-  // Download file
+  // Download file (supports keys with slashes using wildcard)
   fastify.get<{ Params: FileParams }>(
-    "/storage/:bucket/:key",
+    "/storage/:bucket/file/*",
     async (request: FastifyRequest<{ Params: FileParams }>, reply: FastifyReply) => {
-      const { bucket, key } = request.params;
+      const { bucket } = request.params;
+      const key = request.params["*"];
 
       const exists = await storage.fileExists(bucket, key);
       if (!exists) {
@@ -85,9 +99,10 @@ export default async function storageRoutes(fastify: FastifyInstance) {
 
   // Get file info
   fastify.get<{ Params: FileParams }>(
-    "/storage/:bucket/:key/info",
+    "/storage/:bucket/info/*",
     async (request: FastifyRequest<{ Params: FileParams }>, reply: FastifyReply) => {
-      const { bucket, key } = request.params;
+      const { bucket } = request.params;
+      const key = request.params["*"];
 
       const exists = await storage.fileExists(bucket, key);
       if (!exists) {
@@ -104,12 +119,13 @@ export default async function storageRoutes(fastify: FastifyInstance) {
 
   // Get presigned download URL
   fastify.get<{ Params: FileParams; Querystring: { expires?: string } }>(
-    "/storage/:bucket/:key/presigned",
+    "/storage/:bucket/presigned/*",
     async (
       request: FastifyRequest<{ Params: FileParams; Querystring: { expires?: string } }>,
       reply: FastifyReply,
     ) => {
-      const { bucket, key } = request.params;
+      const { bucket } = request.params;
+      const key = request.params["*"];
       const expires = parseInt(request.query.expires ?? "3600", 10);
 
       const exists = await storage.fileExists(bucket, key);
@@ -127,9 +143,10 @@ export default async function storageRoutes(fastify: FastifyInstance) {
 
   // Delete file
   fastify.delete<{ Params: FileParams }>(
-    "/storage/:bucket/:key",
+    "/storage/:bucket/file/*",
     async (request: FastifyRequest<{ Params: FileParams }>, reply: FastifyReply) => {
-      const { bucket, key } = request.params;
+      const { bucket } = request.params;
+      const key = request.params["*"];
 
       const exists = await storage.fileExists(bucket, key);
       if (!exists) {
