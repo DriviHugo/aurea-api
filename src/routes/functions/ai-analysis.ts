@@ -222,18 +222,18 @@ function optionalField(value: string | undefined, label: string): string {
 
 // Base interface for analysis requests
 interface BaseAnalysisBody {
-  objeto: string;
-  unidad?: string;
-  organo?: string;
+  subject: string;
+  unit?: string;
+  department?: string;
 }
 
 interface TipoAnalysisBody extends BaseAnalysisBody {
-  cpvPrincipal?: string;
+  mainCpv?: string;
 }
 
 interface BudgetAnalysisBody extends BaseAnalysisBody {
-  cpvPrincipal?: string;
-  tipoContrato?: string;
+  mainCpv?: string;
+  contractType?: string;
 }
 
 interface LoteInfo {
@@ -257,12 +257,12 @@ export default async function aiAnalysisRoutes(
       req: FastifyRequest<{ Body: BaseAnalysisBody }>,
       reply: FastifyReply,
     ) => {
-      const { objeto, unidad, organo } = req.body;
+      const { subject, unit, department } = req.body;
       const userPrompt = `Analiza el siguiente objeto de contrato y sugiere códigos CPV:
 
-OBJETO: ${objeto}
-${optionalField(unidad, "UNIDAD")}
-${optionalField(organo, "ÓRGANO")}`;
+OBJETO: ${subject}
+${optionalField(unit, "UNIDAD")}
+${optionalField(department, "ÓRGANO")}`;
 
       try {
         const result = await handleAnalysis(
@@ -285,13 +285,13 @@ ${optionalField(organo, "ÓRGANO")}`;
       req: FastifyRequest<{ Body: TipoAnalysisBody }>,
       reply: FastifyReply,
     ) => {
-      const { objeto, unidad, organo, cpvPrincipal } = req.body;
+      const { subject, unit, department, mainCpv } = req.body;
       const userPrompt = `Determina el tipo de contrato para:
 
-OBJETO: ${objeto}
-${optionalField(cpvPrincipal, "CPV PRINCIPAL")}
-${optionalField(unidad, "UNIDAD")}
-${optionalField(organo, "ÓRGANO")}`;
+OBJETO: ${subject}
+${optionalField(mainCpv, "CPV PRINCIPAL")}
+${optionalField(unit, "UNIDAD")}
+${optionalField(department, "ÓRGANO")}`;
 
       try {
         const result = await handleAnalysis(
@@ -314,12 +314,12 @@ ${optionalField(organo, "ÓRGANO")}`;
       req: FastifyRequest<{ Body: BaseAnalysisBody }>,
       reply: FastifyReply,
     ) => {
-      const { objeto, unidad, organo } = req.body;
+      const { subject, unit, department } = req.body;
       const userPrompt = `Analiza si el siguiente objeto de contrato podría justificar tramitación de emergencia (Art. 120 LCSP):
 
-OBJETO: ${objeto}
-${optionalField(unidad, "UNIDAD")}
-${optionalField(organo, "ÓRGANO")}`;
+OBJETO: ${subject}
+${optionalField(unit, "UNIDAD")}
+${optionalField(department, "ÓRGANO")}`;
 
       try {
         const result = await handleAnalysis(
@@ -342,12 +342,12 @@ ${optionalField(organo, "ÓRGANO")}`;
       req: FastifyRequest<{ Body: BaseAnalysisBody }>,
       reply: FastifyReply,
     ) => {
-      const { objeto, unidad, organo } = req.body;
+      const { subject, unit, department } = req.body;
       const userPrompt = `Analiza si el siguiente objeto de contrato podría estar cubierto por contratación centralizada (DGRCC):
 
-OBJETO: ${objeto}
-${optionalField(unidad, "UNIDAD")}
-${optionalField(organo, "ÓRGANO")}`;
+OBJETO: ${subject}
+${optionalField(unit, "UNIDAD")}
+${optionalField(department, "ÓRGANO")}`;
 
       try {
         const result = await handleAnalysis(
@@ -370,12 +370,12 @@ ${optionalField(organo, "ÓRGANO")}`;
       req: FastifyRequest<{ Body: BaseAnalysisBody }>,
       reply: FastifyReply,
     ) => {
-      const { objeto, unidad, organo } = req.body;
+      const { subject, unit, department } = req.body;
       const userPrompt = `Analiza si el siguiente objeto de contrato podría ser prestado por un medio propio (Arts. 32-33 LCSP):
 
-OBJETO: ${objeto}
-${optionalField(unidad, "UNIDAD")}
-${optionalField(organo, "ÓRGANO")}`;
+OBJETO: ${subject}
+${optionalField(unit, "UNIDAD")}
+${optionalField(department, "ÓRGANO")}`;
 
       try {
         const result = await handleAnalysis(
@@ -398,13 +398,13 @@ ${optionalField(organo, "ÓRGANO")}`;
       req: FastifyRequest<{ Body: TipoAnalysisBody }>,
       reply: FastifyReply,
     ) => {
-      const { objeto, unidad, organo, cpvPrincipal } = req.body;
+      const { subject, unit, department, mainCpv } = req.body;
       const userPrompt = `Analiza si el siguiente objeto de contrato tiene características de suscripción:
 
-OBJETO: ${objeto}
-${optionalField(cpvPrincipal, "CPV PRINCIPAL")}
-${optionalField(unidad, "UNIDAD")}
-${optionalField(organo, "ÓRGANO")}`;
+OBJETO: ${subject}
+${optionalField(mainCpv, "CPV PRINCIPAL")}
+${optionalField(unit, "UNIDAD")}
+${optionalField(department, "ÓRGANO")}`;
 
       try {
         const result = await handleAnalysis(
@@ -427,13 +427,13 @@ ${optionalField(organo, "ÓRGANO")}`;
       req: FastifyRequest<{ Body: TipoAnalysisBody }>,
       reply: FastifyReply,
     ) => {
-      const { objeto, unidad, organo, cpvPrincipal } = req.body;
+      const { subject, unit, department, mainCpv } = req.body;
       const userPrompt = `Analiza el nivel de innovación requerido para:
 
-OBJETO: ${objeto}
-${optionalField(cpvPrincipal, "CPV PRINCIPAL")}
-${optionalField(unidad, "UNIDAD")}
-${optionalField(organo, "ÓRGANO")}`;
+OBJETO: ${subject}
+${optionalField(mainCpv, "CPV PRINCIPAL")}
+${optionalField(unit, "UNIDAD")}
+${optionalField(department, "ÓRGANO")}`;
 
       try {
         const result = await handleAnalysis(
@@ -456,12 +456,12 @@ ${optionalField(organo, "ÓRGANO")}`;
       req: FastifyRequest<{ Body: BudgetAnalysisBody }>,
       reply: FastifyReply,
     ) => {
-      const { objeto, tipoContrato, cpvPrincipal } = req.body;
+      const { subject, contractType, mainCpv } = req.body;
       const userPrompt = `Estima la duración recomendada para el contrato:
 
-OBJETO: ${objeto}
-${optionalField(tipoContrato, "TIPO")}
-${optionalField(cpvPrincipal, "CPV PRINCIPAL")}`;
+OBJETO: ${subject}
+${optionalField(contractType, "TIPO")}
+${optionalField(mainCpv, "CPV PRINCIPAL")}`;
 
       try {
         const result = await handleAnalysis(
@@ -484,12 +484,12 @@ ${optionalField(cpvPrincipal, "CPV PRINCIPAL")}`;
       req: FastifyRequest<{ Body: BudgetAnalysisBody }>,
       reply: FastifyReply,
     ) => {
-      const { objeto, tipoContrato, cpvPrincipal } = req.body;
+      const { subject, contractType, mainCpv } = req.body;
       const userPrompt = `Analiza si el contrato debería dividirse en lotes (Art. 99.3 LCSP):
 
-OBJETO: ${objeto}
-${optionalField(tipoContrato, "TIPO")}
-${optionalField(cpvPrincipal, "CPV PRINCIPAL")}`;
+OBJETO: ${subject}
+${optionalField(contractType, "TIPO")}
+${optionalField(mainCpv, "CPV PRINCIPAL")}`;
 
       try {
         const result = await handleAnalysis(
@@ -512,12 +512,12 @@ ${optionalField(cpvPrincipal, "CPV PRINCIPAL")}`;
       req: FastifyRequest<{ Body: PartidasBody }>,
       reply: FastifyReply,
     ) => {
-      const { objeto, tipoContrato, cpvPrincipal, numLotes, lotes } = req.body;
+      const { subject, contractType, mainCpv, numLotes, lotes } = req.body;
       let userPrompt = `Propón las partidas presupuestarias para:
 
-OBJETO: ${objeto}
-${optionalField(tipoContrato, "TIPO")}
-${optionalField(cpvPrincipal, "CPV PRINCIPAL")}`;
+OBJETO: ${subject}
+${optionalField(contractType, "TIPO")}
+${optionalField(mainCpv, "CPV PRINCIPAL")}`;
 
       if (numLotes !== undefined && numLotes > 1 && lotes !== undefined) {
         userPrompt += `\n\nDIVISIÓN EN ${numLotes} LOTES:

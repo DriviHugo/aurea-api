@@ -32,7 +32,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
                     functionCode: { type: "string" },
                     functionName: { type: ["string", "null"] },
                     providerName: { type: ["string", "null"] },
-                    modelo: { type: "string" },
+                    model: { type: "string" },
                     inputVariables: { type: "object" },
                   },
                 },
@@ -101,7 +101,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
               functionCode: { type: "string" },
               functionName: { type: ["string", "null"] },
               providerName: { type: ["string", "null"] },
-              modelo: { type: "string" },
+              model: { type: "string" },
               inputVariables: { type: "object" },
             },
           },
@@ -147,10 +147,10 @@ const routes: FastifyPluginAsync = async (fastify) => {
             functionCode: { type: "string" },
             functionName: { type: ["string", "null"] },
             providerName: { type: ["string", "null"] },
-            modelo: { type: "string" },
+            model: { type: "string" },
             inputVariables: { type: "object", default: {} },
           },
-          required: ["functionCode", "modelo"],
+          required: ["functionCode", "model"],
         },
         response: {
           201: {
@@ -160,7 +160,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
               functionCode: { type: "string" },
               functionName: { type: ["string", "null"] },
               providerName: { type: ["string", "null"] },
-              modelo: { type: "string" },
+              model: { type: "string" },
               inputVariables: { type: "object" },
             },
           },
@@ -179,13 +179,13 @@ const routes: FastifyPluginAsync = async (fastify) => {
           functionCode,
           functionName,
           providerName,
-          modelo,
+          model,
           inputVariables = {},
         } = request.body as {
           functionCode: string;
           functionName?: string | null;
           providerName?: string | null;
-          modelo: string;
+          model: string;
           inputVariables?: object;
         };
 
@@ -194,7 +194,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
             functionCode,
             functionName,
             providerName,
-            modelo,
+            model,
             inputVariables,
           },
         });
@@ -229,7 +229,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
             functionCode: { type: "string" },
             functionName: { type: ["string", "null"] },
             providerName: { type: ["string", "null"] },
-            modelo: { type: "string" },
+            model: { type: "string" },
             inputVariables: { type: "object" },
           },
         },
@@ -241,7 +241,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
               functionCode: { type: "string" },
               functionName: { type: ["string", "null"] },
               providerName: { type: ["string", "null"] },
-              modelo: { type: "string" },
+              model: { type: "string" },
               inputVariables: { type: "object" },
             },
           },
@@ -261,7 +261,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
           functionCode?: string;
           functionName?: string | null;
           providerName?: string | null;
-          modelo?: string;
+          model?: string;
           inputVariables?: object;
         };
 

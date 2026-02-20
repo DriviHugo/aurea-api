@@ -22,12 +22,12 @@ export default async function authRoutes(app: FastifyInstance): Promise<void> {
     schema: {
       body: {
         type: "object",
-        required: ["email", "password", "nombre"],
+        required: ["email", "password", "name"],
         properties: {
           email: { type: "string", format: "email" },
           password: { type: "string", minLength: 6 },
-          nombre: { type: "string", minLength: 1 },
-          apellidos: { type: "string" },
+          name: { type: "string", minLength: 1 },
+          lastName: { type: "string" },
         },
       },
     },

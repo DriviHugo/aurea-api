@@ -1,40 +1,40 @@
 import type { FastifyPluginAsync } from "fastify";
 import type { PrismaClient } from "@prisma/client";
 
-const incidenciaSchema = {
+const issueSchema = {
   type: "object",
   properties: {
-    usuarioId: { type: "string", format: "uuid" },
-    ubicacion: { type: "string", minLength: 1 },
-    funcionalidad: { type: "string", minLength: 1 },
-    descripcion: { type: "string", minLength: 1 },
-    comportamientoEsperado: { type: "string", minLength: 1 },
+    userId: { type: "string", format: "uuid" },
+    location: { type: "string", minLength: 1 },
+    functionality: { type: "string", minLength: 1 },
+    description: { type: "string", minLength: 1 },
+    expectedBehavior: { type: "string", minLength: 1 },
     screenshotUrl: { type: "string", nullable: true },
-    estado: {
+    status: {
       type: "string",
-      enum: ["pendiente", "en_proceso", "resuelto", "cerrado"],
+      enum: ["pending", "in_progress", "resolved", "closed"],
     },
   },
   required: [
-    "usuarioId",
-    "ubicacion",
-    "funcionalidad",
-    "descripcion",
-    "comportamientoEsperado",
+    "userId",
+    "location",
+    "functionality",
+    "description",
+    "expectedBehavior",
   ],
 };
 
-const incidenciaResponseSchema = {
+const issueResponseSchema = {
   type: "object",
   properties: {
     id: { type: "string", format: "uuid" },
-    usuarioId: { type: "string", format: "uuid" },
-    ubicacion: { type: "string" },
-    funcionalidad: { type: "string" },
-    descripcion: { type: "string" },
-    comportamientoEsperado: { type: "string" },
+    userId: { type: "string", format: "uuid" },
+    location: { type: "string" },
+    functionality: { type: "string" },
+    description: { type: "string" },
+    expectedBehavior: { type: "string" },
     screenshotUrl: { type: "string", nullable: true },
-    estado: { type: "string" },
+    status: { type: "string" },
     createdAt: { type: "string", format: "date-time" },
     updatedAt: { type: "string", format: "date-time" },
   },
@@ -51,14 +51,14 @@ const paginationQuerySchema = {
 const routes: FastifyPluginAsync = async (fastify) => {
   const prisma: PrismaClient = fastify.prisma;
 
-  // GET /incidencias - List with pagination
+  // GET /issues - List with pagination
   fastify.get(
     "/",
     {
       preValidation: [fastify.authAccessToken],
       schema: {
-        tags: ["Incidencias"],
-        description: "Get all incidencias with pagination",
+        tags: ["Issues"],
+        description: "Get all issues with pagination",
         querystring: paginationQuerySchema,
         response: {
           200: {
@@ -66,7 +66,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
             properties: {
               data: {
                 type: "array",
-                items: incidenciaResponseSchema,
+                items: issueResponseSchema,
               },
               total: { type: "integer" },
               page: { type: "integer" },
@@ -85,7 +85,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
         };
         const skip = (page - 1) * limit;
 
-        const [incidencias, total] = await Promise.all([
+        const [issues, total] = await Promise.all([
           prisma.issue.findMany({
             skip,
             take: limit,
@@ -97,7 +97,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
         const totalPages = Math.ceil(total / limit);
 
         return reply.status(200).send({
-          data: incidencias,
+          data: issues,
           total,
           page,
           limit,
@@ -109,14 +109,14 @@ const routes: FastifyPluginAsync = async (fastify) => {
     },
   );
 
-  // GET /incidencias/:id - Get by ID
+  // GET /issues/:id - Get by ID
   fastify.get(
     "/:id",
     {
       preValidation: [fastify.authAccessToken],
       schema: {
-        tags: ["Incidencias"],
-        description: "Get incidencia by ID",
+        tags: ["Issues"],
+        description: "Get issue by ID",
         params: {
           type: "object",
           properties: {
@@ -125,7 +125,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
           required: ["id"],
         },
         response: {
-          200: incidenciaResponseSchema,
+          200: issueResponseSchema,
           404: {
             type: "object",
             properties: {
@@ -139,32 +139,32 @@ const routes: FastifyPluginAsync = async (fastify) => {
       try {
         const { id } = request.params as { id: string };
 
-        const incidencia = await prisma.issue.findUnique({
+        const issue = await prisma.issue.findUnique({
           where: { id },
         });
 
-        if (!incidencia) {
-          return reply.status(404).send({ error: "Incidencia not found" });
+        if (!issue) {
+          return reply.status(404).send({ error: "Issue not found" });
         }
 
-        return reply.status(200).send(incidencia);
+        return reply.status(200).send(issue);
       } catch (error) {
         return reply.status(500).send({ error: "Internal server error" });
       }
     },
   );
 
-  // POST /incidencias - Create
+  // POST /issues - Create
   fastify.post(
     "/",
     {
       preValidation: [fastify.authAccessToken],
       schema: {
-        tags: ["Incidencias"],
-        description: "Create new incidencia",
-        body: incidenciaSchema,
+        tags: ["Issues"],
+        description: "Create new issue",
+        body: issueSchema,
         response: {
-          201: incidenciaResponseSchema,
+          201: issueResponseSchema,
           400: {
             type: "object",
             properties: {
@@ -177,46 +177,46 @@ const routes: FastifyPluginAsync = async (fastify) => {
     async (request, reply) => {
       try {
         const data = request.body as {
-          usuarioId: string;
-          ubicacion: string;
-          funcionalidad: string;
-          descripcion: string;
-          comportamientoEsperado: string;
+          userId: string;
+          location: string;
+          functionality: string;
+          description: string;
+          expectedBehavior: string;
           screenshotUrl?: string;
-          estado?: string;
+          status?: string;
         };
 
         // Verify user exists
         const userExists = await prisma.profile.findUnique({
-          where: { id: data.usuarioId },
+          where: { id: data.userId },
         });
 
         if (!userExists) {
           return reply.status(400).send({ error: "User not found" });
         }
 
-        const incidencia = await prisma.issue.create({
+        const issue = await prisma.issue.create({
           data: {
             ...data,
-            estado: data.estado || "pendiente",
+            status: data.status || "pending",
           },
         });
 
-        return reply.status(201).send(incidencia);
+        return reply.status(201).send(issue);
       } catch (error) {
         return reply.status(500).send({ error: "Internal server error" });
       }
     },
   );
 
-  // PUT /incidencias/:id - Update
+  // PUT /issues/:id - Update
   fastify.put(
     "/:id",
     {
       preValidation: [fastify.authAccessToken],
       schema: {
-        tags: ["Incidencias"],
-        description: "Update incidencia by ID",
+        tags: ["Issues"],
+        description: "Update issue by ID",
         params: {
           type: "object",
           properties: {
@@ -227,19 +227,19 @@ const routes: FastifyPluginAsync = async (fastify) => {
         body: {
           type: "object",
           properties: {
-            ubicacion: { type: "string", minLength: 1 },
-            funcionalidad: { type: "string", minLength: 1 },
-            descripcion: { type: "string", minLength: 1 },
-            comportamientoEsperado: { type: "string", minLength: 1 },
+            location: { type: "string", minLength: 1 },
+            functionality: { type: "string", minLength: 1 },
+            description: { type: "string", minLength: 1 },
+            expectedBehavior: { type: "string", minLength: 1 },
             screenshotUrl: { type: "string", nullable: true },
-            estado: {
+            status: {
               type: "string",
-              enum: ["pendiente", "en_proceso", "resuelto", "cerrado"],
+              enum: ["pending", "in_progress", "resolved", "closed"],
             },
           },
         },
         response: {
-          200: incidenciaResponseSchema,
+          200: issueResponseSchema,
           404: {
             type: "object",
             properties: {
@@ -253,42 +253,42 @@ const routes: FastifyPluginAsync = async (fastify) => {
       try {
         const { id } = request.params as { id: string };
         const data = request.body as {
-          ubicacion?: string;
-          funcionalidad?: string;
-          descripcion?: string;
-          comportamientoEsperado?: string;
+          location?: string;
+          functionality?: string;
+          description?: string;
+          expectedBehavior?: string;
           screenshotUrl?: string;
-          estado?: string;
+          status?: string;
         };
 
-        const existingIncidencia = await prisma.issue.findUnique({
+        const existingIssue = await prisma.issue.findUnique({
           where: { id },
         });
 
-        if (!existingIncidencia) {
-          return reply.status(404).send({ error: "Incidencia not found" });
+        if (!existingIssue) {
+          return reply.status(404).send({ error: "Issue not found" });
         }
 
-        const incidencia = await prisma.issue.update({
+        const issue = await prisma.issue.update({
           where: { id },
           data,
         });
 
-        return reply.status(200).send(incidencia);
+        return reply.status(200).send(issue);
       } catch (error) {
         return reply.status(500).send({ error: "Internal server error" });
       }
     },
   );
 
-  // DELETE /incidencias/:id - Delete
+  // DELETE /issues/:id - Delete
   fastify.delete(
     "/:id",
     {
       preValidation: [fastify.authAccessToken],
       schema: {
-        tags: ["Incidencias"],
-        description: "Delete incidencia by ID",
+        tags: ["Issues"],
+        description: "Delete issue by ID",
         params: {
           type: "object",
           properties: {
@@ -316,12 +316,12 @@ const routes: FastifyPluginAsync = async (fastify) => {
       try {
         const { id } = request.params as { id: string };
 
-        const existingIncidencia = await prisma.issue.findUnique({
+        const existingIssue = await prisma.issue.findUnique({
           where: { id },
         });
 
-        if (!existingIncidencia) {
-          return reply.status(404).send({ error: "Incidencia not found" });
+        if (!existingIssue) {
+          return reply.status(404).send({ error: "Issue not found" });
         }
 
         await prisma.issue.delete({
@@ -330,7 +330,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
 
         return reply
           .status(200)
-          .send({ message: "Incidencia deleted successfully" });
+          .send({ message: "Issue deleted successfully" });
       } catch (error) {
         return reply.status(500).send({ error: "Internal server error" });
       }

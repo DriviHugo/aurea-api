@@ -5,21 +5,21 @@ import {
 } from "../../services/ai-gateway/index.js";
 
 interface ExpedienteData {
-  codigo: string;
-  objeto: string;
-  descripcion?: string;
-  tipoContrato: string;
-  procedimiento?: string;
-  valorEstimado?: number;
-  presupuestoBase?: number;
-  iva?: number;
-  unidad: string;
-  organo: string;
-  cpvElegido?: string;
-  tieneLotes?: boolean;
-  numLotes?: number;
-  esUrgente?: boolean;
-  esEmergencia?: boolean;
+  code: string;
+  subject: string;
+  description?: string;
+  contractType: string;
+  procedure?: string;
+  estimatedValue?: number;
+  baseBudget?: number;
+  vat?: number;
+  unit: string;
+  department: string;
+  selectedCpv?: string;
+  hasLots?: boolean;
+  numLots?: number;
+  isUrgent?: boolean;
+  isEmergency?: boolean;
 }
 
 interface Section {
@@ -30,18 +30,18 @@ interface Section {
 }
 
 interface RequestBody {
-  fase: "planificar" | "generar_seccion" | "revisar";
-  tipoDocumento?: string;
+  phase: "plan" | "generate_section" | "review";
+  documentType?: string;
   expediente?: ExpedienteData;
-  documentoId?: string;
-  seccionId?: string;
+  documentId?: string;
+  sectionId?: string;
   plan?: Section[];
-  seccionActual?: number;
-  contextoExpediente?: ExpedienteData;
-  seccionesAnteriores?: Array<{ titulo: string; contenido: string }>;
-  comentarios?: string;
-  contenidoCompleto?: string;
-  secciones?: Array<{ titulo: string; contenido: string }>;
+  currentSection?: number;
+  caseContext?: ExpedienteData;
+  previousSections?: Array<{ titulo: string; contenido: string }>;
+  comments?: string;
+  fullContent?: string;
+  sections?: Array<{ titulo: string; contenido: string }>;
 }
 
 let gateway: AIGatewayService | null = null;
@@ -359,14 +359,14 @@ Descripción: ${section.descripcion}
 ${section.articulosLCSP ? `Artículos LCSP relacionados: ${section.articulosLCSP.join(", ")}` : ""}
 
 **Datos del expediente:**
-- Objeto: ${expediente.objeto}
-- Tipo de contrato: ${expediente.tipoContrato}
-- Procedimiento: ${expediente.procedimiento ?? "No especificado"}
-- Valor estimado: ${expediente.valorEstimado ?? "No especificado"} €
-- Presupuesto base: ${expediente.presupuestoBase ?? "No especificado"} €
-- Unidad contratante: ${expediente.unidad}
-- Órgano de contratación: ${expediente.organo}
-${expediente.cpvElegido !== undefined && expediente.cpvElegido !== "" ? `- Código CPV: ${expediente.cpvElegido}` : ""}
+- Objeto: ${expediente.subject}
+- Tipo de contrato: ${expediente.contractType}
+- Procedimiento: ${expediente.procedure ?? "No especificado"}
+- Valor estimado: ${expediente.estimatedValue ?? "No especificado"} €
+- Presupuesto base: ${expediente.baseBudget ?? "No especificado"} €
+- Unidad contratante: ${expediente.unit}
+- Órgano de contratación: ${expediente.department}
+${expediente.selectedCpv !== undefined && expediente.selectedCpv !== "" ? `- Código CPV: ${expediente.selectedCpv}` : ""}
 ${previousContext}
 ${comments !== undefined && comments !== "" ? `\n**Comentarios adicionales:** ${comments}` : ""}
 
@@ -395,61 +395,61 @@ export default async function aiGenerarDocumentoRoutes(
       reply: FastifyReply,
     ) => {
       const startTime = Date.now();
-      const { fase } = request.body;
+      const { phase } = request.body;
 
       try {
-        switch (fase) {
-          case "planificar": {
-            const { tipoDocumento } = request.body;
+        switch (phase) {
+          case "plan": {
+            const { documentType } = request.body;
 
-            if (tipoDocumento === undefined || tipoDocumento === "") {
+            if (documentType === undefined || documentType === "") {
               return reply.status(400).send({
                 data: null,
-                error: { message: "Se requiere el campo 'tipoDocumento'" },
+                error: { message: "Field 'documentType' is required" },
               });
             }
 
-            const secciones = Object.hasOwn(DOCUMENT_SECTIONS, tipoDocumento)
+            const secciones = Object.hasOwn(DOCUMENT_SECTIONS, documentType)
               ? // eslint-disable-next-line security/detect-object-injection
-                DOCUMENT_SECTIONS[tipoDocumento]
+                DOCUMENT_SECTIONS[documentType]
               : DEFAULT_SECTIONS;
 
             return reply.send({ secciones });
           }
 
-          case "generar_seccion": {
+          case "generate_section": {
             const {
               plan,
-              seccionActual,
-              contextoExpediente,
-              seccionesAnteriores = [],
-              comentarios,
+              currentSection,
+              caseContext,
+              previousSections = [],
+              comments,
             } = request.body;
 
-            if (!plan || seccionActual === undefined || !contextoExpediente) {
+            if (!plan || currentSection === undefined || !caseContext) {
               return reply.status(400).send({
                 data: null,
                 error: {
                   message:
-                    "Se requieren 'plan', 'seccionActual' y 'contextoExpediente'",
+                    "Fields 'plan', 'currentSection' and 'caseContext' are required",
                 },
               });
             }
 
-            const section = plan.find((s) => s.orden === seccionActual);
+            const section = plan.find((s) => s.orden === currentSection);
 
             if (!section) {
               return reply.status(400).send({
                 data: null,
-                error: { message: `Sección ${seccionActual} no encontrada` },
+                error: { message: `Section ${currentSection} not found` },
               });
             }
 
             const prompt = buildSectionPrompt(
               section,
-              contextoExpediente,
-              seccionesAnteriores,
-              comentarios,
+              caseContext,
+              previousSections,
+              comments,
             );
 
             const contenido = await getGateway().completeSimple(
@@ -458,28 +458,28 @@ export default async function aiGenerarDocumentoRoutes(
             );
 
             return reply.send({
-              contenido,
-              tokensUsados: 0,
-              tiempoGeneracionMs: Date.now() - startTime,
+              content: contenido,
+              tokensUsed: 0,
+              generationTimeMs: Date.now() - startTime,
             });
           }
 
-          case "revisar": {
-            const { contenidoCompleto, secciones = [] } = request.body;
+          case "review": {
+            const { fullContent, sections = [] } = request.body;
 
-            if (contenidoCompleto === undefined || contenidoCompleto === "") {
+            if (fullContent === undefined || fullContent === "") {
               return reply.status(400).send({
                 data: null,
-                error: { message: "Se requiere el campo 'contenidoCompleto'" },
+                error: { message: "Field 'fullContent' is required" },
               });
             }
 
             const prompt = `Revisa el siguiente documento de contratación pública y evalúa su calidad:
 
-${contenidoCompleto}
+${fullContent}
 
-El documento tiene ${secciones.length} secciones:
-${secciones.map((s, i) => `${i + 1}. ${s.titulo}`).join("\n")}
+El documento tiene ${sections.length} secciones:
+${sections.map((s, i) => `${i + 1}. ${s.titulo}`).join("\n")}
 
 Responde SOLO con JSON válido.`;
 
@@ -489,14 +489,14 @@ Responde SOLO con JSON válido.`;
             );
 
             const fallbackResult = {
-              coherente: true,
-              puntuacionGlobal: 75,
-              evaluacionGeneral:
-                "Documento generado correctamente. Se recomienda revisión manual.",
-              sugerenciasPorSeccion: secciones.map((_, i) => ({
-                seccion: i + 1,
-                tipo: "ok",
-                mensaje: "Sección generada correctamente",
+              coherent: true,
+              globalScore: 75,
+              generalEvaluation:
+                "Document generated correctly. Manual review recommended.",
+              sectionSuggestions: sections.map((_, i) => ({
+                section: i + 1,
+                type: "ok",
+                message: "Section generated correctly",
               })),
             };
 
@@ -506,7 +506,7 @@ Responde SOLO con JSON válido.`;
           default:
             return reply.status(400).send({
               data: null,
-              error: { message: `Fase desconocida: ${fase}` },
+              error: { message: `Unknown phase: ${phase}` },
             });
         }
       } catch (error) {
@@ -516,7 +516,7 @@ Responde SOLO con JSON válido.`;
             message:
               error instanceof Error
                 ? error.message
-                : "Error al generar documento",
+                : "Error generating document",
           },
         });
       }

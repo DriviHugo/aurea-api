@@ -18,136 +18,134 @@ function camelToSnakeValue(value: string | null | undefined): string | null {
 }
 
 /**
- * Normalize expediente for frontend (convert enum values to snake_case)
+ * Normalize case for API response (convert enum values to snake_case)
  */
-function normalizeExpediente(exp: any): any {
-  if (!exp) return exp;
+function normalizeCase(caseData: any): any {
+  if (!caseData) return caseData;
   return {
-    ...exp,
-    estado: camelToSnakeValue(exp.estado),
-    tipo_contrato: camelToSnakeValue(exp.tipoContrato),
-    procedimiento_propuesto: camelToSnakeValue(exp.procedimientoPropuesto),
-    procedimiento_seleccionado: camelToSnakeValue(
-      exp.procedimientoSeleccionado,
-    ),
-    nivel_riesgo: exp.nivelRiesgo,
+    ...caseData,
+    status: camelToSnakeValue(caseData.status),
+    contractType: camelToSnakeValue(caseData.contractType),
+    proposedProcedure: camelToSnakeValue(caseData.proposedProcedure),
+    selectedProcedure: camelToSnakeValue(caseData.selectedProcedure),
+    riskLevel: caseData.riskLevel,
   };
 }
 
 /**
  * Map of valid enum values (both snake_case and camelCase accepted)
  */
-const PROCEDIMIENTO_VALUES = [
-  "abierto",
-  "abierto_simplificado",
-  "abiertoSimplificado",
-  "abierto_supersimplificado",
-  "abiertoSupersimplificado",
-  "restringido",
-  "negociado_sin_publicidad",
-  "negociadoSinPublicidad",
-  "negociado_con_publicidad",
-  "negociadoConPublicidad",
-  "dialogo_competitivo",
-  "dialogoCompetitivo",
-  "asociacion_innovacion",
-  "asociacionInnovacion",
-  "menor",
-  "contrato_basado",
-  "contratoBasado",
+const PROCEDURE_VALUES = [
+  "open",
+  "open_simplified",
+  "openSimplified",
+  "open_super_simplified",
+  "openSuperSimplified",
+  "restricted",
+  "negotiated_no_publicity",
+  "negotiatedNoPublicity",
+  "negotiated_with_publicity",
+  "negotiatedWithPublicity",
+  "competitive_dialogue",
+  "competitiveDialogue",
+  "innovation_partnership",
+  "innovationPartnership",
+  "minor",
+  "based_contract",
+  "basedContract",
 ];
 
-const TIPO_CONTRATO_VALUES = [
-  "obras",
-  "servicios",
-  "suministros",
-  "concesion_obras",
-  "concesionObras",
-  "concesion_servicios",
-  "concesionServicios",
-  "mixto",
+const CONTRACT_TYPE_VALUES = [
+  "works",
+  "services",
+  "supplies",
+  "works_concession",
+  "worksConcession",
+  "services_concession",
+  "servicesConcession",
+  "mixed",
 ];
 
-const ESTADO_VALUES = [
-  "ingesta",
-  "borrador",
-  "alternativas",
-  "validado",
-  "aprobado",
-  "revision",
-  "incidencia",
-  "en_redaccion",
-  "enRedaccion",
-  "con_observaciones",
-  "conObservaciones",
-  "listo_validacion",
-  "listoValidacion",
-  "en_intervencion",
-  "enIntervencion",
-  "cerrado",
+const STATUS_VALUES = [
+  "intake",
+  "draft",
+  "alternatives",
+  "validated",
+  "approved",
+  "review",
+  "incident",
+  "in_drafting",
+  "inDrafting",
+  "with_observations",
+  "withObservations",
+  "ready_validation",
+  "readyValidation",
+  "in_intervention",
+  "inIntervention",
+  "closed",
 ];
 
-const expedienteSchema = {
+const caseSchema = {
   type: "object",
   properties: {
-    codigo: { type: "string" },
-    unidad: { type: "string" },
-    organo: { type: "string" },
-    creadorId: { type: "string", format: "uuid" },
-    estado: {
+    code: { type: "string" },
+    unit: { type: "string" },
+    department: { type: "string" },
+    creatorId: { type: "string", format: "uuid" },
+    status: {
       type: "string",
-      enum: ESTADO_VALUES,
+      enum: STATUS_VALUES,
     },
-    tipoContrato: {
+    contractType: {
       type: "string",
-      enum: TIPO_CONTRATO_VALUES,
+      enum: CONTRACT_TYPE_VALUES,
     },
-    objeto: { type: "string" },
-    descripcion: { type: "string" },
-    valorEstimadoContrato: { type: "number" },
-    presupuestoBaseLicitacion: { type: "number" },
-    iva: { type: "number" },
-    importeProrrogas: { type: "number" },
-    importeModificados: { type: "number" },
-    procedimientoPropuesto: {
+    subject: { type: "string" },
+    description: { type: "string" },
+    estimatedContractValue: { type: "number" },
+    baseTenderBudget: { type: "number" },
+    vat: { type: "number" },
+    extensionsAmount: { type: "number" },
+    modificationsAmount: { type: "number" },
+    proposedProcedure: {
       type: "string",
-      enum: PROCEDIMIENTO_VALUES,
+      enum: PROCEDURE_VALUES,
     },
-    procedimientoSeleccionado: {
+    selectedProcedure: {
       type: "string",
-      enum: PROCEDIMIENTO_VALUES,
+      enum: PROCEDURE_VALUES,
     },
-    cpvElegido: { type: "string" },
-    tieneLotes: { type: "boolean" },
-    justificacionLotes: { type: "string" },
-    numLotes: { type: "integer" },
-    esUrgente: { type: "boolean" },
-    esEmergencia: { type: "boolean" },
-    justificacionUrgencia: { type: "string" },
-    porcentajeCompletitud: { type: "integer", minimum: 0, maximum: 100 },
-    nivelRiesgo: {
+    selectedCpv: { type: "string" },
+    hasLots: { type: "boolean" },
+    lotsJustification: { type: "string" },
+    numLots: { type: "integer" },
+    isUrgent: { type: "boolean" },
+    isEmergency: { type: "boolean" },
+    urgencyJustification: { type: "string" },
+    completionPercentage: { type: "integer", minimum: 0, maximum: 100 },
+    riskLevel: {
       type: "string",
-      enum: ["verde", "ambar", "amarillo", "rojo"],
+      enum: ["green", "amber", "red"],
     },
-    ultimaAccionPendiente: { type: "string" },
-    fechaVencimiento: { type: "string", format: "date-time" },
-    metadatos: { type: "object" },
+    lastPendingAction: { type: "string" },
+    dueDate: { type: "string", format: "date-time" },
+    metadata: { type: "object" },
   },
   required: [
-    "codigo",
-    "unidad",
-    "organo",
-    "creadorId",
-    "tipoContrato",
-    "objeto",
+    "code",
+    "unit",
+    "department",
+    "creatorId",
+    "contractType",
+    "subject",
   ],
 };
 
-const expedienteResponseSchema = {
+const caseResponseSchema = {
   type: "object",
   properties: {
     id: { type: "string", format: "uuid" },
-    ...expedienteSchema.properties,
+    ...caseSchema.properties,
     createdAt: { type: "string", format: "date-time" },
     updatedAt: { type: "string", format: "date-time" },
   },
@@ -164,20 +162,20 @@ const paginationQuerySchema = {
 const routes: FastifyPluginAsync = async (fastify) => {
   const prisma: PrismaClient = fastify.prisma;
 
-  // GET /expedientes - List with pagination
+  // GET /cases - List with pagination
   fastify.get(
     "/",
     {
       preValidation: [fastify.authAccessToken],
       schema: {
-        tags: ["Expedientes"],
-        description: "Get paginated list of expedientes",
+        tags: ["Cases"],
+        description: "Get paginated list of cases",
         querystring: paginationQuerySchema,
         response: {
           200: {
             type: "object",
             properties: {
-              data: { type: "array", items: expedienteResponseSchema },
+              data: { type: "array", items: caseResponseSchema },
               total: { type: "integer" },
               page: { type: "integer" },
               limit: { type: "integer" },
@@ -195,7 +193,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
         };
         const skip = (page - 1) * limit;
 
-        const [expedientes, total] = await Promise.all([
+        const [cases, total] = await Promise.all([
           prisma.case.findMany({
             skip,
             take: limit,
@@ -207,7 +205,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
         const totalPages = Math.ceil(total / limit);
 
         return reply.status(200).send({
-          data: expedientes.map(normalizeExpediente),
+          data: cases.map(normalizeCase),
           total,
           page,
           limit,
@@ -219,14 +217,14 @@ const routes: FastifyPluginAsync = async (fastify) => {
     },
   );
 
-  // GET /expedientes/:id - Get by ID
+  // GET /cases/:id - Get by ID
   fastify.get(
     "/:id",
     {
       preValidation: [fastify.authAccessToken],
       schema: {
-        tags: ["Expedientes"],
-        description: "Get expediente by ID",
+        tags: ["Cases"],
+        description: "Get case by ID",
         params: {
           type: "object",
           properties: {
@@ -235,7 +233,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
           required: ["id"],
         },
         response: {
-          200: expedienteResponseSchema,
+          200: caseResponseSchema,
           404: {
             type: "object",
             properties: {
@@ -249,32 +247,32 @@ const routes: FastifyPluginAsync = async (fastify) => {
       try {
         const { id } = request.params as { id: string };
 
-        const expediente = await prisma.case.findUnique({
+        const caseData = await prisma.case.findUnique({
           where: { id },
         });
 
-        if (!expediente) {
-          return reply.status(404).send({ error: "Expediente not found" });
+        if (!caseData) {
+          return reply.status(404).send({ error: "Case not found" });
         }
 
-        return reply.status(200).send(normalizeExpediente(expediente));
+        return reply.status(200).send(normalizeCase(caseData));
       } catch (error) {
         return reply.status(500).send({ error: "Internal server error" });
       }
     },
   );
 
-  // POST /expedientes - Create
+  // POST /cases - Create
   fastify.post(
     "/",
     {
       preValidation: [fastify.authAccessToken],
       schema: {
-        tags: ["Expedientes"],
-        description: "Create new expediente",
-        body: expedienteSchema,
+        tags: ["Cases"],
+        description: "Create new case",
+        body: caseSchema,
         response: {
-          201: expedienteResponseSchema,
+          201: caseResponseSchema,
           400: {
             type: "object",
             properties: {
@@ -287,61 +285,70 @@ const routes: FastifyPluginAsync = async (fastify) => {
     },
     async (request, reply) => {
       try {
-        fastify.log.info({ body: request.body }, "Creating expediente");
+        fastify.log.info({ body: request.body }, "Creating case");
         const data = request.body as any;
 
         // Convert snake_case enum values to camelCase for Prisma
-        const expediente = await prisma.case.create({
+        const caseData = await prisma.case.create({
           data: {
-            ...data,
-            estado: snakeToCamelValue(data.estado) || "borrador",
-            tipoContrato: snakeToCamelValue(data.tipoContrato),
-            procedimientoPropuesto: snakeToCamelValue(
-              data.procedimientoPropuesto,
-            ),
-            procedimientoSeleccionado: snakeToCamelValue(
-              data.procedimientoSeleccionado,
-            ),
-            valorEstimadoContrato: data.valorEstimadoContrato
-              ? parseFloat(data.valorEstimadoContrato)
+            code: data.code,
+            unit: data.unit,
+            department: data.department,
+            creatorId: data.creatorId,
+            status: snakeToCamelValue(data.status) || "draft",
+            contractType: snakeToCamelValue(data.contractType),
+            subject: data.subject,
+            description: data.description,
+            estimatedContractValue: data.estimatedContractValue
+              ? parseFloat(data.estimatedContractValue)
               : null,
-            presupuestoBaseLicitacion: data.presupuestoBaseLicitacion
-              ? parseFloat(data.presupuestoBaseLicitacion)
+            baseTenderBudget: data.baseTenderBudget
+              ? parseFloat(data.baseTenderBudget)
               : null,
-            iva: data.iva ? parseFloat(data.iva) : null,
-            importeProrrogas: data.importeProrrogas
-              ? parseFloat(data.importeProrrogas)
+            vat: data.vat ? parseFloat(data.vat) : null,
+            extensionsAmount: data.extensionsAmount
+              ? parseFloat(data.extensionsAmount)
               : null,
-            importeModificados: data.importeModificados
-              ? parseFloat(data.importeModificados)
+            modificationsAmount: data.modificationsAmount
+              ? parseFloat(data.modificationsAmount)
               : null,
-            fechaVencimiento: data.fechaVencimiento
-              ? new Date(data.fechaVencimiento)
-              : null,
-            metadatos: data.metadatos || {},
+            proposedProcedure: snakeToCamelValue(data.proposedProcedure),
+            selectedProcedure: snakeToCamelValue(data.selectedProcedure),
+            selectedCpv: data.selectedCpv,
+            hasLots: data.hasLots || false,
+            lotsJustification: data.lotsJustification,
+            numLots: data.numLots,
+            isUrgent: data.isUrgent || false,
+            isEmergency: data.isEmergency || false,
+            urgencyJustification: data.urgencyJustification,
+            completionPercentage: data.completionPercentage || 0,
+            riskLevel: data.riskLevel || "green",
+            lastPendingAction: data.lastPendingAction,
+            dueDate: data.dueDate ? new Date(data.dueDate) : null,
+            metadata: data.metadata || {},
           },
         });
 
-        return reply.status(201).send(normalizeExpediente(expediente));
+        return reply.status(201).send(normalizeCase(caseData));
       } catch (error: any) {
         if (error.code === "P2002") {
           return reply
             .status(400)
-            .send({ error: "Expediente with this codigo already exists" });
+            .send({ error: "Case with this code already exists" });
         }
         return reply.status(500).send({ error: "Internal server error" });
       }
     },
   );
 
-  // PUT /expedientes/:id - Update
+  // PUT /cases/:id - Update
   fastify.put(
     "/:id",
     {
       preValidation: [fastify.authAccessToken],
       schema: {
-        tags: ["Expedientes"],
-        description: "Update expediente by ID",
+        tags: ["Cases"],
+        description: "Update case by ID",
         params: {
           type: "object",
           properties: {
@@ -351,11 +358,11 @@ const routes: FastifyPluginAsync = async (fastify) => {
         },
         body: {
           type: "object",
-          properties: expedienteSchema.properties,
+          properties: caseSchema.properties,
           additionalProperties: true,
         },
         response: {
-          200: expedienteResponseSchema,
+          200: caseResponseSchema,
           404: {
             type: "object",
             properties: {
@@ -376,35 +383,35 @@ const routes: FastifyPluginAsync = async (fastify) => {
         const { id } = request.params as { id: string };
         const data = request.body as any;
 
-        fastify.log.info({ body: data }, "Updating expediente");
+        fastify.log.info({ body: data }, "Updating case");
 
-        const existingExpediente = await prisma.case.findUnique({
+        const existingCase = await prisma.case.findUnique({
           where: { id },
         });
 
-        if (!existingExpediente) {
-          return reply.status(404).send({ error: "Expediente not found" });
+        if (!existingCase) {
+          return reply.status(404).send({ error: "Case not found" });
         }
 
         // Build update data excluding non-updatable fields
         const updateData: Record<string, unknown> = {};
 
         const allowedFields = [
-          "codigo",
-          "unidad",
-          "organo",
-          "objeto",
-          "descripcion",
-          "cpvElegido",
-          "tieneLotes",
-          "justificacionLotes",
-          "numLotes",
-          "esUrgente",
-          "esEmergencia",
-          "justificacionUrgencia",
-          "porcentajeCompletitud",
-          "ultimaAccionPendiente",
-          "metadatos",
+          "code",
+          "unit",
+          "department",
+          "subject",
+          "description",
+          "selectedCpv",
+          "hasLots",
+          "lotsJustification",
+          "numLots",
+          "isUrgent",
+          "isEmergency",
+          "urgencyJustification",
+          "completionPercentage",
+          "lastPendingAction",
+          "metadata",
         ];
 
         for (const field of allowedFields) {
@@ -414,81 +421,67 @@ const routes: FastifyPluginAsync = async (fastify) => {
         }
 
         // Handle enum fields with conversion
-        if (data.estado !== undefined) {
-          updateData.estado = snakeToCamelValue(data.estado);
+        if (data.status !== undefined) {
+          updateData.status = snakeToCamelValue(data.status);
         }
-        if (data.tipoContrato !== undefined) {
-          updateData.tipoContrato = snakeToCamelValue(data.tipoContrato);
+        if (data.contractType !== undefined) {
+          updateData.contractType = snakeToCamelValue(data.contractType);
         }
-        if (data.procedimientoPropuesto !== undefined) {
-          updateData.procedimientoPropuesto = snakeToCamelValue(
-            data.procedimientoPropuesto,
+        if (data.proposedProcedure !== undefined) {
+          updateData.proposedProcedure = snakeToCamelValue(
+            data.proposedProcedure,
           );
         }
-        if (data.procedimientoSeleccionado !== undefined) {
-          updateData.procedimientoSeleccionado = snakeToCamelValue(
-            data.procedimientoSeleccionado,
+        if (data.selectedProcedure !== undefined) {
+          updateData.selectedProcedure = snakeToCamelValue(
+            data.selectedProcedure,
           );
         }
-        if (data.nivelRiesgo !== undefined) {
-          fastify.log.info(
-            { nivelRiesgo: data.nivelRiesgo },
-            "nivelRiesgo from camelCase",
-          );
-          updateData.nivelRiesgo = data.nivelRiesgo;
-        }
-        // Also handle snake_case from frontend
-        if (data.nivel_riesgo !== undefined) {
-          fastify.log.info(
-            { nivel_riesgo: data.nivel_riesgo },
-            "nivel_riesgo from snake_case",
-          );
-          updateData.nivelRiesgo = data.nivel_riesgo;
+        if (data.riskLevel !== undefined) {
+          updateData.riskLevel = data.riskLevel;
         }
 
         // Handle numeric fields
-        if (data.valorEstimadoContrato !== undefined) {
-          updateData.valorEstimadoContrato = parseFloat(
-            data.valorEstimadoContrato,
+        if (data.estimatedContractValue !== undefined) {
+          updateData.estimatedContractValue = parseFloat(
+            data.estimatedContractValue,
           );
         }
-        if (data.presupuestoBaseLicitacion !== undefined) {
-          updateData.presupuestoBaseLicitacion = parseFloat(
-            data.presupuestoBaseLicitacion,
-          );
+        if (data.baseTenderBudget !== undefined) {
+          updateData.baseTenderBudget = parseFloat(data.baseTenderBudget);
         }
-        if (data.iva !== undefined) {
-          updateData.iva = parseFloat(data.iva);
+        if (data.vat !== undefined) {
+          updateData.vat = parseFloat(data.vat);
         }
-        if (data.importeProrrogas !== undefined) {
-          updateData.importeProrrogas = parseFloat(data.importeProrrogas);
+        if (data.extensionsAmount !== undefined) {
+          updateData.extensionsAmount = parseFloat(data.extensionsAmount);
         }
-        if (data.importeModificados !== undefined) {
-          updateData.importeModificados = parseFloat(data.importeModificados);
+        if (data.modificationsAmount !== undefined) {
+          updateData.modificationsAmount = parseFloat(data.modificationsAmount);
         }
 
         // Handle date field
-        if (data.fechaVencimiento !== undefined) {
-          updateData.fechaVencimiento = new Date(data.fechaVencimiento);
+        if (data.dueDate !== undefined) {
+          updateData.dueDate = new Date(data.dueDate);
         }
 
         fastify.log.info({ updateData }, "Prepared update data");
 
-        const expediente = await prisma.case.update({
+        const caseData = await prisma.case.update({
           where: { id },
           data: updateData,
         });
 
-        return reply.status(200).send(normalizeExpediente(expediente));
+        return reply.status(200).send(normalizeCase(caseData));
       } catch (error: any) {
         fastify.log.error(
           { error: error.message, code: error.code },
-          "Error updating expediente",
+          "Error updating case",
         );
         if (error.code === "P2002") {
           return reply
             .status(400)
-            .send({ error: "Expediente with this codigo already exists" });
+            .send({ error: "Case with this code already exists" });
         }
         return reply
           .status(500)
@@ -497,14 +490,14 @@ const routes: FastifyPluginAsync = async (fastify) => {
     },
   );
 
-  // DELETE /expedientes/:id - Delete
+  // DELETE /cases/:id - Delete
   fastify.delete(
     "/:id",
     {
       preValidation: [fastify.authAccessToken],
       schema: {
-        tags: ["Expedientes"],
-        description: "Delete expediente by ID",
+        tags: ["Cases"],
+        description: "Delete case by ID",
         params: {
           type: "object",
           properties: {
@@ -532,21 +525,19 @@ const routes: FastifyPluginAsync = async (fastify) => {
       try {
         const { id } = request.params as { id: string };
 
-        const existingExpediente = await prisma.case.findUnique({
+        const existingCase = await prisma.case.findUnique({
           where: { id },
         });
 
-        if (!existingExpediente) {
-          return reply.status(404).send({ error: "Expediente not found" });
+        if (!existingCase) {
+          return reply.status(404).send({ error: "Case not found" });
         }
 
         await prisma.case.delete({
           where: { id },
         });
 
-        return reply
-          .status(200)
-          .send({ message: "Expediente deleted successfully" });
+        return reply.status(200).send({ message: "Case deleted successfully" });
       } catch (error) {
         return reply.status(500).send({ error: "Internal server error" });
       }

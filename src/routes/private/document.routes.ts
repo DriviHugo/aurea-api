@@ -1,39 +1,46 @@
 import type { FastifyPluginAsync } from "fastify";
 import type { PrismaClient } from "@prisma/client";
 
-// Convert snake_case tipo to camelCase for Prisma enum
-function convertTipoDocumento(tipo: string): string {
-  const tipoMap: Record<string, string> = {
-    memoria: "memoria",
-    ppt: "ppt",
-    pcap: "pcap",
-    anexo_tecnico: "anexoTecnico",
-    anexo_economico: "anexoEconomico",
-    informe_necesidad: "informeNecesidad",
-    justificacion_procedimiento: "justificacionProcedimiento",
+// Convert snake_case type to camelCase for Prisma enum
+function convertDocumentType(type: string): string {
+  const typeMap: Record<string, string> = {
+    memoria: "report",
+    report: "report",
+    ppt: "technicalSpecs",
+    technicalSpecs: "technicalSpecs",
+    pcap: "adminClauses",
+    adminClauses: "adminClauses",
+    anexo_tecnico: "technicalAnnex",
+    technicalAnnex: "technicalAnnex",
+    anexo_economico: "economicAnnex",
+    economicAnnex: "economicAnnex",
+    informe_necesidad: "needsReport",
+    needsReport: "needsReport",
+    justificacion_procedimiento: "procedureJustification",
+    procedureJustification: "procedureJustification",
   };
-  return tipoMap[tipo] || tipo;
+  return typeMap[type] || type;
 }
 
-// Convert camelCase tipo back to snake_case for API response
-function convertTipoToSnakeCase(tipo: string): string {
-  const tipoMap: Record<string, string> = {
-    memoria: "memoria",
-    ppt: "ppt",
-    pcap: "pcap",
-    anexoTecnico: "anexo_tecnico",
-    anexoEconomico: "anexo_economico",
-    informeNecesidad: "informe_necesidad",
-    justificacionProcedimiento: "justificacion_procedimiento",
+// Convert camelCase type back to snake_case for API response (backward compatibility)
+function convertTypeToSnakeCase(type: string): string {
+  const typeMap: Record<string, string> = {
+    report: "memoria",
+    technicalSpecs: "ppt",
+    adminClauses: "pcap",
+    technicalAnnex: "anexo_tecnico",
+    economicAnnex: "anexo_economico",
+    needsReport: "informe_necesidad",
+    procedureJustification: "justificacion_procedimiento",
   };
-  return tipoMap[tipo] || tipo;
+  return typeMap[type] || type;
 }
 
-// Helper to normalize documento response
-function normalizeDocumento(doc: any) {
+// Helper to normalize document response
+function normalizeDocument(doc: any) {
   return {
     ...doc,
-    tipo: convertTipoToSnakeCase(doc.tipo),
+    type: convertTypeToSnakeCase(doc.type),
   };
 }
 
@@ -53,9 +60,9 @@ const routes: FastifyPluginAsync = async (fastify) => {
           properties: {
             page: { type: "integer", minimum: 1, default: 1 },
             limit: { type: "integer", minimum: 1, maximum: 100, default: 10 },
-            expedienteId: { type: "string", format: "uuid" },
-            tipo: { type: "string" },
-            estado: { type: "string" },
+            caseId: { type: "string", format: "uuid" },
+            type: { type: "string" },
+            status: { type: "string" },
           },
         },
         response: {
@@ -68,16 +75,16 @@ const routes: FastifyPluginAsync = async (fastify) => {
                   type: "object",
                   properties: {
                     id: { type: "string" },
-                    expedienteId: { type: "string" },
-                    tipo: { type: "string" },
-                    nombre: { type: "string" },
+                    caseId: { type: "string" },
+                    type: { type: "string" },
+                    name: { type: "string" },
                     version: { type: "integer" },
                     hash: { type: "string", nullable: true },
-                    estado: { type: "string" },
-                    contenido: { type: "object", nullable: true },
-                    urlDocx: { type: "string", nullable: true },
-                    urlPdf: { type: "string", nullable: true },
-                    creadorId: { type: "string" },
+                    status: { type: "string" },
+                    content: { type: "object", nullable: true },
+                    docxUrl: { type: "string", nullable: true },
+                    pdfUrl: { type: "string", nullable: true },
+                    creatorId: { type: "string" },
                     createdAt: { type: "string", format: "date-time" },
                     updatedAt: { type: "string", format: "date-time" },
                   },
@@ -97,19 +104,19 @@ const routes: FastifyPluginAsync = async (fastify) => {
         const {
           page = 1,
           limit = 10,
-          expedienteId,
-          tipo,
-          estado,
+          caseId,
+          type,
+          status,
         } = request.query as any;
         const skip = (page - 1) * limit;
 
         const where: any = {};
-        if (expedienteId) where.expedienteId = expedienteId;
-        // Convert tipo from snake_case to camelCase for Prisma query
-        if (tipo) where.tipo = convertTipoDocumento(tipo);
-        if (estado) where.estado = estado;
+        if (caseId) where.caseId = caseId;
+        // Convert type from snake_case to camelCase for Prisma query
+        if (type) where.type = convertDocumentType(type);
+        if (status) where.status = status;
 
-        const [documentos, total] = await Promise.all([
+        const [documents, total] = await Promise.all([
           prisma.document.findMany({
             where,
             skip,
@@ -122,7 +129,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
         const totalPages = Math.ceil(total / limit);
 
         return reply.status(200).send({
-          data: documentos.map(normalizeDocumento),
+          data: documents.map(normalizeDocument),
           total,
           page,
           limit,
@@ -154,20 +161,20 @@ const routes: FastifyPluginAsync = async (fastify) => {
             type: "object",
             properties: {
               id: { type: "string" },
-              expedienteId: { type: "string" },
-              tipo: { type: "string" },
-              nombre: { type: "string" },
+              caseId: { type: "string" },
+              type: { type: "string" },
+              name: { type: "string" },
               version: { type: "integer" },
               hash: { type: "string", nullable: true },
-              estado: { type: "string" },
-              contenido: { type: "object", nullable: true },
-              urlDocx: { type: "string", nullable: true },
-              urlPdf: { type: "string", nullable: true },
-              creadorId: { type: "string" },
+              status: { type: "string" },
+              content: { type: "object", nullable: true },
+              docxUrl: { type: "string", nullable: true },
+              pdfUrl: { type: "string", nullable: true },
+              creatorId: { type: "string" },
               createdAt: { type: "string", format: "date-time" },
               updatedAt: { type: "string", format: "date-time" },
-              expediente: { type: "object" },
-              creador: { type: "object" },
+              case: { type: "object" },
+              creator: { type: "object" },
             },
           },
           404: {
@@ -183,15 +190,15 @@ const routes: FastifyPluginAsync = async (fastify) => {
       try {
         const { id } = request.params as { id: string };
 
-        const documento = await prisma.document.findUnique({
+        const document = await prisma.document.findUnique({
           where: { id },
         });
 
-        if (!documento) {
-          return reply.status(404).send({ error: "Documento not found" });
+        if (!document) {
+          return reply.status(404).send({ error: "Document not found" });
         }
 
-        return reply.status(200).send(normalizeDocumento(documento));
+        return reply.status(200).send(normalizeDocument(document));
       } catch (error) {
         return reply.status(500).send({ error: "Internal server error" });
       }
@@ -205,21 +212,21 @@ const routes: FastifyPluginAsync = async (fastify) => {
       preValidation: [fastify.authAccessToken],
       schema: {
         tags: ["Documentos"],
-        description: "Create new documento",
+        description: "Create new document",
         body: {
           type: "object",
-          required: ["expedienteId", "tipo", "nombre", "creadorId"],
+          required: ["caseId", "type", "name", "creatorId"],
           properties: {
-            expedienteId: { type: "string", format: "uuid" },
-            tipo: { type: "string" },
-            nombre: { type: "string", minLength: 1 },
+            caseId: { type: "string", format: "uuid" },
+            type: { type: "string" },
+            name: { type: "string", minLength: 1 },
             version: { type: "integer", minimum: 1 },
             hash: { type: "string" },
-            estado: { type: "string" },
-            contenido: { type: "object" },
-            urlDocx: { type: "string" },
-            urlPdf: { type: "string" },
-            creadorId: { type: "string", format: "uuid" },
+            status: { type: "string" },
+            content: { type: "object" },
+            docxUrl: { type: "string" },
+            pdfUrl: { type: "string" },
+            creatorId: { type: "string", format: "uuid" },
           },
         },
         response: {
@@ -227,16 +234,16 @@ const routes: FastifyPluginAsync = async (fastify) => {
             type: "object",
             properties: {
               id: { type: "string" },
-              expedienteId: { type: "string" },
-              tipo: { type: "string" },
-              nombre: { type: "string" },
+              caseId: { type: "string" },
+              type: { type: "string" },
+              name: { type: "string" },
               version: { type: "integer" },
               hash: { type: "string", nullable: true },
-              estado: { type: "string" },
-              contenido: { type: "object", nullable: true },
-              urlDocx: { type: "string", nullable: true },
-              urlPdf: { type: "string", nullable: true },
-              creadorId: { type: "string" },
+              status: { type: "string" },
+              content: { type: "object", nullable: true },
+              docxUrl: { type: "string", nullable: true },
+              pdfUrl: { type: "string", nullable: true },
+              creatorId: { type: "string" },
               createdAt: { type: "string", format: "date-time" },
               updatedAt: { type: "string", format: "date-time" },
             },
@@ -253,69 +260,66 @@ const routes: FastifyPluginAsync = async (fastify) => {
     async (request, reply) => {
       try {
         const data = request.body as any;
-        fastify.log.info({ body: data }, "POST /documentos - received data");
+        fastify.log.info({ body: data }, "POST /documents - received data");
 
-        // Verify expediente exists
-        const expediente = await prisma.case.findUnique({
-          where: { id: data.expedienteId },
+        // Verify case exists
+        const caseEntity = await prisma.case.findUnique({
+          where: { id: data.caseId },
         });
 
-        if (!expediente) {
-          fastify.log.warn(
-            { expedienteId: data.expedienteId },
-            "Expediente not found",
-          );
-          return reply.status(400).send({ error: "Expediente not found" });
+        if (!caseEntity) {
+          fastify.log.warn({ caseId: data.caseId }, "Case not found");
+          return reply.status(400).send({ error: "Case not found" });
         }
 
-        // Verify creador exists
-        const creador = await prisma.profile.findUnique({
-          where: { id: data.creadorId },
+        // Verify creator exists
+        const creator = await prisma.profile.findUnique({
+          where: { id: data.creatorId },
         });
 
-        if (!creador) {
-          fastify.log.warn({ creadorId: data.creadorId }, "Creador not found");
-          return reply.status(400).send({ error: "Creador not found" });
+        if (!creator) {
+          fastify.log.warn({ creatorId: data.creatorId }, "Creator not found");
+          return reply.status(400).send({ error: "Creator not found" });
         }
 
-        const documento = await prisma.document.create({
+        const document = await prisma.document.create({
           data: {
-            expedienteId: data.expedienteId,
-            tipo: convertTipoDocumento(data.tipo) as any,
-            nombre: data.nombre,
+            caseId: data.caseId,
+            type: convertDocumentType(data.type) as any,
+            name: data.name,
             version: data.version || 1,
             hash: data.hash,
-            estado: data.estado || "pendiente",
-            contenido: data.contenido,
-            urlDocx: data.urlDocx,
-            urlPdf: data.urlPdf,
-            creadorId: data.creadorId,
+            status: data.status || "pending",
+            content: data.content,
+            docxUrl: data.docxUrl,
+            pdfUrl: data.pdfUrl,
+            creatorId: data.creatorId,
           },
         });
 
         fastify.log.info(
-          { documentoId: documento.id },
-          "Documento created successfully",
+          { documentId: document.id },
+          "Document created successfully",
         );
-        return reply.status(201).send(normalizeDocumento(documento));
+        return reply.status(201).send(normalizeDocument(document));
       } catch (error) {
         fastify.log.error(
           { error, body: request.body },
-          "POST /documentos - error creating documento",
+          "POST /documents - error creating document",
         );
         return reply.status(500).send({ error: "Internal server error" });
       }
     },
   );
 
-  // PUT /documentos/:id - Update documento
+  // PUT /documents/:id - Update document
   fastify.put(
     "/:id",
     {
       preValidation: [fastify.authAccessToken],
       schema: {
-        tags: ["Documentos"],
-        description: "Update documento by ID",
+        tags: ["Documents"],
+        description: "Update document by ID",
         params: {
           type: "object",
           required: ["id"],
@@ -326,14 +330,14 @@ const routes: FastifyPluginAsync = async (fastify) => {
         body: {
           type: "object",
           properties: {
-            tipo: { type: "string" },
-            nombre: { type: "string", minLength: 1 },
+            type: { type: "string" },
+            name: { type: "string", minLength: 1 },
             version: { type: "integer", minimum: 1 },
             hash: { type: "string" },
-            estado: { type: "string" },
-            contenido: { type: "object" },
-            urlDocx: { type: "string" },
-            urlPdf: { type: "string" },
+            status: { type: "string" },
+            content: { type: "object" },
+            docxUrl: { type: "string" },
+            pdfUrl: { type: "string" },
           },
         },
         response: {
@@ -341,16 +345,16 @@ const routes: FastifyPluginAsync = async (fastify) => {
             type: "object",
             properties: {
               id: { type: "string" },
-              expedienteId: { type: "string" },
-              tipo: { type: "string" },
-              nombre: { type: "string" },
+              caseId: { type: "string" },
+              type: { type: "string" },
+              name: { type: "string" },
               version: { type: "integer" },
               hash: { type: "string", nullable: true },
-              estado: { type: "string" },
-              contenido: { type: "object", nullable: true },
-              urlDocx: { type: "string", nullable: true },
-              urlPdf: { type: "string", nullable: true },
-              creadorId: { type: "string" },
+              status: { type: "string" },
+              content: { type: "object", nullable: true },
+              docxUrl: { type: "string", nullable: true },
+              pdfUrl: { type: "string", nullable: true },
+              creatorId: { type: "string" },
               createdAt: { type: "string", format: "date-time" },
               updatedAt: { type: "string", format: "date-time" },
             },
@@ -369,45 +373,45 @@ const routes: FastifyPluginAsync = async (fastify) => {
         const { id } = request.params as { id: string };
         const data = request.body as any;
 
-        const existingDocumento = await prisma.document.findUnique({
+        const existingDocument = await prisma.document.findUnique({
           where: { id },
         });
 
-        if (!existingDocumento) {
-          return reply.status(404).send({ error: "Documento not found" });
+        if (!existingDocument) {
+          return reply.status(404).send({ error: "Document not found" });
         }
 
-        const documento = await prisma.document.update({
+        const document = await prisma.document.update({
           where: { id },
           data: {
-            tipo: data.tipo
-              ? (convertTipoDocumento(data.tipo) as any)
+            type: data.type
+              ? (convertDocumentType(data.type) as any)
               : undefined,
-            nombre: data.nombre,
+            name: data.name,
             version: data.version,
             hash: data.hash,
-            estado: data.estado,
-            contenido: data.contenido,
-            urlDocx: data.urlDocx,
-            urlPdf: data.urlPdf,
+            status: data.status,
+            content: data.content,
+            docxUrl: data.docxUrl,
+            pdfUrl: data.pdfUrl,
           },
         });
 
-        return reply.status(200).send(normalizeDocumento(documento));
+        return reply.status(200).send(normalizeDocument(document));
       } catch (error) {
         return reply.status(500).send({ error: "Internal server error" });
       }
     },
   );
 
-  // DELETE /documentos/:id - Delete documento
+  // DELETE /documents/:id - Delete document
   fastify.delete(
     "/:id",
     {
       preValidation: [fastify.authAccessToken],
       schema: {
-        tags: ["Documentos"],
-        description: "Delete documento by ID",
+        tags: ["Documents"],
+        description: "Delete document by ID",
         params: {
           type: "object",
           required: ["id"],
@@ -435,12 +439,12 @@ const routes: FastifyPluginAsync = async (fastify) => {
       try {
         const { id } = request.params as { id: string };
 
-        const existingDocumento = await prisma.document.findUnique({
+        const existingDocument = await prisma.document.findUnique({
           where: { id },
         });
 
-        if (!existingDocumento) {
-          return reply.status(404).send({ error: "Documento not found" });
+        if (!existingDocument) {
+          return reply.status(404).send({ error: "Document not found" });
         }
 
         await prisma.document.delete({
@@ -449,7 +453,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
 
         return reply
           .status(200)
-          .send({ message: "Documento deleted successfully" });
+          .send({ message: "Document deleted successfully" });
       } catch (error) {
         return reply.status(500).send({ error: "Internal server error" });
       }

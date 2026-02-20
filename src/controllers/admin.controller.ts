@@ -3,16 +3,16 @@
  */
 
 import type { FastifyRequest, FastifyReply } from "fastify";
-import type { RolUsuario } from "@prisma/client";
+import type { UserRole } from "@prisma/client";
 import type { AdminService } from "../services/admin.service.js";
 
 interface CreateUserBody {
   email: string;
   password: string;
-  nombre: string;
-  apellidos?: string;
-  unidad?: string;
-  roles?: RolUsuario[];
+  name: string;
+  lastName?: string;
+  unit?: string;
+  roles?: UserRole[];
   sendWelcomeEmail?: boolean;
   appUrl?: string;
 }
@@ -49,9 +49,9 @@ export class AdminController {
       const result = await this.adminService.createUser({
         email: req.body.email,
         password: req.body.password,
-        nombre: req.body.nombre,
-        apellidos: req.body.apellidos,
-        unidad: req.body.unidad,
+        name: req.body.name,
+        lastName: req.body.lastName,
+        unit: req.body.unit,
         roles: req.body.roles,
       });
 

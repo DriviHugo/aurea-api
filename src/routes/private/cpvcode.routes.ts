@@ -17,7 +17,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
           properties: {
             page: { type: "integer", minimum: 1, default: 1 },
             limit: { type: "integer", minimum: 1, maximum: 100, default: 10 },
-            activo: { type: "boolean" },
+            active: { type: "boolean" },
             nivel: { type: "integer", minimum: 1 },
             codigo: { type: "string" },
           },
@@ -37,7 +37,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
                     descripcionEn: { type: "string", nullable: true },
                     nivel: { type: "integer" },
                     codigoPadre: { type: "string", nullable: true },
-                    activo: { type: "boolean" },
+                    active: { type: "boolean" },
                     createdAt: { type: "string", format: "date-time" },
                   },
                 },
@@ -56,14 +56,14 @@ const routes: FastifyPluginAsync = async (fastify) => {
         const {
           page = 1,
           limit = 10,
-          activo,
+          active,
           nivel,
           codigo,
         } = request.query as any;
         const skip = (page - 1) * limit;
 
         const where: any = {};
-        if (activo !== undefined) where.activo = activo;
+        if (active !== undefined) where.active = active;
         if (nivel !== undefined) where.nivel = nivel;
         if (codigo) where.codigo = { contains: codigo, mode: "insensitive" };
 
@@ -117,7 +117,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
               descripcionEn: { type: "string", nullable: true },
               nivel: { type: "integer" },
               codigoPadre: { type: "string", nullable: true },
-              activo: { type: "boolean" },
+              active: { type: "boolean" },
               createdAt: { type: "string", format: "date-time" },
             },
           },
@@ -166,7 +166,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
             descripcionEn: { type: "string", nullable: true },
             nivel: { type: "integer", minimum: 1 },
             codigoPadre: { type: "string", nullable: true },
-            activo: { type: "boolean", default: true },
+            active: { type: "boolean", default: true },
           },
         },
         response: {
@@ -179,7 +179,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
               descripcionEn: { type: "string", nullable: true },
               nivel: { type: "integer" },
               codigoPadre: { type: "string", nullable: true },
-              activo: { type: "boolean" },
+              active: { type: "boolean" },
               createdAt: { type: "string", format: "date-time" },
             },
           },
@@ -233,7 +233,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
             descripcionEn: { type: "string", nullable: true },
             nivel: { type: "integer", minimum: 1 },
             codigoPadre: { type: "string", nullable: true },
-            activo: { type: "boolean" },
+            active: { type: "boolean" },
           },
         },
         response: {
@@ -246,7 +246,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
               descripcionEn: { type: "string", nullable: true },
               nivel: { type: "integer" },
               codigoPadre: { type: "string", nullable: true },
-              activo: { type: "boolean" },
+              active: { type: "boolean" },
               createdAt: { type: "string", format: "date-time" },
             },
           },

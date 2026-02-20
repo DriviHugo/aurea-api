@@ -17,7 +17,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
           properties: {
             page: { type: "integer", minimum: 1, default: 1 },
             limit: { type: "integer", minimum: 1, maximum: 100, default: 10 },
-            activo: { type: "boolean" },
+            active: { type: "boolean" },
           },
         },
         response: {
@@ -31,11 +31,11 @@ const routes: FastifyPluginAsync = async (fastify) => {
                   properties: {
                     id: { type: "string" },
                     email: { type: "string", nullable: true },
-                    nombre: { type: "string" },
-                    apellidos: { type: "string", nullable: true },
-                    unidad: { type: "string", nullable: true },
-                    activo: { type: "boolean" },
-                    mostrarAyudaWizard: { type: "boolean" },
+                    name: { type: "string" },
+                    lastName: { type: "string", nullable: true },
+                    unit: { type: "string", nullable: true },
+                    active: { type: "boolean" },
+                    showWizardHelp: { type: "boolean" },
                     createdAt: { type: "string", format: "date-time" },
                     updatedAt: { type: "string", format: "date-time" },
                   },
@@ -52,10 +52,10 @@ const routes: FastifyPluginAsync = async (fastify) => {
     },
     async (request, reply) => {
       try {
-        const { page = 1, limit = 10, activo } = request.query as any;
+        const { page = 1, limit = 10, active } = request.query as any;
         const skip = (page - 1) * limit;
 
-        const where = activo !== undefined ? { activo } : {};
+        const where = active !== undefined ? { active } : {};
 
         const [profiles, total] = await Promise.all([
           prisma.profile.findMany({
@@ -103,11 +103,11 @@ const routes: FastifyPluginAsync = async (fastify) => {
             properties: {
               id: { type: "string" },
               email: { type: "string", nullable: true },
-              nombre: { type: "string" },
-              apellidos: { type: "string", nullable: true },
-              unidad: { type: "string", nullable: true },
-              activo: { type: "boolean" },
-              mostrarAyudaWizard: { type: "boolean" },
+              name: { type: "string" },
+              lastName: { type: "string", nullable: true },
+              unit: { type: "string", nullable: true },
+              active: { type: "boolean" },
+              showWizardHelp: { type: "boolean" },
               createdAt: { type: "string", format: "date-time" },
               updatedAt: { type: "string", format: "date-time" },
             },
@@ -150,15 +150,15 @@ const routes: FastifyPluginAsync = async (fastify) => {
         description: "Create new profile",
         body: {
           type: "object",
-          required: ["id", "nombre"],
+          required: ["id", "name"],
           properties: {
             id: { type: "string" },
             email: { type: "string", nullable: true },
-            nombre: { type: "string", minLength: 1 },
-            apellidos: { type: "string", nullable: true },
-            unidad: { type: "string", nullable: true },
-            activo: { type: "boolean", default: true },
-            mostrarAyudaWizard: { type: "boolean", default: true },
+            name: { type: "string", minLength: 1 },
+            lastName: { type: "string", nullable: true },
+            unit: { type: "string", nullable: true },
+            active: { type: "boolean", default: true },
+            showWizardHelp: { type: "boolean", default: true },
           },
         },
         response: {
@@ -167,11 +167,11 @@ const routes: FastifyPluginAsync = async (fastify) => {
             properties: {
               id: { type: "string" },
               email: { type: "string", nullable: true },
-              nombre: { type: "string" },
-              apellidos: { type: "string", nullable: true },
-              unidad: { type: "string", nullable: true },
-              activo: { type: "boolean" },
-              mostrarAyudaWizard: { type: "boolean" },
+              name: { type: "string" },
+              lastName: { type: "string", nullable: true },
+              unit: { type: "string", nullable: true },
+              active: { type: "boolean" },
+              showWizardHelp: { type: "boolean" },
               createdAt: { type: "string", format: "date-time" },
               updatedAt: { type: "string", format: "date-time" },
             },
@@ -224,11 +224,11 @@ const routes: FastifyPluginAsync = async (fastify) => {
           type: "object",
           properties: {
             email: { type: "string", nullable: true },
-            nombre: { type: "string", minLength: 1 },
-            apellidos: { type: "string", nullable: true },
-            unidad: { type: "string", nullable: true },
-            activo: { type: "boolean" },
-            mostrarAyudaWizard: { type: "boolean" },
+            name: { type: "string", minLength: 1 },
+            lastName: { type: "string", nullable: true },
+            unit: { type: "string", nullable: true },
+            active: { type: "boolean" },
+            showWizardHelp: { type: "boolean" },
           },
         },
         response: {
@@ -237,11 +237,11 @@ const routes: FastifyPluginAsync = async (fastify) => {
             properties: {
               id: { type: "string" },
               email: { type: "string", nullable: true },
-              nombre: { type: "string" },
-              apellidos: { type: "string", nullable: true },
-              unidad: { type: "string", nullable: true },
-              activo: { type: "boolean" },
-              mostrarAyudaWizard: { type: "boolean" },
+              name: { type: "string" },
+              lastName: { type: "string", nullable: true },
+              unit: { type: "string", nullable: true },
+              active: { type: "boolean" },
+              showWizardHelp: { type: "boolean" },
               createdAt: { type: "string", format: "date-time" },
               updatedAt: { type: "string", format: "date-time" },
             },

@@ -34,7 +34,7 @@ export class CpvService {
 
     const results = await this.prisma.cpvCode.findMany({
       where: {
-        activo: true,
+        active: true,
         OR: [
           { codigo: { startsWith: searchTerm } },
           { descripcion: { contains: searchTerm, mode: "insensitive" } },
@@ -70,7 +70,7 @@ export class CpvService {
               descripcionEn: item.descripcion_en ?? null,
               nivel: item.nivel,
               codigoPadre: item.codigo_padre ?? null,
-              activo: true,
+              active: true,
             },
             create: {
               codigo: item.codigo,
@@ -78,7 +78,7 @@ export class CpvService {
               descripcionEn: item.descripcion_en ?? null,
               nivel: item.nivel,
               codigoPadre: item.codigo_padre ?? null,
-              activo: true,
+              active: true,
             },
           });
           inserted++;

@@ -5,45 +5,45 @@ const aiProviderSchema = {
   type: "object",
   properties: {
     id: { type: "string", format: "uuid" },
-    nombre: { type: "string" },
-    tipo: { type: "string", enum: ["openai", "anthropic", "google", "custom"] },
+    name: { type: "string" },
+    type: { type: "string", enum: ["openai", "anthropic", "google", "custom"] },
     baseUrl: { type: "string", format: "uri" },
     apiKeySecretName: { type: "string", nullable: true },
-    modelosDisponibles: { type: "array", items: { type: "string" } },
-    parametrosDefecto: { type: "object" },
+    availableModels: { type: "array", items: { type: "string" } },
+    defaultParams: { type: "object" },
   },
 };
 
 const createAiProviderSchema = {
   type: "object",
-  required: ["nombre", "baseUrl", "modelosDisponibles"],
+  required: ["name", "baseUrl", "availableModels"],
   properties: {
-    nombre: { type: "string", minLength: 1 },
-    tipo: { type: "string", enum: ["openai", "anthropic", "google", "custom"] },
+    name: { type: "string", minLength: 1 },
+    type: { type: "string", enum: ["openai", "anthropic", "google", "custom"] },
     baseUrl: { type: "string", format: "uri" },
     apiKeySecretName: { type: "string" },
-    modelosDisponibles: {
+    availableModels: {
       type: "array",
       items: { type: "string" },
       minItems: 1,
     },
-    parametrosDefecto: { type: "object" },
+    defaultParams: { type: "object" },
   },
 };
 
 const updateAiProviderSchema = {
   type: "object",
   properties: {
-    nombre: { type: "string", minLength: 1 },
-    tipo: { type: "string", enum: ["openai", "anthropic", "google", "custom"] },
+    name: { type: "string", minLength: 1 },
+    type: { type: "string", enum: ["openai", "anthropic", "google", "custom"] },
     baseUrl: { type: "string", format: "uri" },
     apiKeySecretName: { type: "string" },
-    modelosDisponibles: {
+    availableModels: {
       type: "array",
       items: { type: "string" },
       minItems: 1,
     },
-    parametrosDefecto: { type: "object" },
+    defaultParams: { type: "object" },
   },
 };
 
@@ -93,7 +93,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
           prisma.aiProvider.findMany({
             skip,
             take: limit,
-            orderBy: { nombre: "asc" },
+            orderBy: { name: "asc" },
           }),
           prisma.aiProvider.count(),
         ]);
@@ -181,22 +181,22 @@ const routes: FastifyPluginAsync = async (fastify) => {
     async (request, reply) => {
       try {
         const data = request.body as {
-          nombre: string;
-          tipo?: "openai" | "anthropic" | "google" | "custom";
+          name: string;
+          type?: "openai" | "anthropic" | "google" | "custom";
           baseUrl: string;
           apiKeySecretName?: string;
-          modelosDisponibles: string[];
-          parametrosDefecto?: any;
+          availableModels: string[];
+          defaultParams?: any;
         };
 
         const aiProvider = await prisma.aiProvider.create({
           data: {
-            nombre: data.nombre,
-            tipo: data.tipo || "custom",
+            name: data.name,
+            type: data.type || "custom",
             baseUrl: data.baseUrl,
             apiKeySecretName: data.apiKeySecretName,
-            modelosDisponibles: data.modelosDisponibles,
-            parametrosDefecto: data.parametrosDefecto || { temperature: 0.3 },
+            availableModels: data.availableModels,
+            defaultParams: data.defaultParams || { temperature: 0.3 },
           },
         });
 
@@ -249,12 +249,12 @@ const routes: FastifyPluginAsync = async (fastify) => {
       try {
         const { id } = request.params as { id: string };
         const data = request.body as {
-          nombre?: string;
-          tipo?: "openai" | "anthropic" | "google" | "custom";
+          name?: string;
+          type?: "openai" | "anthropic" | "google" | "custom";
           baseUrl?: string;
           apiKeySecretName?: string;
-          modelosDisponibles?: string[];
-          parametrosDefecto?: any;
+          availableModels?: string[];
+          defaultParams?: any;
         };
 
         const existingAiProvider = await prisma.aiProvider.findUnique({

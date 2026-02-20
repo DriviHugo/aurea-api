@@ -17,7 +17,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
           properties: {
             page: { type: "integer", minimum: 1, default: 1 },
             limit: { type: "integer", minimum: 1, maximum: 100, default: 10 },
-            categoria: { type: "string" },
+            category: { type: "string" },
             providerId: { type: "string", format: "uuid" },
           },
         },
@@ -31,16 +31,16 @@ const routes: FastifyPluginAsync = async (fastify) => {
                   type: "object",
                   properties: {
                     id: { type: "string" },
-                    codigo: { type: "string" },
-                    nombre: { type: "string" },
-                    descripcion: { type: "string", nullable: true },
-                    categoria: { type: "string" },
+                    code: { type: "string" },
+                    name: { type: "string" },
+                    description: { type: "string", nullable: true },
+                    category: { type: "string" },
                     providerId: { type: "string", nullable: true },
-                    modelo: { type: "string" },
+                    model: { type: "string" },
                     systemPrompt: { type: "string" },
                     userPromptTemplate: { type: "string", nullable: true },
                     toolSchema: {},
-                    parametros: {},
+                    params: {},
                   },
                 },
               },
@@ -58,13 +58,13 @@ const routes: FastifyPluginAsync = async (fastify) => {
         const {
           page = 1,
           limit = 10,
-          categoria,
+          category,
           providerId,
         } = request.query as any;
         const skip = (page - 1) * limit;
 
         const where: any = {};
-        if (categoria) where.categoria = categoria;
+        if (category) where.category = category;
         if (providerId) where.providerId = providerId;
 
         const [data, total] = await Promise.all([
@@ -72,7 +72,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
             where,
             skip,
             take: limit,
-            orderBy: { nombre: "asc" },
+            orderBy: { name: "asc" },
           }),
           prisma.aiFunction.count({ where }),
         ]);
@@ -112,16 +112,16 @@ const routes: FastifyPluginAsync = async (fastify) => {
             type: "object",
             properties: {
               id: { type: "string" },
-              codigo: { type: "string" },
-              nombre: { type: "string" },
-              descripcion: { type: "string", nullable: true },
-              categoria: { type: "string" },
+              code: { type: "string" },
+              name: { type: "string" },
+              description: { type: "string", nullable: true },
+              category: { type: "string" },
               providerId: { type: "string", nullable: true },
-              modelo: { type: "string" },
+              model: { type: "string" },
               systemPrompt: { type: "string" },
               userPromptTemplate: { type: "string", nullable: true },
               toolSchema: {},
-              parametros: {},
+              params: {},
             },
           },
           404: {
@@ -162,18 +162,18 @@ const routes: FastifyPluginAsync = async (fastify) => {
         description: "Create new AI function",
         body: {
           type: "object",
-          required: ["codigo", "nombre", "categoria", "modelo", "systemPrompt"],
+          required: ["code", "name", "category", "model", "systemPrompt"],
           properties: {
-            codigo: { type: "string", minLength: 1 },
-            nombre: { type: "string", minLength: 1 },
-            descripcion: { type: "string" },
-            categoria: { type: "string", minLength: 1 },
+            code: { type: "string", minLength: 1 },
+            name: { type: "string", minLength: 1 },
+            description: { type: "string" },
+            category: { type: "string", minLength: 1 },
             providerId: { type: "string", format: "uuid" },
-            modelo: { type: "string", minLength: 1 },
+            model: { type: "string", minLength: 1 },
             systemPrompt: { type: "string", minLength: 1 },
             userPromptTemplate: { type: "string" },
             toolSchema: {},
-            parametros: { type: "object", default: { temperature: 0.3 } },
+            params: { type: "object", default: { temperature: 0.3 } },
           },
         },
         response: {
@@ -181,16 +181,16 @@ const routes: FastifyPluginAsync = async (fastify) => {
             type: "object",
             properties: {
               id: { type: "string" },
-              codigo: { type: "string" },
-              nombre: { type: "string" },
-              descripcion: { type: "string", nullable: true },
-              categoria: { type: "string" },
+              code: { type: "string" },
+              name: { type: "string" },
+              description: { type: "string", nullable: true },
+              category: { type: "string" },
               providerId: { type: "string", nullable: true },
-              modelo: { type: "string" },
+              model: { type: "string" },
               systemPrompt: { type: "string" },
               userPromptTemplate: { type: "string", nullable: true },
               toolSchema: {},
-              parametros: {},
+              params: {},
             },
           },
           400: {
@@ -209,7 +209,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
         const aiFunction = await prisma.aiFunction.create({
           data: {
             ...data,
-            parametros: data.parametros || { temperature: 0.3 },
+            params: data.params || { temperature: 0.3 },
           },
         });
 
@@ -243,16 +243,16 @@ const routes: FastifyPluginAsync = async (fastify) => {
         body: {
           type: "object",
           properties: {
-            codigo: { type: "string", minLength: 1 },
-            nombre: { type: "string", minLength: 1 },
-            descripcion: { type: "string" },
-            categoria: { type: "string", minLength: 1 },
+            code: { type: "string", minLength: 1 },
+            name: { type: "string", minLength: 1 },
+            description: { type: "string" },
+            category: { type: "string", minLength: 1 },
             providerId: { type: "string", format: "uuid" },
-            modelo: { type: "string", minLength: 1 },
+            model: { type: "string", minLength: 1 },
             systemPrompt: { type: "string", minLength: 1 },
             userPromptTemplate: { type: "string" },
             toolSchema: {},
-            parametros: { type: "object" },
+            params: { type: "object" },
           },
         },
         response: {
@@ -260,16 +260,16 @@ const routes: FastifyPluginAsync = async (fastify) => {
             type: "object",
             properties: {
               id: { type: "string" },
-              codigo: { type: "string" },
-              nombre: { type: "string" },
-              descripcion: { type: "string", nullable: true },
-              categoria: { type: "string" },
+              code: { type: "string" },
+              name: { type: "string" },
+              description: { type: "string", nullable: true },
+              category: { type: "string" },
               providerId: { type: "string", nullable: true },
-              modelo: { type: "string" },
+              model: { type: "string" },
               systemPrompt: { type: "string" },
               userPromptTemplate: { type: "string", nullable: true },
               toolSchema: {},
-              parametros: {},
+              params: {},
             },
           },
           404: {

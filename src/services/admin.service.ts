@@ -2,16 +2,16 @@
  * Admin Service - User management business logic
  */
 
-import type { PrismaClient, RolUsuario } from "@prisma/client";
+import type { PrismaClient, UserRole } from "@prisma/client";
 import bcrypt from "bcryptjs";
 
 export interface CreateUserInput {
   email: string;
   password: string;
-  nombre: string;
-  apellidos?: string | undefined;
-  unidad?: string | undefined;
-  roles?: RolUsuario[] | undefined;
+  name: string;
+  lastName?: string | undefined;
+  unit?: string | undefined;
+  roles?: UserRole[] | undefined;
 }
 
 export interface CreateUserResult {
@@ -39,10 +39,10 @@ export class AdminService {
     const {
       email,
       password,
-      nombre,
-      apellidos,
-      unidad,
-      roles = ["tramitador" as RolUsuario],
+      name,
+      lastName,
+      unit,
+      roles = ["processor" as UserRole],
     } = input;
 
     // Check if email already exists
@@ -65,10 +65,10 @@ export class AdminService {
           id: crypto.randomUUID(),
           email,
           password: hashedPassword,
-          nombre,
-          apellidos: apellidos ?? null,
-          unidad: unidad ?? null,
-          activo: true,
+          name,
+          lastName: lastName ?? null,
+          unit: unit ?? null,
+          active: true,
         },
       });
 
@@ -109,12 +109,12 @@ export class AdminService {
   ): Promise<DeleteUserResult> {
     // Prevent self-deletion
     if (userId === requestUserId) {
-      throw new Error("No puedes eliminarte a ti mismo");
+      throw new Error("Cannot delete yourself");
     }
 
-    // Check if user has cases (using creadorId field)
+    // Check if user has cases (using creatorId field)
     const cases = await this.prisma.case.findMany({
-      where: { creadorId: userId },
+      where: { creatorId: userId },
       select: { id: true },
     });
 
@@ -130,8 +130,8 @@ export class AdminService {
       // Reassign cases if needed
       if (cases.length > 0 && reassignToUserId) {
         await tx.case.updateMany({
-          where: { creadorId: userId },
-          data: { creadorId: reassignToUserId },
+          where: { creatorId: userId },
+          data: { creatorId: reassignToUserId },
         });
       }
 

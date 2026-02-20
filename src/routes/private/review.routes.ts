@@ -17,8 +17,8 @@ const routes: FastifyPluginAsync = async (fastify) => {
           properties: {
             page: { type: "integer", minimum: 1, default: 1 },
             limit: { type: "integer", minimum: 1, maximum: 100, default: 10 },
-            expedienteId: { type: "string", format: "uuid" },
-            usuarioId: { type: "string", format: "uuid" },
+            caseId: { type: "string", format: "uuid" },
+            userId: { type: "string", format: "uuid" },
           },
         },
         response: {
@@ -31,13 +31,13 @@ const routes: FastifyPluginAsync = async (fastify) => {
                   type: "object",
                   properties: {
                     id: { type: "string" },
-                    expedienteId: { type: "string" },
-                    documentoId: { type: ["string", "null"] },
-                    usuarioId: { type: "string" },
-                    rol: { type: "string" },
-                    cambioDescripcion: { type: "string" },
+                    caseId: { type: "string" },
+                    documentId: { type: ["string", "null"] },
+                    userId: { type: "string" },
+                    role: { type: "string" },
+                    changeDescription: { type: "string" },
                     decision: { type: "string" },
-                    motivo: { type: ["string", "null"] },
+                    reason: { type: ["string", "null"] },
                     createdAt: { type: "string", format: "date-time" },
                   },
                 },
@@ -53,17 +53,12 @@ const routes: FastifyPluginAsync = async (fastify) => {
     },
     async (request, reply) => {
       try {
-        const {
-          page = 1,
-          limit = 10,
-          expedienteId,
-          usuarioId,
-        } = request.query as any;
+        const { page = 1, limit = 10, caseId, userId } = request.query as any;
         const skip = (page - 1) * limit;
 
         const where: any = {};
-        if (expedienteId) where.expedienteId = expedienteId;
-        if (usuarioId) where.usuarioId = usuarioId;
+        if (caseId) where.caseId = caseId;
+        if (userId) where.userId = userId;
 
         const [revisions, total] = await Promise.all([
           prisma.review.findMany({
@@ -159,30 +154,30 @@ const routes: FastifyPluginAsync = async (fastify) => {
         body: {
           type: "object",
           required: [
-            "expedienteId",
-            "usuarioId",
-            "rol",
-            "cambioDescripcion",
+            "caseId",
+            "userId",
+            "role",
+            "changeDescription",
             "decision",
           ],
           properties: {
-            expedienteId: { type: "string", format: "uuid" },
-            documentoId: { type: "string", format: "uuid" },
-            usuarioId: { type: "string", format: "uuid" },
-            rol: {
+            caseId: { type: "string", format: "uuid" },
+            documentId: { type: "string", format: "uuid" },
+            userId: { type: "string", format: "uuid" },
+            role: {
               type: "string",
-              enum: ["ADMINISTRADOR", "COORDINADOR", "ANALISTA", "CONSULTOR"],
+              enum: ["processor", "legal", "auditor", "supervisor", "admin"],
             },
-            cambioDescripcion: {
+            changeDescription: {
               type: "string",
               minLength: 1,
               maxLength: 1000,
             },
             decision: {
               type: "string",
-              enum: ["APROBADO", "RECHAZADO", "PENDIENTE", "REVISION"],
+              enum: ["approved", "rejected", "pending", "in_review"],
             },
-            motivo: { type: "string", maxLength: 500 },
+            reason: { type: "string", maxLength: 500 },
           },
         },
         response: {
@@ -190,13 +185,13 @@ const routes: FastifyPluginAsync = async (fastify) => {
             type: "object",
             properties: {
               id: { type: "string" },
-              expedienteId: { type: "string" },
-              documentoId: { type: ["string", "null"] },
-              usuarioId: { type: "string" },
-              rol: { type: "string" },
-              cambioDescripcion: { type: "string" },
+              caseId: { type: "string" },
+              documentId: { type: ["string", "null"] },
+              userId: { type: "string" },
+              role: { type: "string" },
+              changeDescription: { type: "string" },
               decision: { type: "string" },
-              motivo: { type: ["string", "null"] },
+              reason: { type: ["string", "null"] },
               createdAt: { type: "string", format: "date-time" },
             },
           },
@@ -213,44 +208,44 @@ const routes: FastifyPluginAsync = async (fastify) => {
       try {
         const data = request.body as any;
 
-        // Verify expediente exists
-        const expediente = await prisma.case.findUnique({
-          where: { id: data.expedienteId },
+        // Verify case exists
+        const caseRecord = await prisma.case.findUnique({
+          where: { id: data.caseId },
         });
 
-        if (!expediente) {
-          return reply.status(400).send({ error: "Expediente not found" });
+        if (!caseRecord) {
+          return reply.status(400).send({ error: "Case not found" });
         }
 
-        // Verify documento exists if provided
-        if (data.documentoId) {
-          const documento = await prisma.document.findUnique({
-            where: { id: data.documentoId },
+        // Verify document exists if provided
+        if (data.documentId) {
+          const document = await prisma.document.findUnique({
+            where: { id: data.documentId },
           });
 
-          if (!documento) {
-            return reply.status(400).send({ error: "Documento not found" });
+          if (!document) {
+            return reply.status(400).send({ error: "Document not found" });
           }
         }
 
-        // Verify usuario exists
-        const usuario = await prisma.profile.findUnique({
-          where: { id: data.usuarioId },
+        // Verify user exists
+        const user = await prisma.profile.findUnique({
+          where: { id: data.userId },
         });
 
-        if (!usuario) {
-          return reply.status(400).send({ error: "Usuario not found" });
+        if (!user) {
+          return reply.status(400).send({ error: "User not found" });
         }
 
         const revision = await prisma.review.create({
           data: {
-            expedienteId: data.expedienteId,
-            documentoId: data.documentoId || null,
-            usuarioId: data.usuarioId,
-            rol: data.rol,
-            cambioDescripcion: data.cambioDescripcion,
+            caseId: data.caseId,
+            documentId: data.documentId || null,
+            userId: data.userId,
+            role: data.role,
+            changeDescription: data.changeDescription,
             decision: data.decision,
-            motivo: data.motivo || null,
+            reason: data.reason || null,
           },
         });
 
@@ -279,21 +274,21 @@ const routes: FastifyPluginAsync = async (fastify) => {
         body: {
           type: "object",
           properties: {
-            documentoId: { type: "string", format: "uuid" },
-            rol: {
+            documentId: { type: "string", format: "uuid" },
+            role: {
               type: "string",
-              enum: ["ADMINISTRADOR", "COORDINADOR", "ANALISTA", "CONSULTOR"],
+              enum: ["processor", "legal", "auditor", "supervisor", "admin"],
             },
-            cambioDescripcion: {
+            changeDescription: {
               type: "string",
               minLength: 1,
               maxLength: 1000,
             },
             decision: {
               type: "string",
-              enum: ["APROBADO", "RECHAZADO", "PENDIENTE", "REVISION"],
+              enum: ["approved", "rejected", "pending", "in_review"],
             },
-            motivo: { type: "string", maxLength: 500 },
+            reason: { type: "string", maxLength: 500 },
           },
         },
         response: {
@@ -301,13 +296,13 @@ const routes: FastifyPluginAsync = async (fastify) => {
             type: "object",
             properties: {
               id: { type: "string" },
-              expedienteId: { type: "string" },
-              documentoId: { type: ["string", "null"] },
-              usuarioId: { type: "string" },
-              rol: { type: "string" },
-              cambioDescripcion: { type: "string" },
+              caseId: { type: "string" },
+              documentId: { type: ["string", "null"] },
+              userId: { type: "string" },
+              role: { type: "string" },
+              changeDescription: { type: "string" },
               decision: { type: "string" },
-              motivo: { type: ["string", "null"] },
+              reason: { type: ["string", "null"] },
               createdAt: { type: "string", format: "date-time" },
             },
           },
@@ -333,25 +328,25 @@ const routes: FastifyPluginAsync = async (fastify) => {
           return reply.status(404).send({ error: "Revision not found" });
         }
 
-        // Verify documento exists if provided
-        if (data.documentoId) {
-          const documento = await prisma.document.findUnique({
-            where: { id: data.documentoId },
+        // Verify document exists if provided
+        if (data.documentId) {
+          const document = await prisma.document.findUnique({
+            where: { id: data.documentId },
           });
 
-          if (!documento) {
-            return reply.status(400).send({ error: "Documento not found" });
+          if (!document) {
+            return reply.status(400).send({ error: "Document not found" });
           }
         }
 
         const updateData: any = {};
-        if (data.documentoId !== undefined)
-          updateData.documentoId = data.documentoId;
-        if (data.rol !== undefined) updateData.rol = data.rol;
-        if (data.cambioDescripcion !== undefined)
-          updateData.cambioDescripcion = data.cambioDescripcion;
+        if (data.documentId !== undefined)
+          updateData.documentId = data.documentId;
+        if (data.role !== undefined) updateData.role = data.role;
+        if (data.changeDescription !== undefined)
+          updateData.changeDescription = data.changeDescription;
         if (data.decision !== undefined) updateData.decision = data.decision;
-        if (data.motivo !== undefined) updateData.motivo = data.motivo;
+        if (data.reason !== undefined) updateData.reason = data.reason;
 
         const revision = await prisma.review.update({
           where: { id },

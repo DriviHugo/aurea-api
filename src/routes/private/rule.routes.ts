@@ -4,14 +4,14 @@ import type { PrismaClient } from "@prisma/client";
 const routes: FastifyPluginAsync = async (fastify) => {
   const prisma: PrismaClient = fastify.prisma;
 
-  // GET /reglas - List reglas with pagination
+  // GET /rules - List rules with pagination
   fastify.get(
     "/",
     {
       preValidation: [fastify.authAccessToken],
       schema: {
-        tags: ["Reglas"],
-        description: "Get paginated list of reglas",
+        tags: ["Rules"],
+        description: "Get paginated list of rules",
         querystring: {
           type: "object",
           properties: {
@@ -29,18 +29,18 @@ const routes: FastifyPluginAsync = async (fastify) => {
                   type: "object",
                   properties: {
                     id: { type: "string" },
-                    codigo: { type: "string" },
-                    nombre: { type: "string" },
-                    descripcion: { type: "string" },
-                    severidad: { type: "string" },
-                    evidenciaId: { type: ["string", "null"] },
-                    condicion: { type: "string" },
-                    mensaje: { type: "string" },
+                    code: { type: "string" },
+                    name: { type: "string" },
+                    description: { type: "string" },
+                    severity: { type: "string" },
+                    evidenceId: { type: ["string", "null"] },
+                    condition: { type: "string" },
+                    message: { type: "string" },
                     version: { type: "integer" },
-                    estado: { type: "string" },
-                    aprobadorId: { type: ["string", "null"] },
-                    aprobadorRol: { type: ["string", "null"] },
-                    fechaAprobacion: { type: ["string", "null"] },
+                    status: { type: "string" },
+                    approverId: { type: ["string", "null"] },
+                    approverRole: { type: ["string", "null"] },
+                    approvalDate: { type: ["string", "null"] },
                     createdAt: { type: "string" },
                     updatedAt: { type: "string" },
                   },
@@ -63,7 +63,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
         };
         const skip = (page - 1) * limit;
 
-        const [reglas, total] = await Promise.all([
+        const [rules, total] = await Promise.all([
           prisma.rule.findMany({
             skip,
             take: limit,
@@ -75,7 +75,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
         const totalPages = Math.ceil(total / limit);
 
         return reply.status(200).send({
-          data: reglas,
+          data: rules,
           total,
           page,
           limit,
@@ -87,14 +87,14 @@ const routes: FastifyPluginAsync = async (fastify) => {
     },
   );
 
-  // GET /reglas/:id - Get regla by ID
+  // GET /rules/:id - Get rule by ID
   fastify.get(
     "/:id",
     {
       preValidation: [fastify.authAccessToken],
       schema: {
-        tags: ["Reglas"],
-        description: "Get regla by ID",
+        tags: ["Rules"],
+        description: "Get rule by ID",
         params: {
           type: "object",
           properties: {
@@ -107,18 +107,18 @@ const routes: FastifyPluginAsync = async (fastify) => {
             type: "object",
             properties: {
               id: { type: "string" },
-              codigo: { type: "string" },
-              nombre: { type: "string" },
-              descripcion: { type: "string" },
-              severidad: { type: "string" },
-              evidenciaId: { type: ["string", "null"] },
-              condicion: { type: "string" },
-              mensaje: { type: "string" },
+              code: { type: "string" },
+              name: { type: "string" },
+              description: { type: "string" },
+              severity: { type: "string" },
+              evidenceId: { type: ["string", "null"] },
+              condition: { type: "string" },
+              message: { type: "string" },
               version: { type: "integer" },
-              estado: { type: "string" },
-              aprobadorId: { type: ["string", "null"] },
-              aprobadorRol: { type: ["string", "null"] },
-              fechaAprobacion: { type: ["string", "null"] },
+              status: { type: "string" },
+              approverId: { type: ["string", "null"] },
+              approverRole: { type: ["string", "null"] },
+              approvalDate: { type: ["string", "null"] },
               createdAt: { type: "string" },
               updatedAt: { type: "string" },
             },
@@ -136,58 +136,58 @@ const routes: FastifyPluginAsync = async (fastify) => {
       try {
         const { id } = request.params as { id: string };
 
-        const regla = await prisma.rule.findUnique({
+        const rule = await prisma.rule.findUnique({
           where: { id },
         });
 
-        if (!regla) {
-          return reply.status(404).send({ error: "Regla not found" });
+        if (!rule) {
+          return reply.status(404).send({ error: "Rule not found" });
         }
 
-        return reply.status(200).send(regla);
+        return reply.status(200).send(rule);
       } catch (error) {
         return reply.status(500).send({ error: "Internal server error" });
       }
     },
   );
 
-  // POST /reglas - Create new regla
+  // POST /rules - Create new rule
   fastify.post(
     "/",
     {
       preValidation: [fastify.authAccessToken],
       schema: {
-        tags: ["Reglas"],
-        description: "Create new regla",
+        tags: ["Rules"],
+        description: "Create new rule",
         body: {
           type: "object",
           properties: {
-            codigo: { type: "string", minLength: 1 },
-            nombre: { type: "string", minLength: 1 },
-            descripcion: { type: "string", minLength: 1 },
-            severidad: {
+            code: { type: "string", minLength: 1 },
+            name: { type: "string", minLength: 1 },
+            description: { type: "string", minLength: 1 },
+            severity: {
               type: "string",
-              enum: ["BAJA", "MEDIA", "ALTA", "CRITICA"],
+              enum: ["blocking", "warning", "recommendation"],
             },
-            evidenciaId: { type: "string", format: "uuid" },
-            condicion: { type: "string", minLength: 1 },
-            mensaje: { type: "string", minLength: 1 },
+            evidenceId: { type: "string", format: "uuid" },
+            condition: { type: "string", minLength: 1 },
+            message: { type: "string", minLength: 1 },
             version: { type: "integer", minimum: 1 },
-            estado: { type: "string" },
-            aprobadorId: { type: "string", format: "uuid" },
-            aprobadorRol: {
+            status: { type: "string" },
+            approverId: { type: "string", format: "uuid" },
+            approverRole: {
               type: "string",
-              enum: ["ADMIN", "AUDITOR", "USUARIO"],
+              enum: ["processor", "legal", "auditor", "supervisor", "admin"],
             },
-            fechaAprobacion: { type: "string", format: "date-time" },
+            approvalDate: { type: "string", format: "date-time" },
           },
           required: [
-            "codigo",
-            "nombre",
-            "descripcion",
-            "severidad",
-            "condicion",
-            "mensaje",
+            "code",
+            "name",
+            "description",
+            "severity",
+            "condition",
+            "message",
           ],
         },
         response: {
@@ -195,18 +195,18 @@ const routes: FastifyPluginAsync = async (fastify) => {
             type: "object",
             properties: {
               id: { type: "string" },
-              codigo: { type: "string" },
-              nombre: { type: "string" },
-              descripcion: { type: "string" },
-              severidad: { type: "string" },
-              evidenciaId: { type: ["string", "null"] },
-              condicion: { type: "string" },
-              mensaje: { type: "string" },
+              code: { type: "string" },
+              name: { type: "string" },
+              description: { type: "string" },
+              severity: { type: "string" },
+              evidenceId: { type: ["string", "null"] },
+              condition: { type: "string" },
+              message: { type: "string" },
               version: { type: "integer" },
-              estado: { type: "string" },
-              aprobadorId: { type: ["string", "null"] },
-              aprobadorRol: { type: ["string", "null"] },
-              fechaAprobacion: { type: ["string", "null"] },
+              status: { type: "string" },
+              approverId: { type: ["string", "null"] },
+              approverRole: { type: ["string", "null"] },
+              approvalDate: { type: ["string", "null"] },
               createdAt: { type: "string" },
               updatedAt: { type: "string" },
             },
@@ -223,57 +223,57 @@ const routes: FastifyPluginAsync = async (fastify) => {
     async (request, reply) => {
       try {
         const data = request.body as {
-          codigo: string;
-          nombre: string;
-          descripcion: string;
-          severidad: string;
-          evidenciaId?: string;
-          condicion: string;
-          mensaje: string;
+          code: string;
+          name: string;
+          description: string;
+          severity: string;
+          evidenceId?: string;
+          condition: string;
+          message: string;
           version?: number;
-          estado?: string;
-          aprobadorId?: string;
-          aprobadorRol?: string;
-          fechaAprobacion?: string;
+          status?: string;
+          approverId?: string;
+          approverRole?: string;
+          approvalDate?: string;
         };
 
-        const regla = await prisma.rule.create({
+        const rule = await prisma.rule.create({
           data: {
-            codigo: data.codigo,
-            nombre: data.nombre,
-            descripcion: data.descripcion,
-            severidad: data.severidad as any,
-            evidenciaId: data.evidenciaId,
-            condicion: data.condicion,
-            mensaje: data.mensaje,
+            code: data.code,
+            name: data.name,
+            description: data.description,
+            severity: data.severity as any,
+            evidenceId: data.evidenceId,
+            condition: data.condition,
+            message: data.message,
             version: data.version,
-            estado: data.estado,
-            aprobadorId: data.aprobadorId,
-            aprobadorRol: data.aprobadorRol as any,
-            fechaAprobacion: data.fechaAprobacion
-              ? new Date(data.fechaAprobacion)
+            status: data.status,
+            approverId: data.approverId,
+            approverRole: data.approverRole as any,
+            approvalDate: data.approvalDate
+              ? new Date(data.approvalDate)
               : null,
           },
         });
 
-        return reply.status(201).send(regla);
+        return reply.status(201).send(rule);
       } catch (error: any) {
         if (error.code === "P2002") {
-          return reply.status(400).send({ error: "Codigo already exists" });
+          return reply.status(400).send({ error: "Code already exists" });
         }
         return reply.status(500).send({ error: "Internal server error" });
       }
     },
   );
 
-  // PUT /reglas/:id - Update regla
+  // PUT /rules/:id - Update rule
   fastify.put(
     "/:id",
     {
       preValidation: [fastify.authAccessToken],
       schema: {
-        tags: ["Reglas"],
-        description: "Update regla by ID",
+        tags: ["Rules"],
+        description: "Update rule by ID",
         params: {
           type: "object",
           properties: {
@@ -284,24 +284,24 @@ const routes: FastifyPluginAsync = async (fastify) => {
         body: {
           type: "object",
           properties: {
-            codigo: { type: "string", minLength: 1 },
-            nombre: { type: "string", minLength: 1 },
-            descripcion: { type: "string", minLength: 1 },
-            severidad: {
+            code: { type: "string", minLength: 1 },
+            name: { type: "string", minLength: 1 },
+            description: { type: "string", minLength: 1 },
+            severity: {
               type: "string",
-              enum: ["BAJA", "MEDIA", "ALTA", "CRITICA"],
+              enum: ["blocking", "warning", "recommendation"],
             },
-            evidenciaId: { type: ["string", "null"], format: "uuid" },
-            condicion: { type: "string", minLength: 1 },
-            mensaje: { type: "string", minLength: 1 },
+            evidenceId: { type: ["string", "null"], format: "uuid" },
+            condition: { type: "string", minLength: 1 },
+            message: { type: "string", minLength: 1 },
             version: { type: "integer", minimum: 1 },
-            estado: { type: "string" },
-            aprobadorId: { type: ["string", "null"], format: "uuid" },
-            aprobadorRol: {
+            status: { type: "string" },
+            approverId: { type: ["string", "null"], format: "uuid" },
+            approverRole: {
               type: ["string", "null"],
-              enum: ["ADMIN", "AUDITOR", "USUARIO"],
+              enum: ["processor", "legal", "auditor", "supervisor", "admin"],
             },
-            fechaAprobacion: { type: ["string", "null"], format: "date-time" },
+            approvalDate: { type: ["string", "null"], format: "date-time" },
           },
         },
         response: {
@@ -309,18 +309,18 @@ const routes: FastifyPluginAsync = async (fastify) => {
             type: "object",
             properties: {
               id: { type: "string" },
-              codigo: { type: "string" },
-              nombre: { type: "string" },
-              descripcion: { type: "string" },
-              severidad: { type: "string" },
-              evidenciaId: { type: ["string", "null"] },
-              condicion: { type: "string" },
-              mensaje: { type: "string" },
+              code: { type: "string" },
+              name: { type: "string" },
+              description: { type: "string" },
+              severity: { type: "string" },
+              evidenceId: { type: ["string", "null"] },
+              condition: { type: "string" },
+              message: { type: "string" },
               version: { type: "integer" },
-              estado: { type: "string" },
-              aprobadorId: { type: ["string", "null"] },
-              aprobadorRol: { type: ["string", "null"] },
-              fechaAprobacion: { type: ["string", "null"] },
+              status: { type: "string" },
+              approverId: { type: ["string", "null"] },
+              approverRole: { type: ["string", "null"] },
+              approvalDate: { type: ["string", "null"] },
               createdAt: { type: "string" },
               updatedAt: { type: "string" },
             },
@@ -338,66 +338,66 @@ const routes: FastifyPluginAsync = async (fastify) => {
       try {
         const { id } = request.params as { id: string };
         const data = request.body as {
-          codigo?: string;
-          nombre?: string;
-          descripcion?: string;
-          severidad?: string;
-          evidenciaId?: string | null;
-          condicion?: string;
-          mensaje?: string;
+          code?: string;
+          name?: string;
+          description?: string;
+          severity?: string;
+          evidenceId?: string | null;
+          condition?: string;
+          message?: string;
           version?: number;
-          estado?: string;
-          aprobadorId?: string | null;
-          aprobadorRol?: string | null;
-          fechaAprobacion?: string | null;
+          status?: string;
+          approverId?: string | null;
+          approverRole?: string | null;
+          approvalDate?: string | null;
         };
 
-        const existingRegla = await prisma.rule.findUnique({
+        const existingRule = await prisma.rule.findUnique({
           where: { id },
         });
 
-        if (!existingRegla) {
-          return reply.status(404).send({ error: "Regla not found" });
+        if (!existingRule) {
+          return reply.status(404).send({ error: "Rule not found" });
         }
 
-        const regla = await prisma.rule.update({
+        const rule = await prisma.rule.update({
           where: { id },
           data: {
-            codigo: data.codigo,
-            nombre: data.nombre,
-            descripcion: data.descripcion,
-            severidad: data.severidad as any,
-            evidenciaId: data.evidenciaId,
-            condicion: data.condicion,
-            mensaje: data.mensaje,
+            code: data.code,
+            name: data.name,
+            description: data.description,
+            severity: data.severity as any,
+            evidenceId: data.evidenceId,
+            condition: data.condition,
+            message: data.message,
             version: data.version,
-            estado: data.estado,
-            aprobadorId: data.aprobadorId,
-            aprobadorRol: data.aprobadorRol as any,
-            fechaAprobacion: data.fechaAprobacion
-              ? new Date(data.fechaAprobacion)
+            status: data.status,
+            approverId: data.approverId,
+            approverRole: data.approverRole as any,
+            approvalDate: data.approvalDate
+              ? new Date(data.approvalDate)
               : null,
           },
         });
 
-        return reply.status(200).send(regla);
+        return reply.status(200).send(rule);
       } catch (error: any) {
         if (error.code === "P2002") {
-          return reply.status(400).send({ error: "Codigo already exists" });
+          return reply.status(400).send({ error: "Code already exists" });
         }
         return reply.status(500).send({ error: "Internal server error" });
       }
     },
   );
 
-  // DELETE /reglas/:id - Delete regla
+  // DELETE /rules/:id - Delete rule
   fastify.delete(
     "/:id",
     {
       preValidation: [fastify.authAccessToken],
       schema: {
-        tags: ["Reglas"],
-        description: "Delete regla by ID",
+        tags: ["Rules"],
+        description: "Delete rule by ID",
         params: {
           type: "object",
           properties: {
@@ -425,21 +425,19 @@ const routes: FastifyPluginAsync = async (fastify) => {
       try {
         const { id } = request.params as { id: string };
 
-        const existingRegla = await prisma.rule.findUnique({
+        const existingRule = await prisma.rule.findUnique({
           where: { id },
         });
 
-        if (!existingRegla) {
-          return reply.status(404).send({ error: "Regla not found" });
+        if (!existingRule) {
+          return reply.status(404).send({ error: "Rule not found" });
         }
 
         await prisma.rule.delete({
           where: { id },
         });
 
-        return reply
-          .status(200)
-          .send({ message: "Regla deleted successfully" });
+        return reply.status(200).send({ message: "Rule deleted successfully" });
       } catch (error) {
         return reply.status(500).send({ error: "Internal server error" });
       }

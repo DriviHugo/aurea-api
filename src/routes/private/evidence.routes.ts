@@ -4,14 +4,14 @@ import type { PrismaClient } from "@prisma/client";
 const routes: FastifyPluginAsync = async (fastify) => {
   const prisma: PrismaClient = fastify.prisma;
 
-  // List evidencias with pagination
+  // List evidence with pagination
   fastify.get(
     "/",
     {
       preValidation: [fastify.authAccessToken],
       schema: {
-        tags: ["Evidencias"],
-        description: "Get list of evidencias with pagination",
+        tags: ["Evidence"],
+        description: "Get list of evidence with pagination",
         querystring: {
           type: "object",
           properties: {
@@ -29,20 +29,20 @@ const routes: FastifyPluginAsync = async (fastify) => {
                   type: "object",
                   properties: {
                     id: { type: "string" },
-                    tipoFuente: { type: "string" },
-                    fuenteId: { type: "string" },
-                    fuenteNombre: { type: "string" },
-                    seccion: { type: "string", nullable: true },
-                    rango: { type: "string", nullable: true },
+                    sourceType: { type: "string" },
+                    sourceId: { type: "string" },
+                    sourceName: { type: "string" },
+                    section: { type: "string", nullable: true },
+                    range: { type: "string", nullable: true },
                     version: { type: "string" },
-                    fechaVigenciaInicio: { type: "string", format: "date" },
-                    fechaVigenciaFin: {
+                    validityStart: { type: "string", format: "date" },
+                    validityEnd: {
                       type: "string",
                       format: "date",
                       nullable: true,
                     },
-                    textoFragmento: { type: "string" },
-                    metadatos: { type: "object" },
+                    textFragment: { type: "string" },
+                    metadata: { type: "object" },
                   },
                 },
               },
@@ -63,11 +63,11 @@ const routes: FastifyPluginAsync = async (fastify) => {
         };
         const skip = (page - 1) * limit;
 
-        const [evidencias, total] = await Promise.all([
+        const [evidence, total] = await Promise.all([
           prisma.evidence.findMany({
             skip,
             take: limit,
-            orderBy: { fechaVigenciaInicio: "desc" },
+            orderBy: { validityStart: "desc" },
           }),
           prisma.evidence.count(),
         ]);
@@ -75,7 +75,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
         const totalPages = Math.ceil(total / limit);
 
         return reply.status(200).send({
-          data: evidencias,
+          data: evidence,
           total,
           page,
           limit,
@@ -87,14 +87,14 @@ const routes: FastifyPluginAsync = async (fastify) => {
     },
   );
 
-  // Get evidencia by ID
+  // Get evidence by ID
   fastify.get(
     "/:id",
     {
       preValidation: [fastify.authAccessToken],
       schema: {
-        tags: ["Evidencias"],
-        description: "Get evidencia by ID",
+        tags: ["Evidence"],
+        description: "Get evidence by ID",
         params: {
           type: "object",
           properties: {
@@ -107,20 +107,20 @@ const routes: FastifyPluginAsync = async (fastify) => {
             type: "object",
             properties: {
               id: { type: "string" },
-              tipoFuente: { type: "string" },
-              fuenteId: { type: "string" },
-              fuenteNombre: { type: "string" },
-              seccion: { type: "string", nullable: true },
-              rango: { type: "string", nullable: true },
+              sourceType: { type: "string" },
+              sourceId: { type: "string" },
+              sourceName: { type: "string" },
+              section: { type: "string", nullable: true },
+              range: { type: "string", nullable: true },
               version: { type: "string" },
-              fechaVigenciaInicio: { type: "string", format: "date" },
-              fechaVigenciaFin: {
+              validityStart: { type: "string", format: "date" },
+              validityEnd: {
                 type: "string",
                 format: "date",
                 nullable: true,
               },
-              textoFragmento: { type: "string" },
-              metadatos: { type: "object" },
+              textFragment: { type: "string" },
+              metadata: { type: "object" },
             },
           },
           404: {
@@ -136,65 +136,65 @@ const routes: FastifyPluginAsync = async (fastify) => {
       try {
         const { id } = request.params as { id: string };
 
-        const evidencia = await prisma.evidence.findUnique({
+        const evidence = await prisma.evidence.findUnique({
           where: { id },
         });
 
-        if (!evidencia) {
-          return reply.status(404).send({ error: "Evidencia not found" });
+        if (!evidence) {
+          return reply.status(404).send({ error: "Evidence not found" });
         }
 
-        return reply.status(200).send(evidencia);
+        return reply.status(200).send(evidence);
       } catch (error) {
         return reply.status(500).send({ error: "Internal server error" });
       }
     },
   );
 
-  // Create evidencia
+  // Create evidence
   fastify.post(
     "/",
     {
       preValidation: [fastify.authAccessToken],
       schema: {
-        tags: ["Evidencias"],
-        description: "Create new evidencia",
+        tags: ["Evidence"],
+        description: "Create new evidence",
         body: {
           type: "object",
           properties: {
-            tipoFuente: {
+            sourceType: {
               type: "string",
               enum: [
-                "LEY",
-                "DECRETO",
-                "RESOLUCION",
-                "CIRCULAR",
-                "CONCEPTO",
-                "JURISPRUDENCIA",
-                "DOCTRINA",
+                "law",
+                "decree",
+                "resolution",
+                "circular",
+                "concept",
+                "jurisprudence",
+                "doctrine",
               ],
             },
-            fuenteId: { type: "string" },
-            fuenteNombre: { type: "string" },
-            seccion: { type: "string", nullable: true },
-            rango: { type: "string", nullable: true },
+            sourceId: { type: "string" },
+            sourceName: { type: "string" },
+            section: { type: "string", nullable: true },
+            range: { type: "string", nullable: true },
             version: { type: "string" },
-            fechaVigenciaInicio: { type: "string", format: "date" },
-            fechaVigenciaFin: {
+            validityStart: { type: "string", format: "date" },
+            validityEnd: {
               type: "string",
               format: "date",
               nullable: true,
             },
-            textoFragmento: { type: "string" },
-            metadatos: { type: "object", default: {} },
+            textFragment: { type: "string" },
+            metadata: { type: "object", default: {} },
           },
           required: [
-            "tipoFuente",
-            "fuenteId",
-            "fuenteNombre",
+            "sourceType",
+            "sourceId",
+            "sourceName",
             "version",
-            "fechaVigenciaInicio",
-            "textoFragmento",
+            "validityStart",
+            "textFragment",
           ],
         },
         response: {
@@ -202,20 +202,20 @@ const routes: FastifyPluginAsync = async (fastify) => {
             type: "object",
             properties: {
               id: { type: "string" },
-              tipoFuente: { type: "string" },
-              fuenteId: { type: "string" },
-              fuenteNombre: { type: "string" },
-              seccion: { type: "string", nullable: true },
-              rango: { type: "string", nullable: true },
+              sourceType: { type: "string" },
+              sourceId: { type: "string" },
+              sourceName: { type: "string" },
+              section: { type: "string", nullable: true },
+              range: { type: "string", nullable: true },
               version: { type: "string" },
-              fechaVigenciaInicio: { type: "string", format: "date" },
-              fechaVigenciaFin: {
+              validityStart: { type: "string", format: "date" },
+              validityEnd: {
                 type: "string",
                 format: "date",
                 nullable: true,
               },
-              textoFragmento: { type: "string" },
-              metadatos: { type: "object" },
+              textFragment: { type: "string" },
+              metadata: { type: "object" },
             },
           },
         },
@@ -224,50 +224,48 @@ const routes: FastifyPluginAsync = async (fastify) => {
     async (request, reply) => {
       try {
         const data = request.body as {
-          tipoFuente: string;
-          fuenteId: string;
-          fuenteNombre: string;
-          seccion?: string;
-          rango?: string;
+          sourceType: string;
+          sourceId: string;
+          sourceName: string;
+          section?: string;
+          range?: string;
           version: string;
-          fechaVigenciaInicio: string;
-          fechaVigenciaFin?: string;
-          textoFragmento: string;
-          metadatos?: object;
+          validityStart: string;
+          validityEnd?: string;
+          textFragment: string;
+          metadata?: object;
         };
 
-        const evidencia = await prisma.evidence.create({
+        const evidence = await prisma.evidence.create({
           data: {
-            tipoFuente: data.tipoFuente as any,
-            fuenteId: data.fuenteId,
-            fuenteNombre: data.fuenteNombre,
-            seccion: data.seccion,
-            rango: data.rango,
+            sourceType: data.sourceType as any,
+            sourceId: data.sourceId,
+            sourceName: data.sourceName,
+            section: data.section,
+            range: data.range,
             version: data.version,
-            fechaVigenciaInicio: new Date(data.fechaVigenciaInicio),
-            fechaVigenciaFin: data.fechaVigenciaFin
-              ? new Date(data.fechaVigenciaFin)
-              : null,
-            textoFragmento: data.textoFragmento,
-            metadatos: data.metadatos || {},
+            validityStart: new Date(data.validityStart),
+            validityEnd: data.validityEnd ? new Date(data.validityEnd) : null,
+            textFragment: data.textFragment,
+            metadata: data.metadata || {},
           },
         });
 
-        return reply.status(201).send(evidencia);
+        return reply.status(201).send(evidence);
       } catch (error) {
         return reply.status(500).send({ error: "Internal server error" });
       }
     },
   );
 
-  // Update evidencia
+  // Update evidence
   fastify.put(
     "/:id",
     {
       preValidation: [fastify.authAccessToken],
       schema: {
-        tags: ["Evidencias"],
-        description: "Update evidencia by ID",
+        tags: ["Evidence"],
+        description: "Update evidence by ID",
         params: {
           type: "object",
           properties: {
@@ -278,31 +276,31 @@ const routes: FastifyPluginAsync = async (fastify) => {
         body: {
           type: "object",
           properties: {
-            tipoFuente: {
+            sourceType: {
               type: "string",
               enum: [
-                "LEY",
-                "DECRETO",
-                "RESOLUCION",
-                "CIRCULAR",
-                "CONCEPTO",
-                "JURISPRUDENCIA",
-                "DOCTRINA",
+                "law",
+                "decree",
+                "resolution",
+                "circular",
+                "concept",
+                "jurisprudence",
+                "doctrine",
               ],
             },
-            fuenteId: { type: "string" },
-            fuenteNombre: { type: "string" },
-            seccion: { type: "string", nullable: true },
-            rango: { type: "string", nullable: true },
+            sourceId: { type: "string" },
+            sourceName: { type: "string" },
+            section: { type: "string", nullable: true },
+            range: { type: "string", nullable: true },
             version: { type: "string" },
-            fechaVigenciaInicio: { type: "string", format: "date" },
-            fechaVigenciaFin: {
+            validityStart: { type: "string", format: "date" },
+            validityEnd: {
               type: "string",
               format: "date",
               nullable: true,
             },
-            textoFragmento: { type: "string" },
-            metadatos: { type: "object" },
+            textFragment: { type: "string" },
+            metadata: { type: "object" },
           },
         },
         response: {
@@ -310,20 +308,20 @@ const routes: FastifyPluginAsync = async (fastify) => {
             type: "object",
             properties: {
               id: { type: "string" },
-              tipoFuente: { type: "string" },
-              fuenteId: { type: "string" },
-              fuenteNombre: { type: "string" },
-              seccion: { type: "string", nullable: true },
-              rango: { type: "string", nullable: true },
+              sourceType: { type: "string" },
+              sourceId: { type: "string" },
+              sourceName: { type: "string" },
+              section: { type: "string", nullable: true },
+              range: { type: "string", nullable: true },
               version: { type: "string" },
-              fechaVigenciaInicio: { type: "string", format: "date" },
-              fechaVigenciaFin: {
+              validityStart: { type: "string", format: "date" },
+              validityEnd: {
                 type: "string",
                 format: "date",
                 nullable: true,
               },
-              textoFragmento: { type: "string" },
-              metadatos: { type: "object" },
+              textFragment: { type: "string" },
+              metadata: { type: "object" },
             },
           },
           404: {
@@ -339,65 +337,65 @@ const routes: FastifyPluginAsync = async (fastify) => {
       try {
         const { id } = request.params as { id: string };
         const data = request.body as {
-          tipoFuente?: string;
-          fuenteId?: string;
-          fuenteNombre?: string;
-          seccion?: string;
-          rango?: string;
+          sourceType?: string;
+          sourceId?: string;
+          sourceName?: string;
+          section?: string;
+          range?: string;
           version?: string;
-          fechaVigenciaInicio?: string;
-          fechaVigenciaFin?: string;
-          textoFragmento?: string;
-          metadatos?: object;
+          validityStart?: string;
+          validityEnd?: string;
+          textFragment?: string;
+          metadata?: object;
         };
 
-        const existingEvidencia = await prisma.evidence.findUnique({
+        const existingEvidence = await prisma.evidence.findUnique({
           where: { id },
         });
 
-        if (!existingEvidencia) {
-          return reply.status(404).send({ error: "Evidencia not found" });
+        if (!existingEvidence) {
+          return reply.status(404).send({ error: "Evidence not found" });
         }
 
         const updateData: any = {};
-        if (data.tipoFuente !== undefined)
-          updateData.tipoFuente = data.tipoFuente;
-        if (data.fuenteId !== undefined) updateData.fuenteId = data.fuenteId;
-        if (data.fuenteNombre !== undefined)
-          updateData.fuenteNombre = data.fuenteNombre;
-        if (data.seccion !== undefined) updateData.seccion = data.seccion;
-        if (data.rango !== undefined) updateData.rango = data.rango;
+        if (data.sourceType !== undefined)
+          updateData.sourceType = data.sourceType;
+        if (data.sourceId !== undefined) updateData.sourceId = data.sourceId;
+        if (data.sourceName !== undefined)
+          updateData.sourceName = data.sourceName;
+        if (data.section !== undefined) updateData.section = data.section;
+        if (data.range !== undefined) updateData.range = data.range;
         if (data.version !== undefined) updateData.version = data.version;
-        if (data.fechaVigenciaInicio !== undefined)
-          updateData.fechaVigenciaInicio = new Date(data.fechaVigenciaInicio);
-        if (data.fechaVigenciaFin !== undefined)
-          updateData.fechaVigenciaFin = data.fechaVigenciaFin
-            ? new Date(data.fechaVigenciaFin)
+        if (data.validityStart !== undefined)
+          updateData.validityStart = new Date(data.validityStart);
+        if (data.validityEnd !== undefined)
+          updateData.validityEnd = data.validityEnd
+            ? new Date(data.validityEnd)
             : null;
-        if (data.textoFragmento !== undefined)
-          updateData.textoFragmento = data.textoFragmento;
-        if (data.metadatos !== undefined) updateData.metadatos = data.metadatos;
+        if (data.textFragment !== undefined)
+          updateData.textFragment = data.textFragment;
+        if (data.metadata !== undefined) updateData.metadata = data.metadata;
 
-        const evidencia = await prisma.evidence.update({
+        const evidence = await prisma.evidence.update({
           where: { id },
           data: updateData,
         });
 
-        return reply.status(200).send(evidencia);
+        return reply.status(200).send(evidence);
       } catch (error) {
         return reply.status(500).send({ error: "Internal server error" });
       }
     },
   );
 
-  // Delete evidencia
+  // Delete evidence
   fastify.delete(
     "/:id",
     {
       preValidation: [fastify.authAccessToken],
       schema: {
-        tags: ["Evidencias"],
-        description: "Delete evidencia by ID",
+        tags: ["Evidence"],
+        description: "Delete evidence by ID",
         params: {
           type: "object",
           properties: {
@@ -425,12 +423,12 @@ const routes: FastifyPluginAsync = async (fastify) => {
       try {
         const { id } = request.params as { id: string };
 
-        const existingEvidencia = await prisma.evidence.findUnique({
+        const existingEvidence = await prisma.evidence.findUnique({
           where: { id },
         });
 
-        if (!existingEvidencia) {
-          return reply.status(404).send({ error: "Evidencia not found" });
+        if (!existingEvidence) {
+          return reply.status(404).send({ error: "Evidence not found" });
         }
 
         await prisma.evidence.delete({
@@ -439,7 +437,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
 
         return reply
           .status(200)
-          .send({ message: "Evidencia deleted successfully" });
+          .send({ message: "Evidence deleted successfully" });
       } catch (error) {
         return reply.status(500).send({ error: "Internal server error" });
       }

@@ -19,8 +19,8 @@ interface LoginBody {
 interface RegisterBody {
   email: string;
   password: string;
-  nombre: string;
-  apellidos?: string;
+  name: string;
+  lastName?: string;
 }
 
 const DUMMY_PASSWORD_HASH =
@@ -40,9 +40,9 @@ export const login = async (
     const passwordHash = user?.password ?? DUMMY_PASSWORD_HASH;
     const passwordCheck = await validatePasswordHash(password, passwordHash);
 
-    if (user === null || !passwordCheck || user.activo !== true) {
+    if (user === null || !passwordCheck || user.active !== true) {
       return res.status(401).send({
-        error: "Credenciales inválidas",
+        error: "Invalid credentials",
       });
     }
 
@@ -57,8 +57,8 @@ export const login = async (
       user: {
         id: user.id,
         email: user.email,
-        nombre: user.nombre,
-        apellidos: user.apellidos,
+        name: user.name,
+        lastName: user.lastName,
       },
     });
   } catch (error) {
@@ -73,7 +73,7 @@ export const register = async (
   req: FastifyRequest<{ Body: RegisterBody }>,
   res: FastifyReply,
 ): Promise<void> => {
-  const { email, password, nombre, apellidos } = req.body;
+  const { email, password, name, lastName } = req.body;
 
   const existingUser = await prisma.profile.findUnique({
     where: { email },
@@ -81,7 +81,7 @@ export const register = async (
 
   if (existingUser !== null) {
     return res.status(400).send({
-      error: "El email ya está registrado",
+      error: "Email already registered",
     });
   }
 
@@ -92,9 +92,9 @@ export const register = async (
       id: crypto.randomUUID(),
       email,
       password: hashedPassword,
-      nombre,
-      apellidos: apellidos ?? null,
-      activo: true,
+      name,
+      lastName: lastName ?? null,
+      active: true,
     },
   });
 
@@ -109,8 +109,8 @@ export const register = async (
     user: {
       id: user.id,
       email: user.email,
-      nombre: user.nombre,
-      apellidos: user.apellidos,
+      name: user.name,
+      lastName: user.lastName,
     },
   });
 };
@@ -124,15 +124,15 @@ export const me = async (
     select: {
       id: true,
       email: true,
-      nombre: true,
-      apellidos: true,
-      unidad: true,
-      activo: true,
+      name: true,
+      lastName: true,
+      unit: true,
+      active: true,
     },
   });
 
   if (user === null) {
-    return res.status(404).send({ error: "Usuario no encontrado" });
+    return res.status(404).send({ error: "User not found" });
   }
 
   return res.send({ user });

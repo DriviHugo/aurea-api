@@ -4,20 +4,20 @@ import type { PrismaClient } from "@prisma/client";
 const routes: FastifyPluginAsync = async (fastify) => {
   const prisma: PrismaClient = fastify.prisma;
 
-  // GET /documento-versions - List with pagination
+  // GET /document-versions - List with pagination
   fastify.get(
     "/",
     {
       preValidation: [fastify.authAccessToken],
       schema: {
-        tags: ["DocumentoVersion"],
-        description: "Get paginated list of documento versions",
+        tags: ["DocumentVersion"],
+        description: "Get paginated list of document versions",
         querystring: {
           type: "object",
           properties: {
             page: { type: "integer", minimum: 1, default: 1 },
             limit: { type: "integer", minimum: 1, maximum: 100, default: 10 },
-            documentoId: { type: "string", format: "uuid" },
+            documentId: { type: "string", format: "uuid" },
           },
         },
         response: {
@@ -30,12 +30,12 @@ const routes: FastifyPluginAsync = async (fastify) => {
                   type: "object",
                   properties: {
                     id: { type: "string", format: "uuid" },
-                    documentoId: { type: "string", format: "uuid" },
+                    documentId: { type: "string", format: "uuid" },
                     version: { type: "integer" },
-                    contenidoSnapshot: { type: "object" },
-                    seccionesSnapshot: { type: ["object", "null"] },
-                    descripcionCambio: { type: ["string", "null"] },
-                    usuarioId: { type: "string", format: "uuid" },
+                    contentSnapshot: { type: "object" },
+                    sectionsSnapshot: { type: ["object", "null"] },
+                    changeDescription: { type: ["string", "null"] },
+                    userId: { type: "string", format: "uuid" },
                     createdAt: { type: "string", format: "date-time" },
                   },
                 },
@@ -51,10 +51,10 @@ const routes: FastifyPluginAsync = async (fastify) => {
     },
     async (request, reply) => {
       try {
-        const { page = 1, limit = 10, documentoId } = request.query as any;
+        const { page = 1, limit = 10, documentId } = request.query as any;
         const skip = (page - 1) * limit;
 
-        const where = documentoId ? { documentoId } : {};
+        const where = documentId ? { documentId } : {};
 
         const [data, total] = await Promise.all([
           prisma.documentVersion.findMany({
@@ -81,14 +81,14 @@ const routes: FastifyPluginAsync = async (fastify) => {
     },
   );
 
-  // GET /documento-versions/:id - Get by ID
+  // GET /document-versions/:id - Get by ID
   fastify.get(
     "/:id",
     {
       preValidation: [fastify.authAccessToken],
       schema: {
-        tags: ["DocumentoVersion"],
-        description: "Get documento version by ID",
+        tags: ["DocumentVersion"],
+        description: "Get document version by ID",
         params: {
           type: "object",
           required: ["id"],
@@ -101,12 +101,12 @@ const routes: FastifyPluginAsync = async (fastify) => {
             type: "object",
             properties: {
               id: { type: "string", format: "uuid" },
-              documentoId: { type: "string", format: "uuid" },
+              documentId: { type: "string", format: "uuid" },
               version: { type: "integer" },
-              contenidoSnapshot: { type: "object" },
-              seccionesSnapshot: { type: ["object", "null"] },
-              descripcionCambio: { type: ["string", "null"] },
-              usuarioId: { type: "string", format: "uuid" },
+              contentSnapshot: { type: "object" },
+              sectionsSnapshot: { type: ["object", "null"] },
+              changeDescription: { type: ["string", "null"] },
+              userId: { type: "string", format: "uuid" },
               createdAt: { type: "string", format: "date-time" },
             },
           },
@@ -123,46 +123,41 @@ const routes: FastifyPluginAsync = async (fastify) => {
       try {
         const { id } = request.params as { id: string };
 
-        const documentoVersion = await prisma.documentVersion.findUnique({
+        const documentVersion = await prisma.documentVersion.findUnique({
           where: { id },
         });
 
-        if (!documentoVersion) {
+        if (!documentVersion) {
           return reply
             .status(404)
-            .send({ error: "Documento version not found" });
+            .send({ error: "Document version not found" });
         }
 
-        return reply.status(200).send(documentoVersion);
+        return reply.status(200).send(documentVersion);
       } catch (error) {
         return reply.status(500).send({ error: "Internal server error" });
       }
     },
   );
 
-  // POST /documento-versions - Create
+  // POST /document-versions - Create
   fastify.post(
     "/",
     {
       preValidation: [fastify.authAccessToken],
       schema: {
-        tags: ["DocumentoVersion"],
-        description: "Create new documento version",
+        tags: ["DocumentVersion"],
+        description: "Create new document version",
         body: {
           type: "object",
-          required: [
-            "documentoId",
-            "version",
-            "contenidoSnapshot",
-            "usuarioId",
-          ],
+          required: ["documentId", "version", "contentSnapshot", "userId"],
           properties: {
-            documentoId: { type: "string", format: "uuid" },
+            documentId: { type: "string", format: "uuid" },
             version: { type: "integer", minimum: 1 },
-            contenidoSnapshot: { type: "object" },
-            seccionesSnapshot: { type: ["object", "null"] },
-            descripcionCambio: { type: ["string", "null"] },
-            usuarioId: { type: "string", format: "uuid" },
+            contentSnapshot: { type: "object" },
+            sectionsSnapshot: { type: ["object", "null"] },
+            changeDescription: { type: ["string", "null"] },
+            userId: { type: "string", format: "uuid" },
           },
         },
         response: {
@@ -170,12 +165,12 @@ const routes: FastifyPluginAsync = async (fastify) => {
             type: "object",
             properties: {
               id: { type: "string", format: "uuid" },
-              documentoId: { type: "string", format: "uuid" },
+              documentId: { type: "string", format: "uuid" },
               version: { type: "integer" },
-              contenidoSnapshot: { type: "object" },
-              seccionesSnapshot: { type: ["object", "null"] },
-              descripcionCambio: { type: ["string", "null"] },
-              usuarioId: { type: "string", format: "uuid" },
+              contentSnapshot: { type: "object" },
+              sectionsSnapshot: { type: ["object", "null"] },
+              changeDescription: { type: ["string", "null"] },
+              userId: { type: "string", format: "uuid" },
               createdAt: { type: "string", format: "date-time" },
             },
           },
@@ -192,35 +187,35 @@ const routes: FastifyPluginAsync = async (fastify) => {
       try {
         const data = request.body as any;
 
-        const documentoVersion = await prisma.documentVersion.create({
+        const documentVersion = await prisma.documentVersion.create({
           data,
         });
 
-        return reply.status(201).send(documentoVersion);
+        return reply.status(201).send(documentVersion);
       } catch (error: any) {
         if (error.code === "P2002") {
           return reply
             .status(400)
-            .send({ error: "Version already exists for this documento" });
+            .send({ error: "Version already exists for this document" });
         }
         if (error.code === "P2003") {
           return reply
             .status(400)
-            .send({ error: "Referenced documento or usuario does not exist" });
+            .send({ error: "Referenced document or user does not exist" });
         }
         return reply.status(500).send({ error: "Internal server error" });
       }
     },
   );
 
-  // PUT /documento-versions/:id - Update
+  // PUT /document-versions/:id - Update
   fastify.put(
     "/:id",
     {
       preValidation: [fastify.authAccessToken],
       schema: {
-        tags: ["DocumentoVersion"],
-        description: "Update documento version by ID",
+        tags: ["DocumentVersion"],
+        description: "Update document version by ID",
         params: {
           type: "object",
           required: ["id"],
@@ -231,9 +226,9 @@ const routes: FastifyPluginAsync = async (fastify) => {
         body: {
           type: "object",
           properties: {
-            contenidoSnapshot: { type: "object" },
-            seccionesSnapshot: { type: ["object", "null"] },
-            descripcionCambio: { type: ["string", "null"] },
+            contentSnapshot: { type: "object" },
+            sectionsSnapshot: { type: ["object", "null"] },
+            changeDescription: { type: ["string", "null"] },
           },
         },
         response: {
@@ -241,12 +236,12 @@ const routes: FastifyPluginAsync = async (fastify) => {
             type: "object",
             properties: {
               id: { type: "string", format: "uuid" },
-              documentoId: { type: "string", format: "uuid" },
+              documentId: { type: "string", format: "uuid" },
               version: { type: "integer" },
-              contenidoSnapshot: { type: "object" },
-              seccionesSnapshot: { type: ["object", "null"] },
-              descripcionCambio: { type: ["string", "null"] },
-              usuarioId: { type: "string", format: "uuid" },
+              contentSnapshot: { type: "object" },
+              sectionsSnapshot: { type: ["object", "null"] },
+              changeDescription: { type: ["string", "null"] },
+              userId: { type: "string", format: "uuid" },
               createdAt: { type: "string", format: "date-time" },
             },
           },
@@ -271,29 +266,29 @@ const routes: FastifyPluginAsync = async (fastify) => {
         if (!existingVersion) {
           return reply
             .status(404)
-            .send({ error: "Documento version not found" });
+            .send({ error: "Document version not found" });
         }
 
-        const documentoVersion = await prisma.documentVersion.update({
+        const documentVersion = await prisma.documentVersion.update({
           where: { id },
           data,
         });
 
-        return reply.status(200).send(documentoVersion);
+        return reply.status(200).send(documentVersion);
       } catch (error) {
         return reply.status(500).send({ error: "Internal server error" });
       }
     },
   );
 
-  // DELETE /documento-versions/:id - Delete
+  // DELETE /document-versions/:id - Delete
   fastify.delete(
     "/:id",
     {
       preValidation: [fastify.authAccessToken],
       schema: {
-        tags: ["DocumentoVersion"],
-        description: "Delete documento version by ID",
+        tags: ["DocumentVersion"],
+        description: "Delete document version by ID",
         params: {
           type: "object",
           required: ["id"],
@@ -328,7 +323,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
         if (!existingVersion) {
           return reply
             .status(404)
-            .send({ error: "Documento version not found" });
+            .send({ error: "Document version not found" });
         }
 
         await prisma.documentVersion.delete({
@@ -337,7 +332,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
 
         return reply
           .status(200)
-          .send({ message: "Documento version deleted successfully" });
+          .send({ message: "Document version deleted successfully" });
       } catch (error) {
         return reply.status(500).send({ error: "Internal server error" });
       }

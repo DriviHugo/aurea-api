@@ -4,29 +4,29 @@ import type { PrismaClient } from "@prisma/client";
 const auditLogSchema = {
   type: "object",
   properties: {
-    expedienteId: { type: "string", format: "uuid", nullable: true },
-    usuarioId: { type: "string", format: "uuid", nullable: true },
-    accion: { type: "string", minLength: 1 },
-    entidad: { type: "string", minLength: 1 },
-    entidadId: { type: "string", format: "uuid", nullable: true },
-    datosAnteriores: { type: "object", nullable: true },
-    datosNuevos: { type: "object", nullable: true },
+    caseId: { type: "string", format: "uuid", nullable: true },
+    userId: { type: "string", format: "uuid", nullable: true },
+    action: { type: "string", minLength: 1 },
+    entity: { type: "string", minLength: 1 },
+    entityId: { type: "string", format: "uuid", nullable: true },
+    previousData: { type: "object", nullable: true },
+    newData: { type: "object", nullable: true },
     ipAddress: { type: "string", nullable: true },
   },
-  required: ["accion", "entidad"],
+  required: ["action", "entity"],
 };
 
 const auditLogResponseSchema = {
   type: "object",
   properties: {
     id: { type: "string", format: "uuid" },
-    expedienteId: { type: "string", format: "uuid", nullable: true },
-    usuarioId: { type: "string", format: "uuid", nullable: true },
-    accion: { type: "string" },
-    entidad: { type: "string" },
-    entidadId: { type: "string", format: "uuid", nullable: true },
-    datosAnteriores: { type: "object", nullable: true },
-    datosNuevos: { type: "object", nullable: true },
+    caseId: { type: "string", format: "uuid", nullable: true },
+    userId: { type: "string", format: "uuid", nullable: true },
+    action: { type: "string" },
+    entity: { type: "string" },
+    entityId: { type: "string", format: "uuid", nullable: true },
+    previousData: { type: "object", nullable: true },
+    newData: { type: "object", nullable: true },
     ipAddress: { type: "string", nullable: true },
     createdAt: { type: "string", format: "date-time" },
   },
@@ -37,10 +37,10 @@ const paginationQuerySchema = {
   properties: {
     page: { type: "integer", minimum: 1, default: 1 },
     limit: { type: "integer", minimum: 1, maximum: 100, default: 10 },
-    expedienteId: { type: "string", format: "uuid" },
-    usuarioId: { type: "string", format: "uuid" },
-    entidad: { type: "string" },
-    accion: { type: "string" },
+    caseId: { type: "string", format: "uuid" },
+    userId: { type: "string", format: "uuid" },
+    entity: { type: "string" },
+    action: { type: "string" },
   },
 };
 
@@ -86,18 +86,18 @@ const routes: FastifyPluginAsync = async (fastify) => {
         const {
           page = 1,
           limit = 10,
-          expedienteId,
-          usuarioId,
-          entidad,
-          accion,
+          caseId,
+          userId,
+          entity,
+          action,
         } = request.query as any;
         const skip = (page - 1) * limit;
 
         const where: any = {};
-        if (expedienteId) where.expedienteId = expedienteId;
-        if (usuarioId) where.usuarioId = usuarioId;
-        if (entidad) where.entidad = { contains: entidad, mode: "insensitive" };
-        if (accion) where.accion = { contains: accion, mode: "insensitive" };
+        if (caseId) where.caseId = caseId;
+        if (userId) where.userId = userId;
+        if (entity) where.entity = { contains: entity, mode: "insensitive" };
+        if (action) where.action = { contains: action, mode: "insensitive" };
 
         const [auditLogs, total] = await Promise.all([
           prisma.auditLog.findMany({
@@ -190,21 +190,21 @@ const routes: FastifyPluginAsync = async (fastify) => {
         const data = request.body as any;
 
         // Validate foreign key references if provided
-        if (data.expedienteId) {
-          const expediente = await prisma.case.findUnique({
-            where: { id: data.expedienteId },
+        if (data.caseId) {
+          const caseRecord = await prisma.case.findUnique({
+            where: { id: data.caseId },
           });
-          if (!expediente) {
-            return reply.status(400).send({ error: "Expediente not found" });
+          if (!caseRecord) {
+            return reply.status(400).send({ error: "Case not found" });
           }
         }
 
-        if (data.usuarioId) {
-          const usuario = await prisma.profile.findUnique({
-            where: { id: data.usuarioId },
+        if (data.userId) {
+          const user = await prisma.profile.findUnique({
+            where: { id: data.userId },
           });
-          if (!usuario) {
-            return reply.status(400).send({ error: "Usuario not found" });
+          if (!user) {
+            return reply.status(400).send({ error: "User not found" });
           }
         }
 
@@ -232,13 +232,13 @@ const routes: FastifyPluginAsync = async (fastify) => {
         body: {
           type: "object",
           properties: {
-            expedienteId: { type: "string", format: "uuid", nullable: true },
-            usuarioId: { type: "string", format: "uuid", nullable: true },
-            accion: { type: "string", minLength: 1 },
-            entidad: { type: "string", minLength: 1 },
-            entidadId: { type: "string", format: "uuid", nullable: true },
-            datosAnteriores: { type: "object", nullable: true },
-            datosNuevos: { type: "object", nullable: true },
+            caseId: { type: "string", format: "uuid", nullable: true },
+            userId: { type: "string", format: "uuid", nullable: true },
+            action: { type: "string", minLength: 1 },
+            entity: { type: "string", minLength: 1 },
+            entityId: { type: "string", format: "uuid", nullable: true },
+            previousData: { type: "object", nullable: true },
+            newData: { type: "object", nullable: true },
             ipAddress: { type: "string", nullable: true },
           },
         },
@@ -273,21 +273,21 @@ const routes: FastifyPluginAsync = async (fastify) => {
         }
 
         // Validate foreign key references if provided
-        if (data.expedienteId) {
-          const expediente = await prisma.case.findUnique({
-            where: { id: data.expedienteId },
+        if (data.caseId) {
+          const caseRecord = await prisma.case.findUnique({
+            where: { id: data.caseId },
           });
-          if (!expediente) {
-            return reply.status(400).send({ error: "Expediente not found" });
+          if (!caseRecord) {
+            return reply.status(400).send({ error: "Case not found" });
           }
         }
 
-        if (data.usuarioId) {
-          const usuario = await prisma.profile.findUnique({
-            where: { id: data.usuarioId },
+        if (data.userId) {
+          const user = await prisma.profile.findUnique({
+            where: { id: data.userId },
           });
-          if (!usuario) {
-            return reply.status(400).send({ error: "Usuario not found" });
+          if (!user) {
+            return reply.status(400).send({ error: "User not found" });
           }
         }
 

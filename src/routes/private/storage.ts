@@ -81,7 +81,10 @@ export default async function storageRoutes(fastify: FastifyInstance) {
   fastify.get<{ Params: FileParams; Querystring: { download?: string } }>(
     "/storage/:bucket/file/*",
     async (
-      request: FastifyRequest<{ Params: FileParams; Querystring: { download?: string } }>,
+      request: FastifyRequest<{
+        Params: FileParams;
+        Querystring: { download?: string };
+      }>,
       reply: FastifyReply,
     ) => {
       const { bucket } = request.params;
@@ -98,10 +101,10 @@ export default async function storageRoutes(fastify: FastifyInstance) {
 
       const info = await storage.getFileInfo(bucket, key);
       const stream = await storage.downloadStream(bucket, key);
-      
+
       // Extract just the filename from the key
       const filename = key.split("/").pop() || key;
-      
+
       // Use inline for viewing, attachment for downloading
       const disposition = forceDownload ? "attachment" : "inline";
 

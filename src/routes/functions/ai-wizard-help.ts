@@ -9,9 +9,9 @@ import Anthropic from "@anthropic-ai/sdk";
 interface WizardHelpRequest {
   stepId: string;
   sectionId?: string;
-  objeto?: string;
-  tipoContrato?: string;
-  contexto?: Record<string, unknown>;
+  subject?: string;
+  contractType?: string;
+  context?: Record<string, unknown>;
 }
 
 const SYSTEM_PROMPT = `Eres un experto en contratación pública española (LCSP 9/2017).
@@ -77,15 +77,15 @@ export default async function aiWizardHelpRoutes(
         properties: {
           stepId: { type: "string" },
           sectionId: { type: "string" },
-          objeto: { type: "string" },
-          tipoContrato: { type: "string" },
-          contexto: { type: "object" },
+          subject: { type: "string" },
+          contractType: { type: "string" },
+          context: { type: "object" },
         },
         required: ["stepId"],
       },
     },
     handler: async (request, reply) => {
-      const { stepId, sectionId, objeto, tipoContrato, contexto } =
+      const { stepId, sectionId, subject, contractType, context } =
         request.body as WizardHelpRequest;
 
       // Check if AI is configured
@@ -119,9 +119,9 @@ ${stepContext}
 ${sectionContext}
 
 CONTEXTO DEL EXPEDIENTE:
-- Objeto: ${objeto ?? "No definido aún"}
-- Tipo de contrato: ${tipoContrato ?? "No determinado"}
-${contexto !== undefined ? `- Datos adicionales: ${JSON.stringify(contexto)}` : ""}
+- Objeto: ${subject ?? "No definido aún"}
+- Tipo de contrato: ${contractType ?? "No determinado"}
+${context !== undefined ? `- Datos adicionales: ${JSON.stringify(context)}` : ""}
 
 Proporciona ayuda contextual y práctica para este paso.`;
 

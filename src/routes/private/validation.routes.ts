@@ -4,21 +4,21 @@ import type { PrismaClient } from "@prisma/client";
 const routes: FastifyPluginAsync = async (fastify) => {
   const prisma: PrismaClient = fastify.prisma;
 
-  // GET /validaciones - List validaciones with pagination
+  // GET /validations - List validations with pagination
   fastify.get(
     "/",
     {
       preValidation: [fastify.authAccessToken],
       schema: {
-        tags: ["Validaciones"],
-        description: "Get paginated list of validaciones",
+        tags: ["Validations"],
+        description: "Get paginated list of validations",
         querystring: {
           type: "object",
           properties: {
             page: { type: "integer", minimum: 1, default: 1 },
             limit: { type: "integer", minimum: 1, maximum: 100, default: 10 },
-            expedienteId: { type: "string", format: "uuid" },
-            reglaId: { type: "string", format: "uuid" },
+            caseId: { type: "string", format: "uuid" },
+            ruleId: { type: "string", format: "uuid" },
             passed: { type: "boolean" },
           },
         },
@@ -32,15 +32,15 @@ const routes: FastifyPluginAsync = async (fastify) => {
                   type: "object",
                   properties: {
                     id: { type: "string", format: "uuid" },
-                    expedienteId: { type: "string", format: "uuid" },
-                    documentoId: { type: ["string", "null"], format: "uuid" },
-                    reglaId: { type: "string", format: "uuid" },
+                    caseId: { type: "string", format: "uuid" },
+                    documentId: { type: ["string", "null"], format: "uuid" },
+                    ruleId: { type: "string", format: "uuid" },
                     passed: { type: "boolean" },
-                    valorEncontrado: { type: ["string", "null"] },
-                    explicacion: { type: "string" },
-                    puntuacionEstructura: { type: ["integer", "null"] },
-                    puntuacionContenido: { type: ["integer", "null"] },
-                    usuarioId: { type: "string", format: "uuid" },
+                    foundValue: { type: ["string", "null"] },
+                    explanation: { type: "string" },
+                    structureScore: { type: ["integer", "null"] },
+                    contentScore: { type: ["integer", "null"] },
+                    userId: { type: "string", format: "uuid" },
                     createdAt: { type: "string", format: "date-time" },
                   },
                 },
@@ -59,18 +59,18 @@ const routes: FastifyPluginAsync = async (fastify) => {
         const {
           page = 1,
           limit = 10,
-          expedienteId,
-          reglaId,
+          caseId,
+          ruleId,
           passed,
         } = request.query as any;
         const skip = (page - 1) * limit;
 
         const where: any = {};
-        if (expedienteId) where.expedienteId = expedienteId;
-        if (reglaId) where.reglaId = reglaId;
+        if (caseId) where.caseId = caseId;
+        if (ruleId) where.ruleId = ruleId;
         if (passed !== undefined) where.passed = passed;
 
-        const [validaciones, total] = await Promise.all([
+        const [validations, total] = await Promise.all([
           prisma.validation.findMany({
             where,
             skip,
@@ -83,7 +83,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
         const totalPages = Math.ceil(total / limit);
 
         return reply.status(200).send({
-          data: validaciones,
+          data: validations,
           total,
           page,
           limit,
@@ -95,14 +95,14 @@ const routes: FastifyPluginAsync = async (fastify) => {
     },
   );
 
-  // GET /validaciones/:id - Get validacion by ID
+  // GET /validations/:id - Get validation by ID
   fastify.get(
     "/:id",
     {
       preValidation: [fastify.authAccessToken],
       schema: {
-        tags: ["Validaciones"],
-        description: "Get validacion by ID",
+        tags: ["Validations"],
+        description: "Get validation by ID",
         params: {
           type: "object",
           required: ["id"],
@@ -115,15 +115,15 @@ const routes: FastifyPluginAsync = async (fastify) => {
             type: "object",
             properties: {
               id: { type: "string", format: "uuid" },
-              expedienteId: { type: "string", format: "uuid" },
-              documentoId: { type: ["string", "null"], format: "uuid" },
-              reglaId: { type: "string", format: "uuid" },
+              caseId: { type: "string", format: "uuid" },
+              documentId: { type: ["string", "null"], format: "uuid" },
+              ruleId: { type: "string", format: "uuid" },
               passed: { type: "boolean" },
-              valorEncontrado: { type: ["string", "null"] },
-              explicacion: { type: "string" },
-              puntuacionEstructura: { type: ["integer", "null"] },
-              puntuacionContenido: { type: ["integer", "null"] },
-              usuarioId: { type: "string", format: "uuid" },
+              foundValue: { type: ["string", "null"] },
+              explanation: { type: "string" },
+              structureScore: { type: ["integer", "null"] },
+              contentScore: { type: ["integer", "null"] },
+              userId: { type: "string", format: "uuid" },
               createdAt: { type: "string", format: "date-time" },
             },
           },
@@ -140,56 +140,50 @@ const routes: FastifyPluginAsync = async (fastify) => {
       try {
         const { id } = request.params as { id: string };
 
-        const validacion = await prisma.validation.findUnique({
+        const validation = await prisma.validation.findUnique({
           where: { id },
         });
 
-        if (!validacion) {
-          return reply.status(404).send({ error: "Validacion not found" });
+        if (!validation) {
+          return reply.status(404).send({ error: "Validation not found" });
         }
 
-        return reply.status(200).send(validacion);
+        return reply.status(200).send(validation);
       } catch (error) {
         return reply.status(500).send({ error: "Internal server error" });
       }
     },
   );
 
-  // POST /validaciones - Create new validacion
+  // POST /validations - Create new validation
   fastify.post(
     "/",
     {
       preValidation: [fastify.authAccessToken],
       schema: {
-        tags: ["Validaciones"],
-        description: "Create new validacion",
+        tags: ["Validations"],
+        description: "Create new validation",
         body: {
           type: "object",
-          required: [
-            "expedienteId",
-            "reglaId",
-            "passed",
-            "explicacion",
-            "usuarioId",
-          ],
+          required: ["caseId", "ruleId", "passed", "explanation", "userId"],
           properties: {
-            expedienteId: { type: "string", format: "uuid" },
-            documentoId: { type: ["string", "null"], format: "uuid" },
-            reglaId: { type: "string", format: "uuid" },
+            caseId: { type: "string", format: "uuid" },
+            documentId: { type: ["string", "null"], format: "uuid" },
+            ruleId: { type: "string", format: "uuid" },
             passed: { type: "boolean" },
-            valorEncontrado: { type: ["string", "null"] },
-            explicacion: { type: "string", minLength: 1 },
-            puntuacionEstructura: {
+            foundValue: { type: ["string", "null"] },
+            explanation: { type: "string", minLength: 1 },
+            structureScore: {
               type: ["integer", "null"],
               minimum: 0,
               maximum: 100,
             },
-            puntuacionContenido: {
+            contentScore: {
               type: ["integer", "null"],
               minimum: 0,
               maximum: 100,
             },
-            usuarioId: { type: "string", format: "uuid" },
+            userId: { type: "string", format: "uuid" },
           },
         },
         response: {
@@ -197,15 +191,15 @@ const routes: FastifyPluginAsync = async (fastify) => {
             type: "object",
             properties: {
               id: { type: "string", format: "uuid" },
-              expedienteId: { type: "string", format: "uuid" },
-              documentoId: { type: ["string", "null"], format: "uuid" },
-              reglaId: { type: "string", format: "uuid" },
+              caseId: { type: "string", format: "uuid" },
+              documentId: { type: ["string", "null"], format: "uuid" },
+              ruleId: { type: "string", format: "uuid" },
               passed: { type: "boolean" },
-              valorEncontrado: { type: ["string", "null"] },
-              explicacion: { type: "string" },
-              puntuacionEstructura: { type: ["integer", "null"] },
-              puntuacionContenido: { type: ["integer", "null"] },
-              usuarioId: { type: "string", format: "uuid" },
+              foundValue: { type: ["string", "null"] },
+              explanation: { type: "string" },
+              structureScore: { type: ["integer", "null"] },
+              contentScore: { type: ["integer", "null"] },
+              userId: { type: "string", format: "uuid" },
               createdAt: { type: "string", format: "date-time" },
             },
           },
@@ -223,57 +217,57 @@ const routes: FastifyPluginAsync = async (fastify) => {
         const data = request.body as any;
 
         // Verify related entities exist
-        const [expediente, regla, usuario, documento] = await Promise.all([
-          prisma.case.findUnique({ where: { id: data.expedienteId } }),
-          prisma.rule.findUnique({ where: { id: data.reglaId } }),
-          prisma.profile.findUnique({ where: { id: data.usuarioId } }),
-          data.documentoId
-            ? prisma.document.findUnique({ where: { id: data.documentoId } })
+        const [caseRecord, rule, user, document] = await Promise.all([
+          prisma.case.findUnique({ where: { id: data.caseId } }),
+          prisma.rule.findUnique({ where: { id: data.ruleId } }),
+          prisma.profile.findUnique({ where: { id: data.userId } }),
+          data.documentId
+            ? prisma.document.findUnique({ where: { id: data.documentId } })
             : null,
         ]);
 
-        if (!expediente) {
-          return reply.status(400).send({ error: "Expediente not found" });
+        if (!caseRecord) {
+          return reply.status(400).send({ error: "Case not found" });
         }
-        if (!regla) {
-          return reply.status(400).send({ error: "Regla not found" });
+        if (!rule) {
+          return reply.status(400).send({ error: "Rule not found" });
         }
-        if (!usuario) {
-          return reply.status(400).send({ error: "Usuario not found" });
+        if (!user) {
+          return reply.status(400).send({ error: "User not found" });
         }
-        if (data.documentoId && !documento) {
-          return reply.status(400).send({ error: "Documento not found" });
+        if (data.documentId && !document) {
+          return reply.status(400).send({ error: "Document not found" });
         }
 
-        const validacion = await prisma.validation.create({
+        const validation = await prisma.validation.create({
           data: {
-            expedienteId: data.expedienteId,
-            documentoId: data.documentoId,
-            reglaId: data.reglaId,
+            caseId: data.caseId,
+            documentId: data.documentId,
+            ruleId: data.ruleId,
             passed: data.passed,
-            valorEncontrado: data.valorEncontrado,
-            explicacion: data.explicacion,
-            puntuacionEstructura: data.puntuacionEstructura,
-            puntuacionContenido: data.puntuacionContenido,
-            usuarioId: data.usuarioId,
+            foundValue: data.foundValue,
+            explanation: data.explanation,
+            structureScore: data.structureScore,
+            contentScore: data.contentScore,
+            userId: data.userId,
           },
         });
 
-        return reply.status(201).send(validacion);
+        return reply.status(201).send(validation);
       } catch (error) {
         return reply.status(500).send({ error: "Internal server error" });
       }
     },
   );
 
-  // PUT /validaciones/:id - Update validacion
+  // PUT /validations/:id - Update validation
   fastify.put(
     "/:id",
     {
       preValidation: [fastify.authAccessToken],
       schema: {
-        tags: ["Validaciones"],
-        description: "Update validacion by ID",
+        tags: ["Validations"],
+        description: "Update validation by ID",
         params: {
           type: "object",
           required: ["id"],
@@ -284,23 +278,23 @@ const routes: FastifyPluginAsync = async (fastify) => {
         body: {
           type: "object",
           properties: {
-            expedienteId: { type: "string", format: "uuid" },
-            documentoId: { type: ["string", "null"], format: "uuid" },
-            reglaId: { type: "string", format: "uuid" },
+            caseId: { type: "string", format: "uuid" },
+            documentId: { type: ["string", "null"], format: "uuid" },
+            ruleId: { type: "string", format: "uuid" },
             passed: { type: "boolean" },
-            valorEncontrado: { type: ["string", "null"] },
-            explicacion: { type: "string", minLength: 1 },
-            puntuacionEstructura: {
+            foundValue: { type: ["string", "null"] },
+            explanation: { type: "string", minLength: 1 },
+            structureScore: {
               type: ["integer", "null"],
               minimum: 0,
               maximum: 100,
             },
-            puntuacionContenido: {
+            contentScore: {
               type: ["integer", "null"],
               minimum: 0,
               maximum: 100,
             },
-            usuarioId: { type: "string", format: "uuid" },
+            userId: { type: "string", format: "uuid" },
           },
         },
         response: {
@@ -308,15 +302,15 @@ const routes: FastifyPluginAsync = async (fastify) => {
             type: "object",
             properties: {
               id: { type: "string", format: "uuid" },
-              expedienteId: { type: "string", format: "uuid" },
-              documentoId: { type: ["string", "null"], format: "uuid" },
-              reglaId: { type: "string", format: "uuid" },
+              caseId: { type: "string", format: "uuid" },
+              documentId: { type: ["string", "null"], format: "uuid" },
+              ruleId: { type: "string", format: "uuid" },
               passed: { type: "boolean" },
-              valorEncontrado: { type: ["string", "null"] },
-              explicacion: { type: "string" },
-              puntuacionEstructura: { type: ["integer", "null"] },
-              puntuacionContenido: { type: ["integer", "null"] },
-              usuarioId: { type: "string", format: "uuid" },
+              foundValue: { type: ["string", "null"] },
+              explanation: { type: "string" },
+              structureScore: { type: ["integer", "null"] },
+              contentScore: { type: ["integer", "null"] },
+              userId: { type: "string", format: "uuid" },
               createdAt: { type: "string", format: "date-time" },
             },
           },
@@ -334,42 +328,42 @@ const routes: FastifyPluginAsync = async (fastify) => {
         const { id } = request.params as { id: string };
         const data = request.body as any;
 
-        const existingValidacion = await prisma.validation.findUnique({
+        const existingValidation = await prisma.validation.findUnique({
           where: { id },
         });
 
-        if (!existingValidacion) {
-          return reply.status(404).send({ error: "Validacion not found" });
+        if (!existingValidation) {
+          return reply.status(404).send({ error: "Validation not found" });
         }
 
         // Verify related entities exist if they are being updated
         const verifications = [];
-        if (data.expedienteId) {
+        if (data.caseId) {
           verifications.push(
             prisma.case
-              .findUnique({ where: { id: data.expedienteId } })
-              .then((result) => ({ type: "expediente", result })),
+              .findUnique({ where: { id: data.caseId } })
+              .then((result) => ({ type: "case", result })),
           );
         }
-        if (data.reglaId) {
+        if (data.ruleId) {
           verifications.push(
             prisma.rule
-              .findUnique({ where: { id: data.reglaId } })
-              .then((result) => ({ type: "regla", result })),
+              .findUnique({ where: { id: data.ruleId } })
+              .then((result) => ({ type: "rule", result })),
           );
         }
-        if (data.usuarioId) {
+        if (data.userId) {
           verifications.push(
             prisma.profile
-              .findUnique({ where: { id: data.usuarioId } })
-              .then((result) => ({ type: "usuario", result })),
+              .findUnique({ where: { id: data.userId } })
+              .then((result) => ({ type: "user", result })),
           );
         }
-        if (data.documentoId) {
+        if (data.documentId) {
           verifications.push(
             prisma.document
-              .findUnique({ where: { id: data.documentoId } })
-              .then((result) => ({ type: "documento", result })),
+              .findUnique({ where: { id: data.documentId } })
+              .then((result) => ({ type: "document", result })),
           );
         }
 
@@ -382,44 +376,44 @@ const routes: FastifyPluginAsync = async (fastify) => {
           }
         }
 
-        const validacion = await prisma.validation.update({
+        const validation = await prisma.validation.update({
           where: { id },
           data: {
-            ...(data.expedienteId && { expedienteId: data.expedienteId }),
-            ...(data.documentoId !== undefined && {
-              documentoId: data.documentoId,
+            ...(data.caseId && { caseId: data.caseId }),
+            ...(data.documentId !== undefined && {
+              documentId: data.documentId,
             }),
-            ...(data.reglaId && { reglaId: data.reglaId }),
+            ...(data.ruleId && { ruleId: data.ruleId }),
             ...(data.passed !== undefined && { passed: data.passed }),
-            ...(data.valorEncontrado !== undefined && {
-              valorEncontrado: data.valorEncontrado,
+            ...(data.foundValue !== undefined && {
+              foundValue: data.foundValue,
             }),
-            ...(data.explicacion && { explicacion: data.explicacion }),
-            ...(data.puntuacionEstructura !== undefined && {
-              puntuacionEstructura: data.puntuacionEstructura,
+            ...(data.explanation && { explanation: data.explanation }),
+            ...(data.structureScore !== undefined && {
+              structureScore: data.structureScore,
             }),
-            ...(data.puntuacionContenido !== undefined && {
-              puntuacionContenido: data.puntuacionContenido,
+            ...(data.contentScore !== undefined && {
+              contentScore: data.contentScore,
             }),
-            ...(data.usuarioId && { usuarioId: data.usuarioId }),
+            ...(data.userId && { userId: data.userId }),
           },
         });
 
-        return reply.status(200).send(validacion);
+        return reply.status(200).send(validation);
       } catch (error) {
         return reply.status(500).send({ error: "Internal server error" });
       }
     },
   );
 
-  // DELETE /validaciones/:id - Delete validacion
+  // DELETE /validations/:id - Delete validation
   fastify.delete(
     "/:id",
     {
       preValidation: [fastify.authAccessToken],
       schema: {
-        tags: ["Validaciones"],
-        description: "Delete validacion by ID",
+        tags: ["Validations"],
+        description: "Delete validation by ID",
         params: {
           type: "object",
           required: ["id"],
@@ -447,12 +441,12 @@ const routes: FastifyPluginAsync = async (fastify) => {
       try {
         const { id } = request.params as { id: string };
 
-        const existingValidacion = await prisma.validation.findUnique({
+        const existingValidation = await prisma.validation.findUnique({
           where: { id },
         });
 
-        if (!existingValidacion) {
-          return reply.status(404).send({ error: "Validacion not found" });
+        if (!existingValidation) {
+          return reply.status(404).send({ error: "Validation not found" });
         }
 
         await prisma.validation.delete({
@@ -461,7 +455,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
 
         return reply
           .status(200)
-          .send({ message: "Validacion deleted successfully" });
+          .send({ message: "Validation deleted successfully" });
       } catch (error) {
         return reply.status(500).send({ error: "Internal server error" });
       }

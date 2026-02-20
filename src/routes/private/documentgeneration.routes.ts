@@ -17,7 +17,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
           properties: {
             page: { type: "integer", minimum: 1, default: 1 },
             limit: { type: "integer", minimum: 1, maximum: 100, default: 10 },
-            documentoId: { type: "string", format: "uuid" },
+            documentId: { type: "string", format: "uuid" },
           },
         },
         response: {
@@ -30,7 +30,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
                   type: "object",
                   properties: {
                     id: { type: "string", format: "uuid" },
-                    documentoId: { type: "string", format: "uuid" },
+                    documentId: { type: "string", format: "uuid" },
                     version: { type: "integer" },
                     plan: { type: "object" },
                   },
@@ -47,10 +47,10 @@ const routes: FastifyPluginAsync = async (fastify) => {
     },
     async (request, reply) => {
       try {
-        const { page = 1, limit = 10, documentoId } = request.query as any;
+        const { page = 1, limit = 10, documentId } = request.query as any;
         const skip = (page - 1) * limit;
 
-        const where = documentoId ? { documentoId } : {};
+        const where = documentId ? { documentId } : {};
 
         const [data, total] = await Promise.all([
           prisma.documentGeneration.findMany({
@@ -97,7 +97,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
             type: "object",
             properties: {
               id: { type: "string", format: "uuid" },
-              documentoId: { type: "string", format: "uuid" },
+              documentId: { type: "string", format: "uuid" },
               version: { type: "integer" },
               plan: { type: "object" },
             },
@@ -115,17 +115,17 @@ const routes: FastifyPluginAsync = async (fastify) => {
       try {
         const { id } = request.params as { id: string };
 
-        const documentoGeneracion = await prisma.documentGeneration.findUnique({
+        const documentGeneration = await prisma.documentGeneration.findUnique({
           where: { id },
         });
 
-        if (!documentoGeneracion) {
+        if (!documentGeneration) {
           return reply
             .status(404)
-            .send({ error: "DocumentoGeneracion not found" });
+            .send({ error: "DocumentGeneration not found" });
         }
 
-        return reply.status(200).send(documentoGeneracion);
+        return reply.status(200).send(documentGeneration);
       } catch (error) {
         return reply.status(500).send({ error: "Internal server error" });
       }
@@ -163,41 +163,41 @@ const routes: FastifyPluginAsync = async (fastify) => {
 
         fastify.log.info(
           { rawBody, processedBody: body },
-          "POST /documento-generacion - received data",
+          "POST /document-generation - received data",
         );
 
-        if (!body?.documentoId || !body.usuarioId) {
+        if (!body?.documentId || !body.userId) {
           return reply.status(400).send({
-            error: "Missing required fields: documentoId, usuarioId",
+            error: "Missing required fields: documentId, userId",
           });
         }
 
-        const documentoGeneracion = await prisma.documentGeneration.create({
+        const documentGeneration = await prisma.documentGeneration.create({
           data: {
-            documentoId: body.documentoId,
-            usuarioId: body.usuarioId,
+            documentId: body.documentId,
+            userId: body.userId,
             version: body.version || 1,
             plan: body.plan || {},
-            estado: body.estado || "planificando",
-            seccionActual: body.seccionActual || 0,
-            totalSecciones: body.totalSecciones,
+            status: body.status || "planning",
+            currentSection: body.currentSection || 0,
+            totalSections: body.totalSections,
           },
         });
 
         fastify.log.info(
-          { id: documentoGeneracion.id },
-          "DocumentoGeneracion created",
+          { id: documentGeneration.id },
+          "DocumentGeneration created",
         );
-        return reply.status(201).send(documentoGeneracion);
+        return reply.status(201).send(documentGeneration);
       } catch (error) {
         fastify.log.error(
           { error, body: request.body },
-          "POST /documento-generacion - error",
+          "POST /document-generation - error",
         );
         if (error.code === "P2002") {
           return reply
             .status(400)
-            .send({ error: "DocumentoGeneracion already exists" });
+            .send({ error: "DocumentGeneration already exists" });
         }
         return reply.status(500).send({ error: "Internal server error" });
       }
@@ -222,7 +222,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
         body: {
           type: "object",
           properties: {
-            documentoId: { type: "string", format: "uuid" },
+            documentId: { type: "string", format: "uuid" },
             version: { type: "integer", minimum: 1 },
             plan: { type: "object" },
           },
@@ -232,7 +232,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
             type: "object",
             properties: {
               id: { type: "string", format: "uuid" },
-              documentoId: { type: "string", format: "uuid" },
+              documentId: { type: "string", format: "uuid" },
               version: { type: "integer" },
               plan: { type: "object" },
             },
@@ -251,23 +251,23 @@ const routes: FastifyPluginAsync = async (fastify) => {
         const { id } = request.params as { id: string };
         const updateData = request.body as any;
 
-        const existingDocumentoGeneracion =
+        const existingDocumentGeneration =
           await prisma.documentGeneration.findUnique({
             where: { id },
           });
 
-        if (!existingDocumentoGeneracion) {
+        if (!existingDocumentGeneration) {
           return reply
             .status(404)
-            .send({ error: "DocumentoGeneracion not found" });
+            .send({ error: "DocumentGeneration not found" });
         }
 
-        const documentoGeneracion = await prisma.documentGeneration.update({
+        const documentGeneration = await prisma.documentGeneration.update({
           where: { id },
           data: updateData,
         });
 
-        return reply.status(200).send(documentoGeneracion);
+        return reply.status(200).send(documentGeneration);
       } catch (error) {
         return reply.status(500).send({ error: "Internal server error" });
       }
@@ -309,15 +309,15 @@ const routes: FastifyPluginAsync = async (fastify) => {
       try {
         const { id } = request.params as { id: string };
 
-        const existingDocumentoGeneracion =
+        const existingDocumentGeneration =
           await prisma.documentGeneration.findUnique({
             where: { id },
           });
 
-        if (!existingDocumentoGeneracion) {
+        if (!existingDocumentGeneration) {
           return reply
             .status(404)
-            .send({ error: "DocumentoGeneracion not found" });
+            .send({ error: "DocumentGeneration not found" });
         }
 
         await prisma.documentGeneration.delete({
@@ -326,7 +326,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
 
         return reply
           .status(200)
-          .send({ message: "DocumentoGeneracion deleted successfully" });
+          .send({ message: "DocumentGeneration deleted successfully" });
       } catch (error) {
         return reply.status(500).send({ error: "Internal server error" });
       }
