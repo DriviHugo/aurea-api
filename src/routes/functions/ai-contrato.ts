@@ -1,9 +1,9 @@
 /**
- * AI Contract Functions - Edge Function compatibility
+ * AI Contrato Functions - Edge Function compatibility
  * Provides AI-powered contract assistance:
- * - improve_subject: Improve contract subject text
- * - propose_budget: Propose budget based on subject
- * - search_cpv: Suggest CPV codes
+ * - mejorar_objeto: Improve contract object text
+ * - proponer_presupuesto: Propose budget based on object
+ * - buscar_cpv: Suggest CPV codes
  */
 
 import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
@@ -12,8 +12,8 @@ import {
   type AIGatewayService,
 } from "../../services/ai-gateway/index.js";
 
-interface AIContractBody {
-  type: "improve_subject" | "propose_budget" | "search_cpv";
+interface AIContratoBody {
+  type: "mejorar_objeto" | "proponer_presupuesto" | "buscar_cpv";
   subject: string;
   contractType?: string;
   unit?: string;
@@ -31,58 +31,54 @@ function optionalField(value: string | undefined, label: string): string {
   return value !== undefined && value !== "" ? `${label}: ${value}` : "";
 }
 
-// Prompts in Spanish because they generate Spanish content for the user interface
-const SYSTEM_PROMPT_IMPROVE_SUBJECT = `Eres un experto en contratación pública española (LCSP 9/2017). 
+const SYSTEM_PROMPT_MEJORAR_OBJETO = `Eres un experto en contratación pública española (LCSP 9/2017). 
 Tu tarea es mejorar el objeto de un contrato para que sea más claro, preciso y cumpla con los requisitos legales.
 
 IMPORTANTE: Responde SOLO con un JSON válido, sin texto adicional ni markdown.
 
-Ejemplo de respuesta correcta:
+El JSON debe tener esta estructura exacta:
 {
-  "improvedSubject": "Suministro de cinco (5) pistolas semiautomáticas reglamentarias homologadas por el Ministerio del Interior, junto con munición de dotación para prácticas y servicio, con destino a la Policía Local del Ayuntamiento, incluyendo formación inicial en su manejo y mantenimiento preventivo durante el período de garantía.",
-  "improvements": ["Mejora 1 aplicada", "Mejora 2 aplicada"],
-  "recommendations": ["Recomendación adicional"],
-  "legalBasis": [
+  "objetoMejorado": "AQUÍ VA EL TEXTO COMPLETO MEJORADO DEL OBJETO DEL CONTRATO (obligatorio, no puede estar vacío)",
+  "mejoras": ["mejora 1", "mejora 2", ...],
+  "recomendaciones": ["recomendación 1", ...],
+  "fundamentosLegales": [
     {
-      "article": "99",
-      "title": "Objeto del contrato",
-      "url": "https://www.boe.es/buscar/act.php?id=BOE-A-2017-12902#a99",
-      "relevance": "Define los requisitos del objeto"
+      "articulo": "99",
+      "titulo": "Título del artículo",
+      "url": "https://www.boe.es/buscar/act.php?id=BOE-A-2017-12902&p=20231222&tn=1#a99",
+      "relevancia": "Por qué es relevante"
     }
   ]
 }
 
-CRÍTICO: 
-1. El campo "improvedSubject" es OBLIGATORIO y debe contener el texto completo y mejorado del objeto del contrato en español.
-2. NO dejes "improvedSubject" vacío bajo ninguna circunstancia.
-3. El texto de "improvedSubject" debe ser una versión mejorada y más técnica del objeto original.`;
+CRÍTICO: El campo "objetoMejorado" DEBE contener el texto completo y mejorado del objeto del contrato. NO lo dejes vacío.`;
 
-const SYSTEM_PROMPT_BUDGET = `Eres un experto en presupuestos de contratación pública española.
+const SYSTEM_PROMPT_PRESUPUESTO = `Eres un experto en presupuestos de contratación pública española.
 Tu tarea es proponer un presupuesto realista basado en precios de mercado para el objeto del contrato.
 
 IMPORTANTE: Responde SOLO con un JSON válido, sin texto adicional ni markdown.
 
 El JSON debe tener esta estructura exacta:
 {
-  "items": [
+  "partidas": [
     {
-      "concept": "Descripción de la partida",
-      "unit": "ud/hora/mes/etc",
-      "quantity": 1,
-      "unitPrice": 100.00,
+      "concepto": "Descripción de la partida",
+      "unidad": "ud/hora/mes/etc",
+      "cantidad": 1,
+      "precioUnitario": 100.00,
       "subtotal": 100.00
     }
   ],
-  "totalExcludingVat": 0,
-  "sources": [
+  "totalSinIva": 0,
+  "fuentes": [
     {
-      "title": "Nombre de la fuente de precios",
+      "titulo": "Nombre de la fuente de precios",
       "url": "https://...",
-      "description": "Descripción de la fuente"
+      "descripcion": "Descripción de la fuente"
     }
   ],
-  "priceSources": "Descripción general de las fuentes utilizadas",
-  "remarks": "Observaciones adicionales"
+  "fuentePrecios": "Descripción general de las fuentes utilizadas",
+  "observaciones": "Observaciones adicionales"
 }`;
 
 const SYSTEM_PROMPT_CPV = `Eres un experto en clasificación CPV (Common Procurement Vocabulary) para contratación pública.
@@ -92,21 +88,21 @@ IMPORTANTE: Responde SOLO con un JSON válido, sin texto adicional ni markdown.
 
 El JSON debe tener esta estructura exacta:
 {
-  "codes": [
+  "codigos": [
     {
-      "code": "XXXXXXXX-X",
-      "description": "Descripción oficial del código CPV",
-      "relevance": 95,
-      "justification": "Por qué este código es apropiado"
+      "codigo": "XXXXXXXX-X",
+      "descripcion": "Descripción oficial del código CPV",
+      "relevancia": 95,
+      "justificacion": "Por qué este código es apropiado"
     }
   ],
-  "remarks": "Observaciones adicionales sobre la clasificación"
+  "observaciones": "Observaciones adicionales sobre la clasificación"
 }`;
 
-export default async function aiContractRoutes(
+export default async function aiContratoRoutes(
   app: FastifyInstance,
 ): Promise<void> {
-  app.post("/ai-contract", {
+  app.post("/ai-contrato", {
     preValidation: [app.authAccessToken],
     schema: {
       body: {
@@ -115,7 +111,7 @@ export default async function aiContractRoutes(
         properties: {
           type: {
             type: "string",
-            enum: ["improve_subject", "propose_budget", "search_cpv"],
+            enum: ["mejorar_objeto", "proponer_presupuesto", "buscar_cpv"],
           },
           subject: { type: "string", minLength: 10 },
           contractType: { type: "string" },
@@ -125,7 +121,7 @@ export default async function aiContractRoutes(
       },
     },
     handler: async (
-      request: FastifyRequest<{ Body: AIContractBody }>,
+      request: FastifyRequest<{ Body: AIContratoBody }>,
       reply: FastifyReply,
     ) => {
       const { type, subject, contractType, unit, department } = request.body;
@@ -136,8 +132,8 @@ export default async function aiContractRoutes(
         let userPrompt: string;
 
         switch (type) {
-          case "improve_subject":
-            systemPrompt = SYSTEM_PROMPT_IMPROVE_SUBJECT;
+          case "mejorar_objeto":
+            systemPrompt = SYSTEM_PROMPT_MEJORAR_OBJETO;
             userPrompt = `Mejora el siguiente objeto de contrato:
 
 OBJETO: ${subject}
@@ -148,8 +144,8 @@ ${optionalField(department, "ÓRGANO DE CONTRATACIÓN")}
 Recuerda responder SOLO con JSON válido.`;
             break;
 
-          case "propose_budget":
-            systemPrompt = SYSTEM_PROMPT_BUDGET;
+          case "proponer_presupuesto":
+            systemPrompt = SYSTEM_PROMPT_PRESUPUESTO;
             userPrompt = `Propón un presupuesto realista para el siguiente objeto de contrato:
 
 OBJETO: ${subject}
@@ -158,7 +154,7 @@ TIPO DE CONTRATO: ${contractType ?? "servicios"}
 Recuerda responder SOLO con JSON válido.`;
             break;
 
-          case "search_cpv":
+          case "buscar_cpv":
             systemPrompt = SYSTEM_PROMPT_CPV;
             userPrompt = `Sugiere los códigos CPV más apropiados para el siguiente objeto de contrato:
 
@@ -171,12 +167,10 @@ Recuerda responder SOLO con JSON válido.`;
           default:
             return reply
               .status(400)
-              .send({ error: `Invalid operation type: ${type}` });
+              .send({ error: `Tipo de operación no válido: ${type}` });
         }
 
         const response = await gateway.completeSimple(systemPrompt, userPrompt);
-
-        console.log("[AI-Contract] Raw AI response:", response);
 
         let result;
         try {
@@ -184,30 +178,21 @@ Recuerda responder SOLO con JSON válido.`;
             .replace(/```json\n?/g, "")
             .replace(/```\n?/g, "")
             .trim();
-          console.log("[AI-Contract] Cleaned response:", cleanResponse);
           result = JSON.parse(cleanResponse);
-          console.log(
-            "[AI-Contract] Parsed result:",
-            JSON.stringify(result, null, 2),
-          );
-          console.log(
-            "[AI-Contract] improvedSubject value:",
-            result.improvedSubject,
-          );
         } catch {
-          console.error("[AI-Contract] Failed to parse AI response:", response);
+          console.error("[AI-Contrato] Failed to parse AI response:", response);
           return reply.status(500).send({
-            error: "Error processing AI response",
-            details: "Response is not valid JSON",
+            error: "Error al procesar la respuesta de IA",
+            details: "La respuesta no es JSON válido",
           });
         }
 
         return reply.send(result);
       } catch (error) {
-        console.error("[AI-Contract] Error:", error);
+        console.error("[AI-Contrato] Error:", error);
         return reply.status(500).send({
-          error: "Error processing AI request",
-          details: error instanceof Error ? error.message : "Unknown error",
+          error: "Error al procesar la solicitud de IA",
+          details: error instanceof Error ? error.message : "Error desconocido",
         });
       }
     },
