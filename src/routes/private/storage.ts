@@ -78,14 +78,15 @@ export default async function storageRoutes(fastify: FastifyInstance) {
   );
 
   // Download file (supports keys with slashes using wildcard)
-  fastify.get<{ Params: FileParams }>(
+  fastify.get<{ Params: FileParams; Querystring: { download?: string } }>(
     "/storage/:bucket/file/*",
     async (
-      request: FastifyRequest<{ Params: FileParams }>,
+      request: FastifyRequest<{ Params: FileParams; Querystring: { download?: string } }>,
       reply: FastifyReply,
     ) => {
       const { bucket } = request.params;
       const key = request.params["*"];
+      const forceDownload = request.query.download === "true";
 
       const exists = await storage.fileExists(bucket, key);
       if (!exists) {
@@ -97,11 +98,17 @@ export default async function storageRoutes(fastify: FastifyInstance) {
 
       const info = await storage.getFileInfo(bucket, key);
       const stream = await storage.downloadStream(bucket, key);
+      
+      // Extract just the filename from the key
+      const filename = key.split("/").pop() || key;
+      
+      // Use inline for viewing, attachment for downloading
+      const disposition = forceDownload ? "attachment" : "inline";
 
       return reply
         .header("Content-Type", info.contentType ?? "application/octet-stream")
         .header("Content-Length", info.size)
-        .header("Content-Disposition", `attachment; filename="${key}"`)
+        .header("Content-Disposition", `${disposition}; filename="${filename}"`)
         .send(stream);
     },
   );
