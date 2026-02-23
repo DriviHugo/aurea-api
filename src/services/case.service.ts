@@ -1,4 +1,11 @@
-import { PrismaClient, Prisma } from "@prisma/client";
+import {
+  Prisma,
+  type PrismaClient,
+  type CaseStatus,
+  type ContractType,
+  type ProcedureType,
+  type RiskLevel,
+} from "@prisma/client";
 
 export interface PaginationParams {
   page: number;
@@ -40,16 +47,16 @@ export interface CreateCaseInput {
   riskLevel?: string;
   lastPendingAction?: string;
   dueDate?: Date;
-  metadata?: Record<string, unknown>;
+  metadata?: Prisma.InputJsonValue;
 }
 
-export interface UpdateCaseInput extends Partial<CreateCaseInput> {}
+export type UpdateCaseInput = Partial<CreateCaseInput>;
 
 /**
  * Convert snake_case enum value to camelCase for Prisma
  */
 function snakeToCamelValue(value: string | null | undefined): string | null {
-  if (!value) return null;
+  if (value === null || value === undefined) return null;
   return value.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
 }
 
@@ -57,29 +64,36 @@ function snakeToCamelValue(value: string | null | undefined): string | null {
  * Convert camelCase enum value to snake_case for frontend
  */
 function camelToSnakeValue(value: string | null | undefined): string | null {
-  if (!value) return null;
+  if (value === null || value === undefined) return null;
   return value.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`);
 }
 
 /**
  * Normalize case for API response (convert enum values to snake_case)
  */
-function normalizeCase(caseData: any): any {
-  if (!caseData) return caseData;
+function normalizeCase(caseData: unknown): unknown {
+  if (
+    caseData === null ||
+    caseData === undefined ||
+    typeof caseData !== "object"
+  ) {
+    return caseData;
+  }
+  const data = caseData as Record<string, unknown>;
   return {
-    ...caseData,
-    status: camelToSnakeValue(caseData.status),
-    contractType: camelToSnakeValue(caseData.contractType),
-    proposedProcedure: camelToSnakeValue(caseData.proposedProcedure),
-    selectedProcedure: camelToSnakeValue(caseData.selectedProcedure),
-    riskLevel: caseData.riskLevel,
+    ...data,
+    status: camelToSnakeValue(data["status"] as string),
+    contractType: camelToSnakeValue(data["contractType"] as string),
+    proposedProcedure: camelToSnakeValue(data["proposedProcedure"] as string),
+    selectedProcedure: camelToSnakeValue(data["selectedProcedure"] as string),
+    riskLevel: data["riskLevel"],
   };
 }
 
 export class CaseService {
   constructor(private prisma: PrismaClient) {}
 
-  async findAll(params: PaginationParams): Promise<PaginatedResult<any>> {
+  async findAll(params: PaginationParams): Promise<PaginatedResult<unknown>> {
     const { page, limit } = params;
     const skip = (page - 1) * limit;
 
@@ -103,7 +117,7 @@ export class CaseService {
     };
   }
 
-  async findById(id: string): Promise<any | null> {
+  async findById(id: string): Promise<unknown | null> {
     const caseData = await this.prisma.case.findUnique({
       where: { id },
     });
@@ -111,7 +125,7 @@ export class CaseService {
     return caseData ? normalizeCase(caseData) : null;
   }
 
-  async findByCode(code: string): Promise<any | null> {
+  async findByCode(code: string): Promise<unknown | null> {
     const caseData = await this.prisma.case.findFirst({
       where: { code },
     });
@@ -119,43 +133,65 @@ export class CaseService {
     return caseData ? normalizeCase(caseData) : null;
   }
 
-  async create(input: CreateCaseInput): Promise<any> {
-    const caseData = await this.prisma.case.create({
-      data: {
-        code: input.code,
-        unit: input.unit,
-        department: input.department,
-        creatorId: input.creatorId,
-        status: snakeToCamelValue(input.status) || "draft",
-        contractType: snakeToCamelValue(input.contractType)!,
-        subject: input.subject,
-        description: input.description,
-        estimatedContractValue: input.estimatedContractValue ?? null,
-        baseTenderBudget: input.baseTenderBudget ?? null,
-        vat: input.vat ?? null,
-        extensionsAmount: input.extensionsAmount ?? null,
-        modificationsAmount: input.modificationsAmount ?? null,
-        proposedProcedure: snakeToCamelValue(input.proposedProcedure),
-        selectedProcedure: snakeToCamelValue(input.selectedProcedure),
-        selectedCpv: input.selectedCpv,
-        hasLots: input.hasLots ?? false,
-        lotsJustification: input.lotsJustification,
-        numLots: input.numLots,
-        isUrgent: input.isUrgent ?? false,
-        isEmergency: input.isEmergency ?? false,
-        urgencyJustification: input.urgencyJustification,
-        completionPercentage: input.completionPercentage ?? 0,
-        riskLevel: input.riskLevel || "green",
-        lastPendingAction: input.lastPendingAction,
-        dueDate: input.dueDate ?? null,
-        metadata: input.metadata ?? {},
-      },
-    });
+  async create(input: CreateCaseInput): Promise<unknown> {
+    const statusValue = snakeToCamelValue(input.status) ?? "draft";
+    const contractTypeValue = snakeToCamelValue(input.contractType);
+    const proposedProcedureValue = snakeToCamelValue(input.proposedProcedure);
+    const selectedProcedureValue = snakeToCamelValue(input.selectedProcedure);
+    const riskLevelValue =
+      (input.riskLevel as RiskLevel | undefined) ?? "green";
+
+    const data: Prisma.CaseCreateInput = {
+      code: input.code,
+      unit: input.unit,
+      department: input.department,
+      creator: { connect: { id: input.creatorId } },
+      status: statusValue as CaseStatus,
+      contractType: contractTypeValue as ContractType,
+      subject: input.subject,
+      hasLots: input.hasLots ?? false,
+      isUrgent: input.isUrgent ?? false,
+      isEmergency: input.isEmergency ?? false,
+      completionPercentage: input.completionPercentage ?? 0,
+      riskLevel: riskLevelValue,
+    };
+
+    // Add optional fields only if defined
+    if (input.description !== undefined) data.description = input.description;
+    if (input.estimatedContractValue !== undefined)
+      data.estimatedContractValue = input.estimatedContractValue;
+    if (input.baseTenderBudget !== undefined)
+      data.baseTenderBudget = input.baseTenderBudget;
+    if (input.vat !== undefined) data.vat = input.vat;
+    if (input.extensionsAmount !== undefined)
+      data.extensionsAmount = input.extensionsAmount;
+    if (input.modificationsAmount !== undefined)
+      data.modificationsAmount = input.modificationsAmount;
+    if (proposedProcedureValue !== null) {
+      data.proposedProcedure = proposedProcedureValue as ProcedureType;
+    }
+    if (selectedProcedureValue !== null) {
+      data.selectedProcedure = selectedProcedureValue as ProcedureType;
+    }
+    if (input.selectedCpv !== undefined) data.selectedCpv = input.selectedCpv;
+    if (input.lotsJustification !== undefined)
+      data.lotsJustification = input.lotsJustification;
+    if (input.numLots !== undefined) data.numLots = input.numLots;
+    if (input.urgencyJustification !== undefined)
+      data.urgencyJustification = input.urgencyJustification;
+    if (input.lastPendingAction !== undefined)
+      data.lastPendingAction = input.lastPendingAction;
+    if (input.dueDate !== undefined) data.dueDate = input.dueDate;
+    if (input.metadata !== undefined) {
+      data.metadata = input.metadata ?? Prisma.JsonNull;
+    }
+
+    const caseData = await this.prisma.case.create({ data });
 
     return normalizeCase(caseData);
   }
 
-  async update(id: string, input: UpdateCaseInput): Promise<any | null> {
+  async update(id: string, input: UpdateCaseInput): Promise<unknown | null> {
     const existingCase = await this.prisma.case.findUnique({
       where: { id },
     });
@@ -168,11 +204,16 @@ export class CaseService {
 
     if (input.code !== undefined) updateData.code = input.code;
     if (input.unit !== undefined) updateData.unit = input.unit;
-    if (input.department !== undefined) updateData.department = input.department;
-    if (input.status !== undefined)
-      updateData.status = snakeToCamelValue(input.status) as any;
-    if (input.contractType !== undefined)
-      updateData.contractType = snakeToCamelValue(input.contractType) as any;
+    if (input.department !== undefined)
+      updateData.department = input.department;
+    if (input.status !== undefined) {
+      const statusValue = snakeToCamelValue(input.status);
+      updateData.status = statusValue as CaseStatus;
+    }
+    if (input.contractType !== undefined) {
+      const contractTypeValue = snakeToCamelValue(input.contractType);
+      updateData.contractType = contractTypeValue as ContractType;
+    }
     if (input.subject !== undefined) updateData.subject = input.subject;
     if (input.description !== undefined)
       updateData.description = input.description;
@@ -185,14 +226,14 @@ export class CaseService {
       updateData.extensionsAmount = input.extensionsAmount;
     if (input.modificationsAmount !== undefined)
       updateData.modificationsAmount = input.modificationsAmount;
-    if (input.proposedProcedure !== undefined)
-      updateData.proposedProcedure = snakeToCamelValue(
-        input.proposedProcedure
-      ) as any;
-    if (input.selectedProcedure !== undefined)
-      updateData.selectedProcedure = snakeToCamelValue(
-        input.selectedProcedure
-      ) as any;
+    if (input.proposedProcedure !== undefined) {
+      const procedureValue = snakeToCamelValue(input.proposedProcedure);
+      updateData.proposedProcedure = procedureValue as ProcedureType | null;
+    }
+    if (input.selectedProcedure !== undefined) {
+      const procedureValue = snakeToCamelValue(input.selectedProcedure);
+      updateData.selectedProcedure = procedureValue as ProcedureType | null;
+    }
     if (input.selectedCpv !== undefined)
       updateData.selectedCpv = input.selectedCpv;
     if (input.hasLots !== undefined) updateData.hasLots = input.hasLots;
@@ -206,12 +247,12 @@ export class CaseService {
       updateData.urgencyJustification = input.urgencyJustification;
     if (input.completionPercentage !== undefined)
       updateData.completionPercentage = input.completionPercentage;
-    if (input.riskLevel !== undefined) updateData.riskLevel = input.riskLevel;
+    if (input.riskLevel !== undefined)
+      updateData.riskLevel = input.riskLevel as RiskLevel;
     if (input.lastPendingAction !== undefined)
       updateData.lastPendingAction = input.lastPendingAction;
     if (input.dueDate !== undefined) updateData.dueDate = input.dueDate;
-    if (input.metadata !== undefined)
-      updateData.metadata = input.metadata as any;
+    if (input.metadata !== undefined) updateData.metadata = input.metadata;
 
     const updatedCase = await this.prisma.case.update({
       where: { id },
@@ -239,8 +280,8 @@ export class CaseService {
 
   async findByCreator(
     creatorId: string,
-    params: PaginationParams
-  ): Promise<PaginatedResult<any>> {
+    params: PaginationParams,
+  ): Promise<PaginatedResult<unknown>> {
     const { page, limit } = params;
     const skip = (page - 1) * limit;
 

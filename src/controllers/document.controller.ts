@@ -1,10 +1,10 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
-import {
+import type {
   DocumentService,
   CreateDocumentInput,
   UpdateDocumentInput,
   DocumentFilters,
-} from "../services/document.service";
+} from "../services/document.service.js";
 
 export class DocumentController {
   constructor(private documentService: DocumentService) {}
@@ -19,12 +19,20 @@ export class DocumentController {
         status?: string;
       };
     }>,
-    reply: FastifyReply
-  ) {
+    reply: FastifyReply,
+  ): Promise<FastifyReply> {
     try {
       const { page = 1, limit = 10, caseId, type, status } = request.query;
-      const filters: DocumentFilters = { caseId, type, status };
-      const result = await this.documentService.findAll({ page, limit }, filters);
+
+      const filters: DocumentFilters = {};
+      if (caseId !== undefined && caseId !== "") filters.caseId = caseId;
+      if (type !== undefined && type !== "") filters.type = type;
+      if (status !== undefined && status !== "") filters.status = status;
+
+      const result = await this.documentService.findAll(
+        { page, limit },
+        filters,
+      );
       return reply.status(200).send(result);
     } catch (error) {
       request.log.error(error, "Error listing documents");
@@ -34,13 +42,13 @@ export class DocumentController {
 
   async getById(
     request: FastifyRequest<{ Params: { id: string } }>,
-    reply: FastifyReply
-  ) {
+    reply: FastifyReply,
+  ): Promise<FastifyReply> {
     try {
       const { id } = request.params;
       const document = await this.documentService.findById(id);
 
-      if (!document) {
+      if (document === null) {
         return reply.status(404).send({ error: "Document not found" });
       }
 
@@ -56,8 +64,8 @@ export class DocumentController {
       Params: { caseId: string };
       Querystring: { page?: number; limit?: number };
     }>,
-    reply: FastifyReply
-  ) {
+    reply: FastifyReply,
+  ): Promise<FastifyReply> {
     try {
       const { caseId } = request.params;
       const { page = 1, limit = 10 } = request.query;
@@ -76,15 +84,16 @@ export class DocumentController {
 
   async create(
     request: FastifyRequest<{ Body: CreateDocumentInput }>,
-    reply: FastifyReply
-  ) {
+    reply: FastifyReply,
+  ): Promise<FastifyReply> {
     try {
       request.log.info({ body: request.body }, "Creating document");
       const document = await this.documentService.create(request.body);
       return reply.status(201).send(document);
-    } catch (error: any) {
+    } catch (error: unknown) {
       request.log.error(error, "Error creating document");
-      if (error.code === "P2003") {
+      const err = error as { code?: string };
+      if (err.code === "P2003") {
         return reply.status(400).send({ error: "Invalid case ID" });
       }
       return reply.status(500).send({ error: "Internal server error" });
@@ -96,15 +105,15 @@ export class DocumentController {
       Params: { id: string };
       Body: UpdateDocumentInput;
     }>,
-    reply: FastifyReply
-  ) {
+    reply: FastifyReply,
+  ): Promise<FastifyReply> {
     try {
       const { id } = request.params;
       request.log.info({ id, body: request.body }, "Updating document");
 
       const document = await this.documentService.update(id, request.body);
 
-      if (!document) {
+      if (document === null) {
         return reply.status(404).send({ error: "Document not found" });
       }
 
@@ -117,8 +126,8 @@ export class DocumentController {
 
   async delete(
     request: FastifyRequest<{ Params: { id: string } }>,
-    reply: FastifyReply
-  ) {
+    reply: FastifyReply,
+  ): Promise<FastifyReply> {
     try {
       const { id } = request.params;
       const deleted = await this.documentService.delete(id);

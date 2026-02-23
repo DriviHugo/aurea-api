@@ -1,36 +1,51 @@
-import { PrismaClient, Prisma } from "@prisma/client";
-import { PaginationParams, PaginatedResult } from "./case.service";
+import type {
+  PrismaClient,
+  Prisma,
+  ReviewDecision,
+  UserRole,
+} from "@prisma/client";
+import type { PaginationParams, PaginatedResult } from "./case.service.js";
 
 export interface ReviewFilters {
   caseId?: string;
-  reviewerId?: string;
-  status?: string;
+  userId?: string;
+  decision?: string;
 }
 
 export interface CreateReviewInput {
   caseId: string;
-  reviewerId: string;
-  comments?: string;
-  status?: string;
-  metadata?: Record<string, unknown>;
+  documentId?: string | null;
+  userId: string;
+  role: string;
+  changeDescription: string;
+  decision: string;
+  reason?: string | null;
 }
 
-export interface UpdateReviewInput extends Partial<CreateReviewInput> {}
+export type UpdateReviewInput = Partial<
+  Omit<CreateReviewInput, "caseId" | "userId">
+>;
 
 export class ReviewService {
   constructor(private prisma: PrismaClient) {}
 
   async findAll(
     params: PaginationParams,
-    filters?: ReviewFilters
-  ): Promise<PaginatedResult<any>> {
+    filters?: ReviewFilters,
+  ): Promise<PaginatedResult<unknown>> {
     const { page, limit } = params;
     const skip = (page - 1) * limit;
 
     const where: Prisma.ReviewWhereInput = {};
-    if (filters?.caseId) where.caseId = filters.caseId;
-    if (filters?.reviewerId) where.reviewerId = filters.reviewerId;
-    if (filters?.status) where.status = filters.status as any;
+    if (filters?.caseId !== undefined && filters.caseId !== "") {
+      where.caseId = filters.caseId;
+    }
+    if (filters?.userId !== undefined && filters.userId !== "") {
+      where.userId = filters.userId;
+    }
+    if (filters?.decision !== undefined && filters.decision !== "") {
+      where.decision = filters.decision as ReviewDecision;
+    }
 
     const [reviews, total] = await Promise.all([
       this.prisma.review.findMany({
@@ -39,14 +54,15 @@ export class ReviewService {
         take: limit,
         orderBy: { createdAt: "desc" },
         include: {
-          reviewer: {
+          user: {
             select: {
               id: true,
-              firstName: true,
+              name: true,
               lastName: true,
               email: true,
             },
           },
+          comments: true,
         },
       }),
       this.prisma.review.count({ where }),
@@ -63,59 +79,63 @@ export class ReviewService {
     };
   }
 
-  async findById(id: string): Promise<any | null> {
+  async findById(id: string): Promise<unknown | null> {
     return this.prisma.review.findUnique({
       where: { id },
       include: {
-        reviewer: {
+        user: {
           select: {
             id: true,
-            firstName: true,
+            name: true,
             lastName: true,
             email: true,
           },
         },
+        comments: true,
       },
     });
   }
 
   async findByCase(
     caseId: string,
-    params: PaginationParams
-  ): Promise<PaginatedResult<any>> {
+    params: PaginationParams,
+  ): Promise<PaginatedResult<unknown>> {
     return this.findAll(params, { caseId });
   }
 
-  async findByReviewer(
-    reviewerId: string,
-    params: PaginationParams
-  ): Promise<PaginatedResult<any>> {
-    return this.findAll(params, { reviewerId });
+  async findByUser(
+    userId: string,
+    params: PaginationParams,
+  ): Promise<PaginatedResult<unknown>> {
+    return this.findAll(params, { userId });
   }
 
-  async create(input: CreateReviewInput): Promise<any> {
+  async create(input: CreateReviewInput): Promise<unknown> {
     return this.prisma.review.create({
       data: {
         caseId: input.caseId,
-        reviewerId: input.reviewerId,
-        comments: input.comments,
-        status: (input.status as any) || "pending",
-        metadata: input.metadata ?? {},
+        documentId: input.documentId ?? null,
+        userId: input.userId,
+        role: input.role as UserRole,
+        changeDescription: input.changeDescription,
+        decision: input.decision as ReviewDecision,
+        reason: input.reason ?? null,
       },
       include: {
-        reviewer: {
+        user: {
           select: {
             id: true,
-            firstName: true,
+            name: true,
             lastName: true,
             email: true,
           },
         },
+        comments: true,
       },
     });
   }
 
-  async update(id: string, input: UpdateReviewInput): Promise<any | null> {
+  async update(id: string, input: UpdateReviewInput): Promise<unknown | null> {
     const existing = await this.prisma.review.findUnique({
       where: { id },
     });
@@ -126,22 +146,33 @@ export class ReviewService {
 
     const updateData: Prisma.ReviewUpdateInput = {};
 
-    if (input.comments !== undefined) updateData.comments = input.comments;
-    if (input.status !== undefined) updateData.status = input.status as any;
-    if (input.metadata !== undefined) updateData.metadata = input.metadata as any;
+    if (input.documentId !== undefined) {
+      if (input.documentId !== null && input.documentId !== "") {
+        updateData.document = { connect: { id: input.documentId } };
+      } else {
+        updateData.document = { disconnect: true };
+      }
+    }
+    if (input.role !== undefined) updateData.role = input.role as UserRole;
+    if (input.changeDescription !== undefined)
+      updateData.changeDescription = input.changeDescription;
+    if (input.decision !== undefined)
+      updateData.decision = input.decision as ReviewDecision;
+    if (input.reason !== undefined) updateData.reason = input.reason;
 
     return this.prisma.review.update({
       where: { id },
       data: updateData,
       include: {
-        reviewer: {
+        user: {
           select: {
             id: true,
-            firstName: true,
+            name: true,
             lastName: true,
             email: true,
           },
         },
+        comments: true,
       },
     });
   }

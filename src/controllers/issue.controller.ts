@@ -1,10 +1,10 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
-import {
+import type {
   IssueService,
   CreateIssueInput,
   UpdateIssueInput,
   IssueFilters,
-} from "../services/issue.service";
+} from "../services/issue.service.js";
 
 export class IssueController {
   constructor(private issueService: IssueService) {}
@@ -18,11 +18,15 @@ export class IssueController {
         status?: string;
       };
     }>,
-    reply: FastifyReply
-  ) {
+    reply: FastifyReply,
+  ): Promise<FastifyReply> {
     try {
       const { page = 1, limit = 10, userId, status } = request.query;
-      const filters: IssueFilters = { userId, status };
+
+      const filters: IssueFilters = {};
+      if (userId !== undefined && userId !== "") filters.userId = userId;
+      if (status !== undefined && status !== "") filters.status = status;
+
       const result = await this.issueService.findAll({ page, limit }, filters);
       return reply.status(200).send(result);
     } catch (error) {
@@ -33,13 +37,13 @@ export class IssueController {
 
   async getById(
     request: FastifyRequest<{ Params: { id: string } }>,
-    reply: FastifyReply
-  ) {
+    reply: FastifyReply,
+  ): Promise<FastifyReply> {
     try {
       const { id } = request.params;
       const issue = await this.issueService.findById(id);
 
-      if (!issue) {
+      if (issue === null) {
         return reply.status(404).send({ error: "Issue not found" });
       }
 
@@ -55,8 +59,8 @@ export class IssueController {
       Params: { userId: string };
       Querystring: { page?: number; limit?: number };
     }>,
-    reply: FastifyReply
-  ) {
+    reply: FastifyReply,
+  ): Promise<FastifyReply> {
     try {
       const { userId } = request.params;
       const { page = 1, limit = 10 } = request.query;
@@ -75,15 +79,16 @@ export class IssueController {
 
   async create(
     request: FastifyRequest<{ Body: CreateIssueInput }>,
-    reply: FastifyReply
-  ) {
+    reply: FastifyReply,
+  ): Promise<FastifyReply> {
     try {
       request.log.info({ body: request.body }, "Creating issue");
       const issue = await this.issueService.create(request.body);
       return reply.status(201).send(issue);
-    } catch (error: any) {
+    } catch (error: unknown) {
       request.log.error(error, "Error creating issue");
-      if (error.code === "P2003") {
+      const err = error as { code?: string };
+      if (err.code === "P2003") {
         return reply.status(400).send({ error: "Invalid user ID" });
       }
       return reply.status(500).send({ error: "Internal server error" });
@@ -95,15 +100,15 @@ export class IssueController {
       Params: { id: string };
       Body: UpdateIssueInput;
     }>,
-    reply: FastifyReply
-  ) {
+    reply: FastifyReply,
+  ): Promise<FastifyReply> {
     try {
       const { id } = request.params;
       request.log.info({ id, body: request.body }, "Updating issue");
 
       const issue = await this.issueService.update(id, request.body);
 
-      if (!issue) {
+      if (issue === null) {
         return reply.status(404).send({ error: "Issue not found" });
       }
 
@@ -119,17 +124,15 @@ export class IssueController {
       Params: { id: string };
       Body: { status: string };
     }>,
-    reply: FastifyReply
-  ) {
+    reply: FastifyReply,
+  ): Promise<FastifyReply> {
     try {
       const { id } = request.params;
       const { status } = request.body;
 
-      request.log.info({ id, status }, "Updating issue status");
-
       const issue = await this.issueService.updateStatus(id, status);
 
-      if (!issue) {
+      if (issue === null) {
         return reply.status(404).send({ error: "Issue not found" });
       }
 
@@ -142,8 +145,8 @@ export class IssueController {
 
   async delete(
     request: FastifyRequest<{ Params: { id: string } }>,
-    reply: FastifyReply
-  ) {
+    reply: FastifyReply,
+  ): Promise<FastifyReply> {
     try {
       const { id } = request.params;
       const deleted = await this.issueService.delete(id);
