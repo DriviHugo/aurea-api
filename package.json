@@ -74,6 +74,7 @@
     "jsonwebtoken": "^9.0.3",
     "minio": "^8.0.6",
     "nodemailer": "^7.0.12",
+    "openid-client": "^5.7.1",
     "pg": "^8.16.3",
     "rate-limiter-flexible": "^7.1.1",
     "request-ip": "^3.3.0",

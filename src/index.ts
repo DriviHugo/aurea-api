@@ -5,6 +5,7 @@ import prisma from "./config/prisma.js";
 import app from "./app.js";
 import logger from "./config/logger.js";
 import { AppError, type AppErrorDetails } from "./errors/appError.js";
+import { createOIDCService } from "./services/oidc.service.js";
 
 const appHost: string = process.env["APP_HOST"] ?? "localhost";
 const appPort: number = Number(process.env["APP_PORT"]) || 3789;
@@ -91,6 +92,23 @@ async function start(): Promise<void> {
       details: { source: "prisma" },
     });
     return;
+  }
+
+  // Initialize OIDC/SSO service (non-blocking if not configured)
+  try {
+    const oidcService = createOIDCService(prisma);
+    await oidcService.initialize();
+    if (oidcService.isConfigured()) {
+      logger.info("Startup: OIDC/SSO service initialized (OpenAM ready)");
+    } else {
+      logger.info("Startup: OIDC not configured - using local auth only");
+    }
+  } catch (error) {
+    // OIDC failure is non-fatal - local auth still works
+    logger.warn({
+      msg: "Startup: OIDC initialization failed - SSO disabled",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
   }
 
   try {

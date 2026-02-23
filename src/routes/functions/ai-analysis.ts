@@ -33,16 +33,16 @@ Analiza el objeto del contrato y sugiere los códigos CPV más apropiados.
 
 IMPORTANTE: Responde SOLO con un JSON válido, sin texto adicional ni markdown.
 {
-  "codigos": [
+  "codes": [
     {
-      "codigo": "XXXXXXXX-X",
-      "descripcion": "Descripción oficial del código CPV",
-      "esPrincipal": true,
-      "relevancia": 95,
-      "justificacion": "Por qué este código es apropiado"
+      "code": "XXXXXXXX-X",
+      "description": "Descripción oficial del código CPV",
+      "isPrimary": true,
+      "relevance": 95,
+      "justification": "Por qué este código es apropiado"
     }
   ],
-  "observaciones": "Observaciones adicionales"
+  "observations": "Observaciones adicionales"
 }`,
 
   tipo: `Eres un experto en contratación pública española (LCSP 9/2017).
@@ -52,13 +52,13 @@ Tipos válidos: "obras" | "servicios" | "suministros" | "concesion_obras" | "con
 
 IMPORTANTE: Responde SOLO con un JSON válido.
 {
-  "tipoRecomendado": "servicios",
-  "justificacion": "Explicación detallada",
-  "articulosLCSP": ["Art. 17", "Art. 18"],
-  "alternativas": [
+  "recommendedType": "servicios",
+  "justification": "Explicación detallada",
+  "lcspArticles": ["Art. 17", "Art. 18"],
+  "alternatives": [
     {
-      "tipo": "suministros",
-      "motivo": "Podría considerarse si..."
+      "type": "suministros",
+      "reason": "Podría considerarse si..."
     }
   ]
 }`,
@@ -73,11 +73,11 @@ Criterios Art. 120 LCSP:
 
 IMPORTANTE: Responde SOLO con un JSON válido.
 {
-  "esEmergencia": false,
-  "probabilidadEmergencia": "nula",
-  "justificacion": "Explicación detallada",
-  "advertencias": ["Advertencia si aplica"],
-  "requisitosFaltantes": ["Requisito que faltaría"]
+  "isEmergency": false,
+  "emergencyProbability": "nula",
+  "justification": "Explicación detallada",
+  "warnings": ["Advertencia si aplica"],
+  "missingRequirements": ["Requisito que faltaría"]
 }`,
 
   centralizacion: `Eres un experto en contratación centralizada del Estado español (DGRCC).
@@ -87,14 +87,14 @@ Instrumentos disponibles: Acuerdos Marco (AM), Sistemas Dinámicos de Adquisici�
 
 IMPORTANTE: Responde SOLO con un JSON válido.
 {
-  "aplica": false,
-  "instrumentoId": null,
-  "enContratacionCentralizada": false,
-  "enAcuerdoMarco": false,
-  "loteRecomendado": null,
-  "modalidadRecomendada": null,
-  "justificacionModalidad": "",
-  "recomendacion": "Explicación detallada"
+  "applies": false,
+  "instrumentId": null,
+  "inCentralizedProcurement": false,
+  "inFrameworkAgreement": false,
+  "recommendedLot": null,
+  "recommendedModality": null,
+  "modalityJustification": "",
+  "recommendation": "Explicación detallada"
 }`,
 
   mediopropio: `Eres un experto en encargos a medios propios personificados (Arts. 32-33 LCSP).
@@ -102,11 +102,11 @@ Analiza si el objeto del contrato podría ser prestado por un medio propio de la
 
 IMPORTANTE: Responde SOLO con un JSON válido.
 {
-  "existeMedioPropio": false,
-  "probabilidad": "nula",
-  "mediosPropiosSugeridos": [],
-  "justificacion": "Explicación detallada",
-  "requisitosVerificar": ["Requisito a verificar"]
+  "ownMeansExists": false,
+  "probability": "nula",
+  "suggestedOwnMeans": [],
+  "justification": "Explicación detallada",
+  "requirementsToVerify": ["Requisito a verificar"]
 }`,
 
   subscripcion: `Eres un experto en contratos de suministro y servicios recurrentes según la LCSP.
@@ -114,16 +114,16 @@ Analiza si el objeto del contrato tiene características de suscripción o servi
 
 IMPORTANTE: Responde SOLO con un JSON válido.
 {
-  "esSubscripcion": false,
-  "probabilidad": "nula",
-  "tipoRecurrencia": "no_aplica",
-  "categoriaSubscripcion": null,
-  "justificacion": "Explicación",
-  "implicacionesValorEstimado": "Impacto en el valor estimado",
-  "duracionSugerida": {
-    "mesesMinimo": 12,
-    "mesesMaximo": 48,
-    "mesesRecomendado": 24
+  "isSubscription": false,
+  "probability": "nula",
+  "recurrenceType": "no_aplica",
+  "subscriptionCategory": null,
+  "justification": "Explicación",
+  "estimatedValueImplications": "Impacto en el valor estimado",
+  "suggestedDuration": {
+    "minMonths": 12,
+    "maxMonths": 48,
+    "recommendedMonths": 24
   }
 }`,
 
@@ -134,10 +134,10 @@ Niveles: "existe" (solución en mercado), "requiere_adaptacion" (adaptación nec
 
 IMPORTANTE: Responde SOLO con un JSON válido.
 {
-  "nivelInnovacion": "existe",
-  "justificacion": "Explicación detallada",
-  "recomendaciones": ["Recomendación 1"],
-  "procedimientosSugeridos": ["Abierto", "Licitación con negociación"]
+  "innovationLevel": "existe",
+  "justification": "Explicación detallada",
+  "recommendations": ["Recomendación 1"],
+  "suggestedProcedures": ["Abierto", "Licitación con negociación"]
 }`,
 
   duracion: `Eres un experto en plazos de contratos públicos según la LCSP.
@@ -145,9 +145,9 @@ Estima la duración recomendada para el contrato según su tipo y objeto.
 
 IMPORTANTE: Responde SOLO con un JSON válido.
 {
-  "meses": 12,
-  "prorrogasMeses": 12,
-  "justificacion": "Explicación con referencia a artículos LCSP"
+  "months": 12,
+  "extensionMonths": 12,
+  "justification": "Explicación con referencia a artículos LCSP"
 }`,
 
   lotes: `Eres un experto en división en lotes de contratos públicos (Art. 99.3 LCSP).
@@ -160,14 +160,14 @@ Criterios Art. 99.3 LCSP:
 
 IMPORTANTE: Responde SOLO con un JSON válido.
 {
-  "recomendaDividir": false,
-  "justificacion": "Explicación detallada",
-  "lotes": [
+  "recommendsDivision": false,
+  "justification": "Explicación detallada",
+  "lots": [
     {
-      "numero": 1,
-      "nombre": "Nombre del lote",
-      "descripcion": "Descripción",
-      "porcentaje": 50
+      "number": 1,
+      "name": "Nombre del lote",
+      "description": "Descripción",
+      "percentage": 50
     }
   ]
 }`,
@@ -177,14 +177,14 @@ Propón las partidas presupuestarias para el objeto del contrato.
 
 IMPORTANTE: Responde SOLO con un JSON válido.
 {
-  "partidas": [
+  "items": [
     {
-      "loteNumero": 1,
-      "concepto": "Descripción de la partida",
-      "cantidad": 1,
-      "importe_unitario": 1000.00,
-      "tipo_coste": "fijo",
-      "periodicidad": null
+      "lotNumber": 1,
+      "concept": "Descripción de la partida",
+      "quantity": 1,
+      "unitPrice": 1000.00,
+      "costType": "fijo",
+      "periodicity": null
     }
   ]
 }`,
@@ -220,20 +220,38 @@ function optionalField(value: string | undefined, label: string): string {
   return value !== undefined && value !== "" ? `${label}: ${value}` : "";
 }
 
+// Normalize field names: accept both Spanish (objeto/unidad/organo) and English (subject/unit/department)
+function normalizeAnalysisBody(body: Record<string, unknown>) {
+  return {
+    subject: (body["subject"] || "") as string,
+    unit: body["unit"] as string | undefined,
+    department: body["department"] as string | undefined,
+    mainCpv: (body["mainCpv"] || body["cpvPrincipal"]) as string | undefined,
+    contractType: (body["contractType"] || body["tipoContrato"]) as
+      | string
+      | undefined,
+    numLotes: body["numLotes"] as number | undefined,
+    lotes: body["lotes"] as LoteInfo[] | undefined,
+  };
+}
+
 // Base interface for analysis requests
 interface BaseAnalysisBody {
-  subject: string;
+  subject?: string;
   unit?: string;
   department?: string;
 }
 
 interface TipoAnalysisBody extends BaseAnalysisBody {
   mainCpv?: string;
+  cpvPrincipal?: string;
 }
 
 interface BudgetAnalysisBody extends BaseAnalysisBody {
   mainCpv?: string;
+  cpvPrincipal?: string;
   contractType?: string;
+  tipoContrato?: string;
 }
 
 interface LoteInfo {
@@ -257,7 +275,9 @@ export default async function aiAnalysisRoutes(
       req: FastifyRequest<{ Body: BaseAnalysisBody }>,
       reply: FastifyReply,
     ) => {
-      const { subject, unit, department } = req.body;
+      const { subject, unit, department } = normalizeAnalysisBody(
+        req.body as Record<string, unknown>,
+      );
       const userPrompt = `Analiza el siguiente objeto de contrato y sugiere códigos CPV:
 
 OBJETO: ${subject}
@@ -285,7 +305,9 @@ ${optionalField(department, "ÓRGANO")}`;
       req: FastifyRequest<{ Body: TipoAnalysisBody }>,
       reply: FastifyReply,
     ) => {
-      const { subject, unit, department, mainCpv } = req.body;
+      const { subject, unit, department, mainCpv } = normalizeAnalysisBody(
+        req.body as Record<string, unknown>,
+      );
       const userPrompt = `Determina el tipo de contrato para:
 
 OBJETO: ${subject}
@@ -314,7 +336,9 @@ ${optionalField(department, "ÓRGANO")}`;
       req: FastifyRequest<{ Body: BaseAnalysisBody }>,
       reply: FastifyReply,
     ) => {
-      const { subject, unit, department } = req.body;
+      const { subject, unit, department } = normalizeAnalysisBody(
+        req.body as Record<string, unknown>,
+      );
       const userPrompt = `Analiza si el siguiente objeto de contrato podría justificar tramitación de emergencia (Art. 120 LCSP):
 
 OBJETO: ${subject}
@@ -342,7 +366,9 @@ ${optionalField(department, "ÓRGANO")}`;
       req: FastifyRequest<{ Body: BaseAnalysisBody }>,
       reply: FastifyReply,
     ) => {
-      const { subject, unit, department } = req.body;
+      const { subject, unit, department } = normalizeAnalysisBody(
+        req.body as Record<string, unknown>,
+      );
       const userPrompt = `Analiza si el siguiente objeto de contrato podría estar cubierto por contratación centralizada (DGRCC):
 
 OBJETO: ${subject}
@@ -370,7 +396,9 @@ ${optionalField(department, "ÓRGANO")}`;
       req: FastifyRequest<{ Body: BaseAnalysisBody }>,
       reply: FastifyReply,
     ) => {
-      const { subject, unit, department } = req.body;
+      const { subject, unit, department } = normalizeAnalysisBody(
+        req.body as Record<string, unknown>,
+      );
       const userPrompt = `Analiza si el siguiente objeto de contrato podría ser prestado por un medio propio (Arts. 32-33 LCSP):
 
 OBJETO: ${subject}
@@ -398,7 +426,9 @@ ${optionalField(department, "ÓRGANO")}`;
       req: FastifyRequest<{ Body: TipoAnalysisBody }>,
       reply: FastifyReply,
     ) => {
-      const { subject, unit, department, mainCpv } = req.body;
+      const { subject, unit, department, mainCpv } = normalizeAnalysisBody(
+        req.body as Record<string, unknown>,
+      );
       const userPrompt = `Analiza si el siguiente objeto de contrato tiene características de suscripción:
 
 OBJETO: ${subject}
@@ -427,7 +457,9 @@ ${optionalField(department, "ÓRGANO")}`;
       req: FastifyRequest<{ Body: TipoAnalysisBody }>,
       reply: FastifyReply,
     ) => {
-      const { subject, unit, department, mainCpv } = req.body;
+      const { subject, unit, department, mainCpv } = normalizeAnalysisBody(
+        req.body as Record<string, unknown>,
+      );
       const userPrompt = `Analiza el nivel de innovación requerido para:
 
 OBJETO: ${subject}
@@ -456,7 +488,9 @@ ${optionalField(department, "ÓRGANO")}`;
       req: FastifyRequest<{ Body: BudgetAnalysisBody }>,
       reply: FastifyReply,
     ) => {
-      const { subject, contractType, mainCpv } = req.body;
+      const { subject, contractType, mainCpv } = normalizeAnalysisBody(
+        req.body as Record<string, unknown>,
+      );
       const userPrompt = `Estima la duración recomendada para el contrato:
 
 OBJETO: ${subject}
@@ -484,7 +518,9 @@ ${optionalField(mainCpv, "CPV PRINCIPAL")}`;
       req: FastifyRequest<{ Body: BudgetAnalysisBody }>,
       reply: FastifyReply,
     ) => {
-      const { subject, contractType, mainCpv } = req.body;
+      const { subject, contractType, mainCpv } = normalizeAnalysisBody(
+        req.body as Record<string, unknown>,
+      );
       const userPrompt = `Analiza si el contrato debería dividirse en lotes (Art. 99.3 LCSP):
 
 OBJETO: ${subject}
@@ -512,7 +548,8 @@ ${optionalField(mainCpv, "CPV PRINCIPAL")}`;
       req: FastifyRequest<{ Body: PartidasBody }>,
       reply: FastifyReply,
     ) => {
-      const { subject, contractType, mainCpv, numLotes, lotes } = req.body;
+      const { subject, contractType, mainCpv, numLotes, lotes } =
+        normalizeAnalysisBody(req.body as Record<string, unknown>);
       let userPrompt = `Propón las partidas presupuestarias para:
 
 OBJETO: ${subject}
