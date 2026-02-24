@@ -1,0 +1,88 @@
+# Ingress para exponer AUREA externamente
+# Asume nginx-ingress-controller instalado en el cluster
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: aurea-ingress
+  namespace: aurea
+  labels:
+    app.kubernetes.io/name: aurea
+  annotations:
+    # Nginx Ingress annotations
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "120"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "120"
+    # Rate limiting para ENS Alto
+    nginx.ingress.kubernetes.io/limit-rps: "100"
+    nginx.ingress.kubernetes.io/limit-connections: "50"
+    # Security headers
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      add_header X-Frame-Options "SAMEORIGIN" always;
+      add_header X-Content-Type-Options "nosniff" always;
+      add_header X-XSS-Protection "1; mode=block" always;
+      add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    # Cert-manager annotation (si usa cert-manager)
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - aurea.guardia-civil.es
+      secretName: aurea-tls-secret
+  rules:
+    - host: aurea.guardia-civil.es
+      http:
+        paths:
+          # API backend
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: aurea-api-service
+                port:
+                  number: 3000
+          # Frontend SPA (catch-all for client-side routing)
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: aurea-frontend-service
+                port:
+                  number: 8080
+---
+# Ingress alternativo para ambiente de staging/desarrollo interno
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: aurea-ingress-internal
+  namespace: aurea
+  labels:
+    app.kubernetes.io/name: aurea
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+spec:
+  ingressClassName: nginx-internal  # Ingress class para red interna
+  tls:
+    - hosts:
+        - aurea-staging.internal.aead.gob.es
+      secretName: aurea-internal-tls-secret
+  rules:
+    - host: aurea-staging.internal.aead.gob.es
+      http:
+        paths:
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: aurea-api-service
+                port:
+                  number: 3000
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: aurea-frontend-service
+                port:
+                  number: 8080

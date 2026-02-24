@@ -1,0 +1,106 @@
+# AUREA Frontend Deployment (SPA served by Nginx)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aurea-frontend
+  namespace: aurea
+  labels:
+    app.kubernetes.io/name: aurea-frontend
+    app.kubernetes.io/component: frontend
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: aurea-frontend
+  template:
+    metadata:
+      labels:
+        app: aurea-frontend
+        app.kubernetes.io/name: aurea-frontend
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 101  # nginx user
+        fsGroup: 101
+      containers:
+        - name: aurea-frontend
+          image: registry.aead.gob.es/aurea/frontend:latest  # Ajustar según registry AEAD
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+              name: http
+          envFrom:
+            - configMapRef:
+                name: aurea-frontend-config
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "50m"
+            limits:
+              memory: "256Mi"
+              cpu: "500m"
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+            - name: nginx-cache
+              mountPath: /var/cache/nginx
+            - name: nginx-run
+              mountPath: /var/run
+      volumes:
+        - name: tmp
+          emptyDir: {}
+        - name: nginx-cache
+          emptyDir: {}
+        - name: nginx-run
+          emptyDir: {}
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app
+                      operator: In
+                      values:
+                        - aurea-frontend
+                topologyKey: kubernetes.io/hostname
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: aurea-frontend-service
+  namespace: aurea
+  labels:
+    app.kubernetes.io/name: aurea-frontend
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8080
+      targetPort: 8080
+      name: http
+  selector:
+    app: aurea-frontend

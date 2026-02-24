@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: aurea-config
+  namespace: aurea
+  labels:
+    app.kubernetes.io/name: aurea-api
+data:
+  APP_HOST: "0.0.0.0"
+  APP_PORT: "3000"
+  NODE_ENV: "production"
+  LOG_LEVEL: "info"
+  FRONTEND_BASE_URL: "https://aurea.guardia-civil.es"
+  # OIDC Configuration (AEAD OpenAM)
+  OIDC_ISSUER_URL: "https://openam.aead.gob.es/openam/oauth2"
+  OIDC_REDIRECT_URI: "https://aurea.guardia-civil.es/api/public/sso/callback"
+  OIDC_POST_LOGOUT_REDIRECT_URI: "https://aurea.guardia-civil.es"
+  OIDC_SCOPES: "openid profile email"
+  # Redis
+  REDIS_HOST: "redis-service"
+  REDIS_PORT: "6379"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: aurea-frontend-config
+  namespace: aurea
+  labels:
+    app.kubernetes.io/name: aurea-frontend
+data:
+  VITE_API_URL: "https://aurea.guardia-civil.es/api"
+  VITE_SSO_ENABLED: "true"

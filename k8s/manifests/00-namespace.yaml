@@ -1,0 +1,60 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: aurea
+  labels:
+    app.kubernetes.io/name: aurea
+    app.kubernetes.io/part-of: gobtechlab
+    environment: production
+---
+# NetworkPolicy para ENS Alto - solo permite tráfico necesario
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: aurea-network-policy
+  namespace: aurea
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: ingress-nginx
+      ports:
+        - protocol: TCP
+          port: 3000
+        - protocol: TCP
+          port: 5173
+  egress:
+    # Permite DNS
+    - to:
+        - namespaceSelector: {}
+      ports:
+        - protocol: UDP
+          port: 53
+    # Permite conexión a PostgreSQL
+    - to:
+        - podSelector:
+            matchLabels:
+              app: postgres
+      ports:
+        - protocol: TCP
+          port: 5432
+    # Permite conexión a Redis
+    - to:
+        - podSelector:
+            matchLabels:
+              app: redis
+      ports:
+        - protocol: TCP
+          port: 6379
+    # Permite conexión a OpenAM (SSO AEAD)
+    - to:
+        - ipBlock:
+            cidr: 10.0.0.0/8  # Red interna AEAD
+      ports:
+        - protocol: TCP
+          port: 443
