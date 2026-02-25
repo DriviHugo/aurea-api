@@ -1,8 +1,6 @@
 import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
-import {
-  createAIGateway,
-  type AIGatewayService,
-} from "../../services/ai-gateway/index.js";
+import { FallbackAIGatewayService } from "../../services/ai-gateway/fallback-gateway.service.js";
+import { AIProvider } from "../../services/ai-gateway/types.js";
 
 interface ExpedienteData {
   code: string;
@@ -44,10 +42,29 @@ interface RequestBody {
   sections?: Array<{ titulo: string; contenido: string }>;
 }
 
-let gateway: AIGatewayService | null = null;
+let gateway: FallbackAIGatewayService | null = null;
 
-function getGateway(): AIGatewayService {
-  gateway ??= createAIGateway();
+function getGateway(): FallbackAIGatewayService {
+  if (!gateway) {
+    // ALIA config (preferente)
+    const aliaConfig = {
+      provider: AIProvider.ALIA,
+      model: "BSC-LT/ALIA-40b-instruct_Q8_0",
+      baseUrl: "https://api.nextbit256.com/onemillion/llm/v1",
+      apiKey: "pk_drlI7lTM1mLjOU1Nm8_4GgLgbf3awmT-jD-OOB-3Xus=",
+      temperature: 0.7,
+      maxTokens: 4096,
+    };
+    // Fallback config (Claude Sonnet 4.5, luego Llama 3.3 70b on-prem)
+    const fallbackConfig = {
+      provider: AIProvider.ANTHROPIC,
+      model: "claude-3-5-sonnet-20241022",
+      apiKey: process.env["ANTHROPIC_API_KEY"] ?? "",
+      temperature: 0.7,
+      maxTokens: 4096,
+    };
+    gateway = new FallbackAIGatewayService(aliaConfig, fallbackConfig);
+  }
   return gateway;
 }
 

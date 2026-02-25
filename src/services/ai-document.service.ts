@@ -3,7 +3,8 @@
  */
 
 import type { PrismaClient } from "@prisma/client";
-import { createAIGateway, type AIGatewayService } from "./ai-gateway/index.js";
+import { FallbackAIGatewayService } from "./ai-gateway/fallback-gateway.service.js";
+import { AIProvider } from "./ai-gateway/types.js";
 
 export interface ReescribirSeccionInput {
   seccionId: string;
@@ -31,11 +32,27 @@ INSTRUCCIONES:
 IMPORTANTE: Responde SOLO con el contenido reescrito, sin explicaciones adicionales ni formato markdown.
 El contenido debe estar listo para ser insertado directamente en el documento.`;
 
-export class AIDocumentService {
-  private aiGateway: AIGatewayService;
+  private aiGateway: FallbackAIGatewayService;
 
   constructor(private prisma: PrismaClient) {
-    this.aiGateway = createAIGateway();
+    // ALIA config (preferente)
+    const aliaConfig = {
+      provider: AIProvider.ALIA,
+      model: "BSC-LT/ALIA-40b-instruct_Q8_0",
+      baseUrl: "https://api.nextbit256.com/onemillion/llm/v1",
+      apiKey: "pk_drlI7lTM1mLjOU1Nm8_4GgLgbf3awmT-jD-OOB-3Xus=",
+      temperature: 0.7,
+      maxTokens: 4096,
+    };
+    // Fallback config (Claude Sonnet 4.5, luego Llama 3.3 70b on-prem)
+    const fallbackConfig = {
+      provider: AIProvider.ANTHROPIC,
+      model: "claude-3-5-sonnet-20241022",
+      apiKey: process.env["ANTHROPIC_API_KEY"] ?? "",
+      temperature: 0.7,
+      maxTokens: 4096,
+    };
+    this.aiGateway = new FallbackAIGatewayService(aliaConfig, fallbackConfig);
   }
 
   async reescribirSeccion(
