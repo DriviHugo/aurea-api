@@ -96,7 +96,9 @@ export class FallbackAIGatewayService {
     }
 
     // Sin fallback disponible
-    throw new Error(`ALIA failed and no fallback configured: ${aliaError?.message}`);
+    throw new Error(
+      `ALIA failed and no fallback configured: ${aliaError?.message}`,
+    );
   }
 
   async completeSimple(

@@ -115,7 +115,10 @@ ${context !== undefined ? `- Datos adicionales: ${JSON.stringify(context)}` : ""
 
 Proporciona ayuda contextual y práctica para este paso.`;
 
-        const response = await gateway.completeSimple(SYSTEM_PROMPT, userPrompt);
+        const response = await gateway.completeSimple(
+          SYSTEM_PROMPT,
+          userPrompt,
+        );
 
         const jsonMatch = response.match(/\{[\s\S]*\}/);
         if (!jsonMatch) {

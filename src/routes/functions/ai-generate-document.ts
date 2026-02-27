@@ -39,10 +39,20 @@ interface RequestBody {
   plan?: Section[];
   currentSection?: number;
   caseContext?: ExpedienteData;
-  previousSections?: Array<{ titulo?: string; contenido?: string; title?: string; content?: string }>;
+  previousSections?: Array<{
+    titulo?: string;
+    contenido?: string;
+    title?: string;
+    content?: string;
+  }>;
   comments?: string;
   fullContent?: string;
-  sections?: Array<{ titulo?: string; contenido?: string; title?: string; content?: string }>;
+  sections?: Array<{
+    titulo?: string;
+    contenido?: string;
+    title?: string;
+    content?: string;
+  }>;
 }
 
 function getGateway() {
@@ -340,18 +350,26 @@ El JSON debe tener esta estructura exacta:
 function buildSectionPrompt(
   section: Section,
   expediente: ExpedienteData,
-  previousSections: Array<{ titulo?: string; contenido?: string; title?: string; content?: string }>,
+  previousSections: Array<{
+    titulo?: string;
+    contenido?: string;
+    title?: string;
+    content?: string;
+  }>,
   comments?: string,
 ): string {
   // Support both Spanish and English field names
   const sectionOrder = section.order ?? section.orden ?? 0;
   const sectionTitle = section.title ?? section.titulo ?? "";
   const sectionDesc = section.description ?? section.descripcion ?? "";
-  
+
   const previousContext =
     previousSections.length > 0
       ? `\n\nSecciones anteriores del documento:\n${previousSections
-          .map((s) => `## ${s.title ?? s.titulo ?? ""}\n${s.content ?? s.contenido ?? ""}`)
+          .map(
+            (s) =>
+              `## ${s.title ?? s.titulo ?? ""}\n${s.content ?? s.contenido ?? ""}`,
+          )
           .join("\n\n")}`
       : "";
 
@@ -412,7 +430,7 @@ export default async function aiGenerarDocumentoRoutes(
       const startTime = Date.now();
       const { phase } = request.body;
 
-      request.log.info({ 
+      request.log.info({
         msg: "ai-generar-documento request",
         phase,
         bodyKeys: Object.keys(request.body || {}),
@@ -482,7 +500,9 @@ export default async function aiGenerarDocumentoRoutes(
             }
 
             // Support both Spanish (orden) and English (order) field names
-            const section = plan.find((s) => (s.order ?? s.orden) === currentSection);
+            const section = plan.find(
+              (s) => (s.order ?? s.orden) === currentSection,
+            );
 
             if (!section) {
               request.log.warn({
@@ -534,7 +554,8 @@ export default async function aiGenerarDocumentoRoutes(
             } catch (aiError) {
               request.log.error({
                 msg: "AI gateway error",
-                error: aiError instanceof Error ? aiError.message : String(aiError),
+                error:
+                  aiError instanceof Error ? aiError.message : String(aiError),
                 stack: aiError instanceof Error ? aiError.stack : undefined,
               });
               throw aiError;
