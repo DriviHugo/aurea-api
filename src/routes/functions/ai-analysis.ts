@@ -14,15 +14,13 @@
  */
 
 import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
-import {
-  createAIGateway,
-  type AIGatewayService,
-} from "../../services/ai-gateway/index.js";
+import { getProductionGateway } from "../../services/ai-gateway/production-gateway.js";
+import type { FallbackAIGatewayService } from "../../services/ai-gateway/fallback-gateway.service.js";
 
-let aiGateway: AIGatewayService | null = null;
+let aiGateway: FallbackAIGatewayService | null = null;
 
-function getAIGateway(): AIGatewayService {
-  aiGateway ??= createAIGateway();
+function getAIGateway(): FallbackAIGatewayService {
+  aiGateway ??= getProductionGateway();
   return aiGateway;
 }
 

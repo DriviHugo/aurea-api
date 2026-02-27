@@ -278,12 +278,30 @@ const routes: FastifyPluginAsync = async (fastify) => {
             properties: {
               error: { type: "string" },
               message: { type: "string" },
+              details: { type: "object" },
             },
           },
         },
       },
+      attachValidation: true,
     },
     async (request, reply) => {
+      // Check for validation errors
+      if (request.validationError) {
+        fastify.log.error(
+          {
+            validationError: request.validationError,
+            body: request.body,
+          },
+          "Validation error on case creation",
+        );
+        return reply.status(400).send({
+          error: "Validation error",
+          message: request.validationError.message,
+          details: request.validationError.validation,
+        });
+      }
+
       try {
         fastify.log.info({ body: request.body }, "Creating case");
         const data = request.body as any;
@@ -331,12 +349,30 @@ const routes: FastifyPluginAsync = async (fastify) => {
 
         return reply.status(201).send(normalizeCase(caseData));
       } catch (error: any) {
+        fastify.log.error(
+          {
+            error: error.message,
+            code: error.code,
+            body: request.body,
+            stack: error.stack,
+            details: error,
+          },
+          "Error creating case (detailed)",
+        );
         if (error.code === "P2002") {
           return reply
             .status(400)
             .send({ error: "Case with this code already exists" });
         }
-        return reply.status(500).send({ error: "Internal server error" });
+        // If error is a validation error, return details
+        if (error.validation) {
+          return reply
+            .status(400)
+            .send({ error: "Validation error", details: error.validation });
+        }
+        return reply
+          .status(500)
+          .send({ error: error.message || "Internal server error" });
       }
     },
   );

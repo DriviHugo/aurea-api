@@ -70,10 +70,27 @@ fastify.register(errorHandler);
 fastify.register(logRequest);
 fastify.register(authAccessToken);
 fastify.register(authRefreshToken);
-// OLD BOILERPLATE HOOKS (DISABLED)
-// fastify.register(authApiKey);
-// fastify.register(allowAdmin);
-// fastify.register(isSameUserOrAdmin);
+
+// Debug hook to log all ai-generar-documento requests
+fastify.addHook("onRequest", async (request) => {
+  if (request.url.includes("ai-generar-documento")) {
+    request.log.info({
+      msg: "DEBUG: ai-generar-documento onRequest",
+      url: request.url,
+      contentType: request.headers["content-type"],
+    });
+  }
+});
+
+fastify.addHook("preParsing", async (request, _reply, payload) => {
+  if (request.url.includes("ai-generar-documento")) {
+    request.log.info({
+      msg: "DEBUG: ai-generar-documento preParsing",
+      payloadType: typeof payload,
+    });
+  }
+  return payload;
+});
 
 // Routes
 fastify.register(privateRoutes, { prefix: `${regularRoutePath}/private` });

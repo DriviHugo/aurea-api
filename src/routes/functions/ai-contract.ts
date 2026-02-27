@@ -7,10 +7,7 @@
  */
 
 import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
-import {
-  createAIGateway,
-  type AIGatewayService,
-} from "../../services/ai-gateway/index.js";
+import { getProductionGateway } from "../../services/ai-gateway/production-gateway.js";
 
 interface AIContractBody {
   type: "improve_subject" | "propose_budget" | "search_cpv";
@@ -18,13 +15,6 @@ interface AIContractBody {
   contractType?: string;
   unit?: string;
   department?: string;
-}
-
-let aiGateway: AIGatewayService | null = null;
-
-function getAIGateway(): AIGatewayService {
-  aiGateway ??= createAIGateway();
-  return aiGateway;
 }
 
 function optionalField(value: string | undefined, label: string): string {
@@ -131,7 +121,7 @@ export default async function aiContractRoutes(
       const { type, subject, contractType, unit, department } = request.body;
 
       try {
-        const gateway = getAIGateway();
+        const gateway = getProductionGateway();
         let systemPrompt: string;
         let userPrompt: string;
 

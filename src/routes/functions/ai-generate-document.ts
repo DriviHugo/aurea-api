@@ -1,6 +1,5 @@
 import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
-import { FallbackAIGatewayService } from "../../services/ai-gateway/fallback-gateway.service.js";
-import { AIProvider } from "../../services/ai-gateway/types.js";
+import { getProductionGateway } from "../../services/ai-gateway/production-gateway.js";
 
 interface ExpedienteData {
   code: string;
@@ -21,10 +20,14 @@ interface ExpedienteData {
 }
 
 interface Section {
-  orden: number;
-  titulo: string;
-  descripcion: string;
+  orden?: number;
+  titulo?: string;
+  descripcion?: string;
   articulosLCSP?: string[];
+  // English field names (from frontend after api-client conversion)
+  order?: number;
+  title?: string;
+  description?: string;
 }
 
 interface RequestBody {
@@ -36,36 +39,14 @@ interface RequestBody {
   plan?: Section[];
   currentSection?: number;
   caseContext?: ExpedienteData;
-  previousSections?: Array<{ titulo: string; contenido: string }>;
+  previousSections?: Array<{ titulo?: string; contenido?: string; title?: string; content?: string }>;
   comments?: string;
   fullContent?: string;
-  sections?: Array<{ titulo: string; contenido: string }>;
+  sections?: Array<{ titulo?: string; contenido?: string; title?: string; content?: string }>;
 }
 
-let gateway: FallbackAIGatewayService | null = null;
-
-function getGateway(): FallbackAIGatewayService {
-  if (!gateway) {
-    // ALIA config (preferente)
-    const aliaConfig = {
-      provider: AIProvider.ALIA,
-      model: "BSC-LT/ALIA-40b-instruct_Q8_0",
-      baseUrl: "https://api.nextbit256.com/onemillion/llm/v1",
-      apiKey: "pk_drlI7lTM1mLjOU1Nm8_4GgLgbf3awmT-jD-OOB-3Xus=",
-      temperature: 0.7,
-      maxTokens: 4096,
-    };
-    // Fallback config (Claude Sonnet 4.5, luego Llama 3.3 70b on-prem)
-    const fallbackConfig = {
-      provider: AIProvider.ANTHROPIC,
-      model: "claude-3-5-sonnet-20241022",
-      apiKey: process.env["ANTHROPIC_API_KEY"] ?? "",
-      temperature: 0.7,
-      maxTokens: 4096,
-    };
-    gateway = new FallbackAIGatewayService(aliaConfig, fallbackConfig);
-  }
-  return gateway;
+function getGateway() {
+  return getProductionGateway();
 }
 
 const DOCUMENT_SECTIONS: Record<string, Section[]> = {
@@ -359,20 +340,25 @@ El JSON debe tener esta estructura exacta:
 function buildSectionPrompt(
   section: Section,
   expediente: ExpedienteData,
-  previousSections: Array<{ titulo: string; contenido: string }>,
+  previousSections: Array<{ titulo?: string; contenido?: string; title?: string; content?: string }>,
   comments?: string,
 ): string {
+  // Support both Spanish and English field names
+  const sectionOrder = section.order ?? section.orden ?? 0;
+  const sectionTitle = section.title ?? section.titulo ?? "";
+  const sectionDesc = section.description ?? section.descripcion ?? "";
+  
   const previousContext =
     previousSections.length > 0
       ? `\n\nSecciones anteriores del documento:\n${previousSections
-          .map((s) => `## ${s.titulo}\n${s.contenido}`)
+          .map((s) => `## ${s.title ?? s.titulo ?? ""}\n${s.content ?? s.contenido ?? ""}`)
           .join("\n\n")}`
       : "";
 
   return `Genera el contenido de la siguiente sección:
 
-**Sección ${section.orden}: ${section.titulo}**
-Descripción: ${section.descripcion}
+**Sección ${sectionOrder}: ${sectionTitle}**
+Descripción: ${sectionDesc}
 ${section.articulosLCSP ? `Artículos LCSP relacionados: ${section.articulosLCSP.join(", ")}` : ""}
 
 **Datos del expediente:**
@@ -405,6 +391,18 @@ function parseJsonSafely(response: string, fallback: unknown): unknown {
 export default async function aiGenerarDocumentoRoutes(
   app: FastifyInstance,
 ): Promise<void> {
+  app.addHook("preHandler", async (request, reply) => {
+    if (request.url.includes("ai-generar-documento")) {
+      request.log.info({
+        msg: "ai-generar-documento preHandler",
+        url: request.url,
+        method: request.method,
+        bodyType: typeof request.body,
+        bodyKeys: request.body ? Object.keys(request.body as object) : [],
+      });
+    }
+  });
+
   app.post("/ai-generar-documento", {
     preValidation: [app.authAccessToken],
     handler: async (
@@ -413,6 +411,12 @@ export default async function aiGenerarDocumentoRoutes(
     ) => {
       const startTime = Date.now();
       const { phase } = request.body;
+
+      request.log.info({ 
+        msg: "ai-generar-documento request",
+        phase,
+        bodyKeys: Object.keys(request.body || {}),
+      });
 
       try {
         switch (phase) {
@@ -426,10 +430,19 @@ export default async function aiGenerarDocumentoRoutes(
               });
             }
 
-            const secciones = Object.hasOwn(DOCUMENT_SECTIONS, documentType)
-              ? // eslint-disable-next-line security/detect-object-injection
-                DOCUMENT_SECTIONS[documentType]
-              : DEFAULT_SECTIONS;
+            const rawSecciones =
+              (Object.hasOwn(DOCUMENT_SECTIONS, documentType)
+                ? // eslint-disable-next-line security/detect-object-injection
+                  DOCUMENT_SECTIONS[documentType]
+                : DEFAULT_SECTIONS) || [];
+
+            // Normalize to English field names for frontend consistency
+            const secciones = rawSecciones.map((s) => ({
+              order: s.order ?? s.orden,
+              title: s.title ?? s.titulo,
+              description: s.description ?? s.descripcion,
+              articulosLCSP: s.articulosLCSP,
+            }));
 
             return reply.send({ secciones });
           }
@@ -443,7 +456,22 @@ export default async function aiGenerarDocumentoRoutes(
               comments,
             } = request.body;
 
+            request.log.info({
+              msg: "generate_section request",
+              currentSection,
+              hasPlan: !!plan,
+              hasCaseContext: !!caseContext,
+              planLength: plan?.length,
+              previousSectionsCount: previousSections.length,
+            });
+
             if (!plan || currentSection === undefined || !caseContext) {
+              request.log.warn({
+                msg: "Missing required fields for generate_section",
+                hasPlan: !!plan,
+                hasCurrentSection: currentSection !== undefined,
+                hasCaseContext: !!caseContext,
+              });
               return reply.status(400).send({
                 data: null,
                 error: {
@@ -453,14 +481,26 @@ export default async function aiGenerarDocumentoRoutes(
               });
             }
 
-            const section = plan.find((s) => s.orden === currentSection);
+            // Support both Spanish (orden) and English (order) field names
+            const section = plan.find((s) => (s.order ?? s.orden) === currentSection);
 
             if (!section) {
+              request.log.warn({
+                msg: "Section not found in plan",
+                currentSection,
+                availableSections: plan.map((s) => s.order ?? s.orden),
+              });
               return reply.status(400).send({
                 data: null,
                 error: { message: `Section ${currentSection} not found` },
               });
             }
+
+            request.log.info({
+              msg: "Building prompt for section",
+              sectionTitle: section.title ?? section.titulo,
+              sectionOrder: section.order ?? section.orden,
+            });
 
             const prompt = buildSectionPrompt(
               section,
@@ -469,16 +509,36 @@ export default async function aiGenerarDocumentoRoutes(
               comments,
             );
 
-            const contenido = await getGateway().completeSimple(
-              GENERATION_PROMPT,
-              prompt,
-            );
-
-            return reply.send({
-              content: contenido,
-              tokensUsed: 0,
-              generationTimeMs: Date.now() - startTime,
+            request.log.info({
+              msg: "Calling AI gateway",
+              promptLength: prompt.length,
             });
+
+            try {
+              const contenido = await getGateway().completeSimple(
+                GENERATION_PROMPT,
+                prompt,
+              );
+
+              request.log.info({
+                msg: "AI generation successful",
+                contentLength: contenido.length,
+                generationTimeMs: Date.now() - startTime,
+              });
+
+              return reply.send({
+                content: contenido,
+                tokensUsed: 0,
+                generationTimeMs: Date.now() - startTime,
+              });
+            } catch (aiError) {
+              request.log.error({
+                msg: "AI gateway error",
+                error: aiError instanceof Error ? aiError.message : String(aiError),
+                stack: aiError instanceof Error ? aiError.stack : undefined,
+              });
+              throw aiError;
+            }
           }
 
           case "review": {
@@ -521,12 +581,19 @@ Responde SOLO con JSON válido.`;
           }
 
           default:
+            request.log.warn({ msg: "Unknown phase requested", phase });
             return reply.status(400).send({
               data: null,
               error: { message: `Unknown phase: ${phase}` },
             });
         }
       } catch (error) {
+        request.log.error({
+          msg: "Error in ai-generar-documento",
+          phase,
+          error: error instanceof Error ? error.message : String(error),
+          stack: error instanceof Error ? error.stack : undefined,
+        });
         return reply.status(500).send({
           data: null,
           error: {

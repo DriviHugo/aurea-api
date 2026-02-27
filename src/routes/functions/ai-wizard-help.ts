@@ -4,7 +4,7 @@
  */
 
 import type { FastifyInstance } from "fastify";
-import Anthropic from "@anthropic-ai/sdk";
+import { getProductionGateway } from "../../services/ai-gateway/production-gateway.js";
 
 interface WizardHelpRequest {
   stepId: string;
@@ -88,18 +88,8 @@ export default async function aiWizardHelpRoutes(
       const { stepId, sectionId, subject, contractType, context } =
         request.body as WizardHelpRequest;
 
-      // Check if AI is configured
-      const aiApiKey = process.env["AI_API_KEY"];
-      if (aiApiKey === undefined || aiApiKey === "") {
-        return reply.status(200).send({
-          ayuda: getStaticHelp(stepId, sectionId),
-          section: sectionId ?? stepId,
-          consejos: getStaticConsejos(stepId, sectionId),
-        });
-      }
-
       try {
-        const anthropic = new Anthropic({ apiKey: aiApiKey });
+        const gateway = getProductionGateway();
 
         const stepContext = Object.hasOwn(STEP_CONTEXTS, stepId)
           ? // eslint-disable-next-line security/detect-object-injection
@@ -125,29 +115,17 @@ ${context !== undefined ? `- Datos adicionales: ${JSON.stringify(context)}` : ""
 
 Proporciona ayuda contextual y práctica para este paso.`;
 
-        const response = await anthropic.messages.create({
-          model: "claude-sonnet-4-20250514",
-          max_tokens: 1024,
-          system: SYSTEM_PROMPT,
-          messages: [{ role: "user", content: userPrompt }],
-        });
+        const response = await gateway.completeSimple(SYSTEM_PROMPT, userPrompt);
 
-        const textContent = response.content.find(
-          (block) => block.type === "text",
-        );
-        if (textContent?.type !== "text") {
-          throw new Error("No text response from AI");
-        }
-
-        const jsonMatch = textContent.text.match(/\{[\s\S]*\}/);
+        const jsonMatch = response.match(/\{[\s\S]*\}/);
         if (!jsonMatch) {
           return reply.status(200).send({
-            ayuda: textContent.text,
+            ayuda: response,
             section: sectionId ?? stepId,
           });
         }
 
-        const parsed = JSON.parse(jsonMatch[0]);
+        const parsed = JSON.parse(jsonMatch[0]) as Record<string, unknown>;
         return reply.status(200).send(parsed);
       } catch (error) {
         console.error("[ai-wizard-help] Error:", error);

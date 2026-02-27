@@ -43,7 +43,10 @@ export class ALIAAdapter implements AIProviderAdapter {
   async complete(request: AICompletionRequest): Promise<AICompletionResponse> {
     // Default to local vLLM/TGI server
     const baseUrl = this.config.baseUrl ?? "http://localhost:8000";
-    const endpoint = `${baseUrl}/v1/chat/completions`;
+    // If baseUrl already ends with /v1, don't add it again
+    const endpoint = baseUrl.endsWith("/v1")
+      ? `${baseUrl}/chat/completions`
+      : `${baseUrl}/v1/chat/completions`;
 
     const headers: Record<string, string> = {
       "Content-Type": "application/json",

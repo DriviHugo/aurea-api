@@ -22,6 +22,35 @@ function convertDocumentType(type: string): string {
   return typeMap[type] || type;
 }
 
+// Convert snake_case status to camelCase for Prisma enum
+function convertReviewStatus(status: string): string {
+  const statusMap: Record<string, string> = {
+    pendiente: "pending",
+    pending: "pending",
+    en_revision: "inReview",
+    inReview: "inReview",
+    aprobado: "approved",
+    approved: "approved",
+    rechazado: "rejected",
+    rejected: "rejected",
+    corregir: "toCorrect",
+    toCorrect: "toCorrect",
+  };
+  return statusMap[status] || "pending";
+}
+
+// Convert camelCase status back to snake_case for API response
+function convertStatusToSnakeCase(status: string): string {
+  const statusMap: Record<string, string> = {
+    pending: "pendiente",
+    inReview: "en_revision",
+    approved: "aprobado",
+    rejected: "rechazado",
+    toCorrect: "corregir",
+  };
+  return statusMap[status] || status;
+}
+
 // Convert camelCase type back to snake_case for API response (backward compatibility)
 function convertTypeToSnakeCase(type: string): string {
   const typeMap: Record<string, string> = {
@@ -41,6 +70,7 @@ function normalizeDocument(doc: any) {
   return {
     ...doc,
     type: convertTypeToSnakeCase(doc.type),
+    status: convertStatusToSnakeCase(doc.status),
   };
 }
 
@@ -114,7 +144,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
         if (caseId) where.caseId = caseId;
         // Convert type from snake_case to camelCase for Prisma query
         if (type) where.type = convertDocumentType(type);
-        if (status) where.status = status;
+        if (status) where.status = convertReviewStatus(status);
 
         const [documents, total] = await Promise.all([
           prisma.document.findMany({
@@ -289,7 +319,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
             name: data.name,
             version: data.version || 1,
             hash: data.hash,
-            status: data.status || "pending",
+            status: convertReviewStatus(data.status || "pending") as any,
             content: data.content,
             docxUrl: data.docxUrl,
             pdfUrl: data.pdfUrl,
@@ -390,7 +420,9 @@ const routes: FastifyPluginAsync = async (fastify) => {
             name: data.name,
             version: data.version,
             hash: data.hash,
-            status: data.status,
+            status: data.status
+              ? (convertReviewStatus(data.status) as any)
+              : undefined,
             content: data.content,
             docxUrl: data.docxUrl,
             pdfUrl: data.pdfUrl,

@@ -32,6 +32,7 @@ INSTRUCCIONES:
 IMPORTANTE: Responde SOLO con el contenido reescrito, sin explicaciones adicionales ni formato markdown.
 El contenido debe estar listo para ser insertado directamente en el documento.`;
 
+export class AIDocumentService {
   private aiGateway: FallbackAIGatewayService;
 
   constructor(private prisma: PrismaClient) {
