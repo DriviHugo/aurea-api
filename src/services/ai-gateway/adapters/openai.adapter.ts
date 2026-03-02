@@ -8,6 +8,7 @@ import type {
   AICompletionRequest,
   AICompletionResponse,
 } from "../types.js";
+import { AIProvider } from "../types.js";
 
 export class OpenAIAdapter implements AIProviderAdapter {
   constructor(private config: AIConfig) {}
@@ -52,6 +53,7 @@ export class OpenAIAdapter implements AIProviderAdapter {
     return {
       content: choice.message.content,
       model: data.model,
+      provider: AIProvider.OPENAI,
       usage: {
         promptTokens: data.usage.prompt_tokens,
         completionTokens: data.usage.completion_tokens,

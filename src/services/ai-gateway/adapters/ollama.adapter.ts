@@ -8,6 +8,7 @@ import type {
   AICompletionRequest,
   AICompletionResponse,
 } from "../types.js";
+import { AIProvider } from "../types.js";
 
 export class OllamaAdapter implements AIProviderAdapter {
   constructor(private config: AIConfig) {}
@@ -45,6 +46,7 @@ export class OllamaAdapter implements AIProviderAdapter {
     return {
       content: data.message.content,
       model: this.config.model,
+      provider: AIProvider.OLLAMA,
       usage: {
         promptTokens: data.prompt_eval_count ?? 0,
         completionTokens: data.eval_count ?? 0,

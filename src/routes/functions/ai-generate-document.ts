@@ -535,21 +535,28 @@ export default async function aiGenerarDocumentoRoutes(
             });
 
             try {
-              const contenido = await getGateway().completeSimple(
+              const aiResponse = await getGateway().completeWithMeta(
                 GENERATION_PROMPT,
                 prompt,
               );
 
               request.log.info({
                 msg: "AI generation successful",
-                contentLength: contenido.length,
+                contentLength: aiResponse.content.length,
                 generationTimeMs: Date.now() - startTime,
+                provider: aiResponse.provider,
+                model: aiResponse.model,
+                tokens: aiResponse.usage,
               });
 
               return reply.send({
-                content: contenido,
-                tokensUsed: 0,
+                content: aiResponse.content,
+                tokensUsed: aiResponse.usage.totalTokens,
                 generationTimeMs: Date.now() - startTime,
+                aiProvider: aiResponse.provider,
+                aiModel: aiResponse.model,
+                promptTokens: aiResponse.usage.promptTokens,
+                completionTokens: aiResponse.usage.completionTokens,
               });
             } catch (aiError) {
               request.log.error({

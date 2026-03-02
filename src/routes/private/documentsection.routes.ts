@@ -39,6 +39,8 @@ const routes: FastifyPluginAsync = async (fastify) => {
                     status: { type: "string" },
                     tokensUsed: { type: ["integer", "null"] },
                     generationTimeMs: { type: ["integer", "null"] },
+                    aiProvider: { type: ["string", "null"] },
+                    aiModel: { type: ["string", "null"] },
                     lcspArticles: { type: "array", items: { type: "string" } },
                     createdAt: { type: "string", format: "date-time" },
                     updatedAt: { type: "string", format: "date-time" },
@@ -121,6 +123,8 @@ const routes: FastifyPluginAsync = async (fastify) => {
               status: { type: "string" },
               tokensUsed: { type: ["integer", "null"] },
               generationTimeMs: { type: ["integer", "null"] },
+              aiProvider: { type: ["string", "null"] },
+              aiModel: { type: ["string", "null"] },
               lcspArticles: { type: "array", items: { type: "string" } },
               createdAt: { type: "string", format: "date-time" },
               updatedAt: { type: "string", format: "date-time" },
@@ -255,6 +259,8 @@ const routes: FastifyPluginAsync = async (fastify) => {
             status: { type: "string" },
             tokensUsed: { type: "integer", minimum: 0 },
             generationTimeMs: { type: "integer", minimum: 0 },
+            aiProvider: { type: "string" },
+            aiModel: { type: "string" },
             lcspArticles: { type: "array", items: { type: "string" } },
           },
         },
@@ -271,6 +277,8 @@ const routes: FastifyPluginAsync = async (fastify) => {
               status: { type: "string" },
               tokensUsed: { type: ["integer", "null"] },
               generationTimeMs: { type: ["integer", "null"] },
+              aiProvider: { type: ["string", "null"] },
+              aiModel: { type: ["string", "null"] },
               lcspArticles: { type: "array", items: { type: "string" } },
               createdAt: { type: "string", format: "date-time" },
               updatedAt: { type: "string", format: "date-time" },
@@ -289,6 +297,15 @@ const routes: FastifyPluginAsync = async (fastify) => {
       try {
         const { id } = request.params as { id: string };
         const data = request.body as any;
+
+        fastify.log.info({
+          msg: "PUT document-section received",
+          id,
+          dataKeys: Object.keys(data),
+          hasAiProvider: !!data.aiProvider,
+          aiProvider: data.aiProvider,
+          aiModel: data.aiModel,
+        });
 
         const existingDocumentSection = await prisma.documentSection.findUnique(
           {
@@ -311,8 +328,16 @@ const routes: FastifyPluginAsync = async (fastify) => {
           updateData.tokensUsed = data.tokensUsed;
         if (data.generationTimeMs !== undefined)
           updateData.generationTimeMs = data.generationTimeMs;
+        if (data.aiProvider !== undefined)
+          updateData.aiProvider = data.aiProvider;
+        if (data.aiModel !== undefined) updateData.aiModel = data.aiModel;
         if (data.lcspArticles !== undefined)
           updateData.lcspArticles = data.lcspArticles;
+
+        fastify.log.info({
+          msg: "About to update DocumentSection",
+          updateData,
+        });
 
         const documentSection = await prisma.documentSection.update({
           where: { id },
@@ -321,6 +346,12 @@ const routes: FastifyPluginAsync = async (fastify) => {
 
         return reply.status(200).send(documentSection);
       } catch (error: any) {
+        fastify.log.error({
+          msg: "DocumentSection update error",
+          error: error.message,
+          code: error.code,
+          stack: error.stack,
+        });
         if (error.code === "P2002") {
           return reply.status(400).send({
             error:

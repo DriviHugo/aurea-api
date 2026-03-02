@@ -9,6 +9,7 @@ import type {
   AICompletionResponse,
   AIMessage,
 } from "../types.js";
+import { AIProvider } from "../types.js";
 
 export class AnthropicAdapter implements AIProviderAdapter {
   constructor(private config: AIConfig) {}
@@ -60,6 +61,7 @@ export class AnthropicAdapter implements AIProviderAdapter {
     return {
       content: data.content[0].text,
       model: data.model,
+      provider: AIProvider.ANTHROPIC,
       usage: {
         promptTokens: data.usage.input_tokens,
         completionTokens: data.usage.output_tokens,

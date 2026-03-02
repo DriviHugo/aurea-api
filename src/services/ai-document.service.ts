@@ -39,7 +39,7 @@ export class AIDocumentService {
     // ALIA config (preferente)
     const aliaConfig = {
       provider: AIProvider.ALIA,
-      model: "BSC-LT/ALIA-40b-instruct_Q8_0",
+      model: "alia-40b-instruct",
       baseUrl: "https://api.nextbit256.com/onemillion/llm/v1",
       apiKey: "pk_drlI7lTM1mLjOU1Nm8_4GgLgbf3awmT-jD-OOB-3Xus=",
       temperature: 0.7,

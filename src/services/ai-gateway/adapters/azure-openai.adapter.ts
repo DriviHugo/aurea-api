@@ -8,6 +8,7 @@ import type {
   AICompletionRequest,
   AICompletionResponse,
 } from "../types.js";
+import { AIProvider } from "../types.js";
 
 export class AzureOpenAIAdapter implements AIProviderAdapter {
   constructor(private config: AIConfig) {}
@@ -54,6 +55,7 @@ export class AzureOpenAIAdapter implements AIProviderAdapter {
     return {
       content: choice.message.content,
       model: this.config.model,
+      provider: AIProvider.AZURE_OPENAI,
       usage: {
         promptTokens: data.usage.prompt_tokens,
         completionTokens: data.usage.completion_tokens,

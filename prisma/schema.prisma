@@ -304,6 +304,8 @@ model DocumentSection {
   status           String   @default("pending")
   tokensUsed       Int?
   generationTimeMs Int?
+  aiProvider       String?  // e.g. "alia", "anthropic", "openai"
+  aiModel          String?  // e.g. "BSC-LT/ALIA-40b-instruct_Q8_0", "claude-sonnet-4-20250514"
   lcspArticles     String[]
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt

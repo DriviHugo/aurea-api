@@ -9,6 +9,7 @@ import type {
   AICompletionResponse,
   AIMessage,
 } from "../types.js";
+import { AIProvider } from "../types.js";
 
 export class GeminiAdapter implements AIProviderAdapter {
   constructor(private config: AIConfig) {}
@@ -72,6 +73,7 @@ export class GeminiAdapter implements AIProviderAdapter {
     return {
       content,
       model: this.config.model,
+      provider: AIProvider.GEMINI,
       usage: {
         promptTokens: data.usageMetadata?.promptTokenCount ?? 0,
         completionTokens: data.usageMetadata?.candidatesTokenCount ?? 0,

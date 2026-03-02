@@ -77,6 +77,22 @@ export class AIGatewayService {
     return response.content;
   }
 
+  /**
+   * Complete with full metadata (provider, model, tokens, etc.)
+   * Use this when you need to track which AI provider was used
+   */
+  async completeWithMeta(
+    systemPrompt: string,
+    userPrompt: string,
+  ): Promise<AICompletionResponse> {
+    return this.complete({
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userPrompt },
+      ],
+    });
+  }
+
   private createAdapter(config: AIConfig): AIProviderAdapter {
     switch (config.provider) {
       case AIProvider.OLLAMA:
@@ -134,7 +150,7 @@ function getDefaultModel(provider: AIProvider): string {
     case AIProvider.DEEPSEEK:
       return "deepseek-chat";
     case AIProvider.ALIA:
-      return "BSC-LT/ALIA-40b-instruct_Q8_0"; // Quantized version for production
+      return "alia-40b-instruct"; // NextBit256 hosted model
   }
 }
 

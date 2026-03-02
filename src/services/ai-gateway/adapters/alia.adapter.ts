@@ -16,6 +16,7 @@ import type {
   AICompletionRequest,
   AICompletionResponse,
 } from "../types.js";
+import { AIProvider } from "../types.js";
 
 interface OpenAICompatibleResponse {
   id: string;
@@ -97,6 +98,7 @@ export class ALIAAdapter implements AIProviderAdapter {
     return {
       content: choice.message.content,
       model: data.model,
+      provider: AIProvider.ALIA,
       usage: {
         promptTokens: data.usage.prompt_tokens,
         completionTokens: data.usage.completion_tokens,

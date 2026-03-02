@@ -113,4 +113,20 @@ export class FallbackAIGatewayService {
     });
     return response.content;
   }
+
+  /**
+   * Complete with full metadata (provider, model, tokens, etc.)
+   * Use this when you need to track which AI provider was used
+   */
+  async completeWithMeta(
+    systemPrompt: string,
+    userPrompt: string,
+  ): Promise<AICompletionResponse> {
+    return this.complete({
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userPrompt },
+      ],
+    });
+  }
 }

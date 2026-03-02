@@ -40,6 +40,7 @@ export interface AICompletionRequest {
 export interface AICompletionResponse {
   content: string;
   model: string;
+  provider: AIProvider; // Which AI provider generated this response
   usage: {
     promptTokens: number;
     completionTokens: number;
