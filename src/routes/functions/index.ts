@@ -8,6 +8,8 @@ import aiContractRoutes from "./ai-contract.js";
 import aiAnalysisRoutes from "./ai-analysis.js";
 import aiWizardHelpRoutes from "./ai-wizard-help.js";
 import aiGenerateDocumentRoutes from "./ai-generate-document.js";
+import aiProcessRepairRoutes from "./ai-process-repair.js";
+import aiEvaluateSufficiencyRoutes from "./ai-evaluate-sufficiency.js";
 
 export default async (fastify: FastifyInstance): Promise<void> => {
   // AI Contract functions (improve_subject, propose_budget, search_cpv)
@@ -21,4 +23,10 @@ export default async (fastify: FastifyInstance): Promise<void> => {
 
   // AI Document generation
   fastify.register(aiGenerateDocumentRoutes);
+
+  // AI Repair document processing
+  fastify.register(aiProcessRepairRoutes);
+
+  // AI Sufficiency evaluation
+  fastify.register(aiEvaluateSufficiencyRoutes);
 };

@@ -543,3 +543,116 @@ model Issue {
 
   user Profile @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
+
+// ============ TEST CASES ============
+
+enum TestCaseStatus {
+  pending
+  passed
+  failed
+  blocked
+  validate
+}
+
+model TestCase {
+  id                  String         @id @default(uuid()) @db.Uuid
+  description         String
+  observations        String?
+  status              TestCaseStatus @default(pending)
+  promotingUnit       String?
+  contractingBody     String?
+  createdBy           String?        @db.Uuid
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+
+  @@index([createdAt(sort: Desc)])
+}
+
+// ============ REPAIRS (REPAROS) ============
+
+model RepairDocument {
+  id           String   @id @default(uuid()) @db.Uuid
+  name         String
+  size         Int
+  storagePath  String
+  status       String   @default("processing")
+  errorMessage String?
+  uploadedBy   String   @db.Uuid
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  extractions RepairExtraction[]
+  rules       RepairRule[]
+
+  @@index([createdAt(sort: Desc)])
+}
+
+model RepairExtraction {
+  id                String   @id @default(uuid()) @db.Uuid
+  documentId        String   @db.Uuid
+  affectedSection   String?
+  errorType         String?
+  literalDescription String
+  normReference     String?
+  consequence       String?
+  originalText      String?
+  createdAt         DateTime @default(now())
+
+  document RepairDocument @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  rules    RepairRule[]
+
+  @@index([documentId])
+}
+
+enum RepairRuleType {
+  do
+  dont
+}
+
+model RepairRule {
+  id              String         @id @default(uuid()) @db.Uuid
+  documentId      String         @db.Uuid
+  extractionId    String?        @db.Uuid
+  caseSection     String
+  category        String
+  type            RepairRuleType
+  content         String
+  priority        Int            @default(0)
+  active          Boolean        @default(true)
+  createdAt       DateTime       @default(now())
+
+  document    RepairDocument     @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  extraction  RepairExtraction?  @relation(fields: [extractionId], references: [id])
+  usages      RuleUsage[]
+
+  @@index([documentId])
+  @@index([active])
+}
+
+model RuleUsage {
+  id         String   @id @default(uuid()) @db.Uuid
+  documentId String   @db.Uuid
+  sectionId  String   @db.Uuid
+  ruleId     String   @db.Uuid
+  createdAt  DateTime @default(now())
+
+  rule RepairRule @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+
+  @@index([documentId, sectionId])
+}
+
+// ============ SUFFICIENCY (SUFICIENCIA) ============
+
+model SectionQuestion {
+  id         String   @id @default(uuid()) @db.Uuid
+  sectionId  String   @db.Uuid
+  documentId String   @db.Uuid
+  question   String
+  answer     String?
+  order      Int
+  round      Int      @default(1)
+  createdAt  DateTime @default(now())
+
+  @@index([sectionId])
+  @@index([documentId])
+}
