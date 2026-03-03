@@ -559,13 +559,23 @@ export default async function aiGenerarDocumentoRoutes(
                 completionTokens: aiResponse.usage.completionTokens,
               });
             } catch (aiError) {
+              const errorMessage =
+                aiError instanceof Error ? aiError.message : String(aiError);
               request.log.error({
                 msg: "AI gateway error",
-                error:
-                  aiError instanceof Error ? aiError.message : String(aiError),
+                error: errorMessage,
                 stack: aiError instanceof Error ? aiError.stack : undefined,
+                sectionTitle: section.title ?? section.titulo,
+                sectionOrder: section.order ?? section.orden,
               });
-              throw aiError;
+              // Return structured error response instead of throwing
+              return reply.status(500).send({
+                error: {
+                  message: `AI generation failed: ${errorMessage}`,
+                  section: section.title ?? section.titulo,
+                  sectionOrder: section.order ?? section.orden,
+                },
+              });
             }
           }
 

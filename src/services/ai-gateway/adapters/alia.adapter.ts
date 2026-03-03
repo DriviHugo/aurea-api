@@ -10,13 +10,13 @@
  * @see https://huggingface.co/BSC-LT/ALIA-40b-instruct
  */
 
-import type {
-  AIConfig,
-  AIProviderAdapter,
-  AICompletionRequest,
-  AICompletionResponse,
+import {
+  type AIConfig,
+  type AIProviderAdapter,
+  type AICompletionRequest,
+  type AICompletionResponse,
+  AIProvider,
 } from "../types.js";
-import { AIProvider } from "../types.js";
 
 interface OpenAICompatibleResponse {
   id: string;
@@ -58,19 +58,38 @@ export class ALIAAdapter implements AIProviderAdapter {
       headers["Authorization"] = `Bearer ${this.config.apiKey}`;
     }
 
-    const response = await fetch(endpoint, {
-      method: "POST",
-      headers,
-      body: JSON.stringify({
-        model: this.config.model,
-        messages: request.messages,
-        temperature: request.temperature ?? this.config.temperature ?? 0.7,
-        max_tokens: request.maxTokens ?? this.config.maxTokens ?? 4096,
-        top_p: request.topP ?? this.config.topP ?? 1,
-        stream: false,
-      }),
-      signal: AbortSignal.timeout(this.config.timeout ?? 120000), // 2 min default for large model
-    });
+    const timeout = this.config.timeout ?? 120000; // 2 min default for large model
+    let response: Response;
+
+    try {
+      response = await fetch(endpoint, {
+        method: "POST",
+        headers,
+        body: JSON.stringify({
+          model: this.config.model,
+          messages: request.messages,
+          temperature: request.temperature ?? this.config.temperature ?? 0.7,
+          max_tokens: request.maxTokens ?? this.config.maxTokens ?? 4096,
+          top_p: request.topP ?? this.config.topP ?? 1,
+          stream: false,
+        }),
+        signal: AbortSignal.timeout(timeout),
+      });
+    } catch (fetchError) {
+      // Handle timeout and network errors explicitly
+      if (fetchError instanceof Error) {
+        if (
+          fetchError.name === "TimeoutError" ||
+          fetchError.name === "AbortError"
+        ) {
+          throw new Error(`ALIA request timed out after ${timeout / 1000}s`);
+        }
+        if (fetchError.message.includes("fetch")) {
+          throw new Error(`ALIA network error: ${fetchError.message}`);
+        }
+      }
+      throw new Error(`ALIA fetch error: ${String(fetchError)}`);
+    }
 
     if (!response.ok) {
       const errorText = await response.text();

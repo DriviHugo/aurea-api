@@ -33,15 +33,22 @@ export class AIGatewayService {
   }
 
   async complete(request: AICompletionRequest): Promise<AICompletionResponse> {
-    const maxRetries = 3;
+    const maxRetries = 2; // Reduced from 3 - fail faster to enable fallback
     let lastError: Error | null = null;
 
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
         const response = await this.adapter.complete(request);
         return response;
-      } catch (error) {
-        lastError = error as Error;
+      } catch (error: unknown) {
+        // Ensure error is always an Error object
+        if (error instanceof Error) {
+          lastError = error;
+        } else if (typeof error === "object" && error !== null) {
+          lastError = new Error(JSON.stringify(error));
+        } else {
+          lastError = new Error(String(error));
+        }
 
         console.error({
           event: "ai_completion_error",
@@ -50,6 +57,18 @@ export class AIGatewayService {
           attempt,
           error: lastError.message,
         });
+
+        // Don't retry on timeout or network errors - fail fast for fallback
+        const isTimeoutOrNetworkError =
+          lastError.message.includes("timed out") ||
+          lastError.message.includes("timeout") ||
+          lastError.message.includes("network") ||
+          lastError.message.includes("ECONNREFUSED") ||
+          lastError.message.includes("ETIMEDOUT");
+
+        if (isTimeoutOrNetworkError) {
+          break; // Exit retry loop immediately
+        }
 
         if (attempt < maxRetries) {
           await new Promise((resolve) =>
