@@ -24,7 +24,8 @@ const routes: FastifyPluginAsync = async (fastify) => {
       try {
         const { documentId } = request.query as { documentId?: string };
 
-        const where = documentId ? { documentId } : {};
+        const where =
+          documentId != null && documentId.length > 0 ? { documentId } : {};
         const data = await prisma.repairExtraction.findMany({
           where,
           orderBy: { createdAt: "asc" },
@@ -55,10 +56,12 @@ const routes: FastifyPluginAsync = async (fastify) => {
     async (request, reply) => {
       try {
         const { id } = request.params as { id: string };
-        const extraction = await prisma.repairExtraction.findUnique({ where: { id } });
+        const extraction = await prisma.repairExtraction.findUnique({
+          where: { id },
+        });
         if (!extraction) return reply.status(404).send({ error: "Not found" });
         return reply.status(200).send(extraction);
-      } catch (error) {
+      } catch {
         return reply.status(500).send({ error: "Internal server error" });
       }
     },
@@ -98,7 +101,17 @@ const routes: FastifyPluginAsync = async (fastify) => {
           originalText?: string | null;
         };
 
-        const extraction = await prisma.repairExtraction.create({ data: data as any });
+        const extraction = await prisma.repairExtraction.create({
+          data: {
+            documentId: data.documentId,
+            affectedSection: data.affectedSection ?? null,
+            errorType: data.errorType ?? null,
+            literalDescription: data.literalDescription,
+            normReference: data.normReference ?? null,
+            consequence: data.consequence ?? null,
+            originalText: data.originalText ?? null,
+          },
+        });
         return reply.status(201).send(extraction);
       } catch (error) {
         fastify.log.error(error);

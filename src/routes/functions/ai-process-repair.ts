@@ -74,7 +74,7 @@ export default async (fastify: FastifyInstance): Promise<void> => {
 
         // If no text provided, try to get document info
         let text = documentText;
-        if (!text) {
+        if (text == null || text.length === 0) {
           const doc = await prisma.repairDocument.findUnique({
             where: { id: documentId },
           });
@@ -84,7 +84,8 @@ export default async (fastify: FastifyInstance): Promise<void> => {
           // In a real implementation, extract text from the stored file
           // For now, return error asking for text
           return reply.status(400).send({
-            error: "Document text extraction not yet implemented. Pass documentText directly.",
+            error:
+              "Document text extraction not yet implemented. Pass documentText directly.",
           });
         }
 
@@ -121,15 +122,19 @@ export default async (fastify: FastifyInstance): Promise<void> => {
           // Update document status to error
           await prisma.repairDocument.update({
             where: { id: documentId },
-            data: { status: "error", errorMessage: "Failed to parse AI response" },
+            data: {
+              status: "error",
+              errorMessage: "Failed to parse AI response",
+            },
           });
-          return reply.status(500).send({ error: "Failed to parse AI response" });
+          return reply
+            .status(500)
+            .send({ error: "Failed to parse AI response" });
         }
-
 
         // Save extractions
         const savedExtractions = [];
-        for (const ext of parsed.extractions || []) {
+        for (const ext of parsed.extractions) {
           const saved = await prisma.repairExtraction.create({
             data: {
               documentId,
@@ -146,7 +151,7 @@ export default async (fastify: FastifyInstance): Promise<void> => {
 
         // Save rules
         const savedRules = [];
-        for (const rule of parsed.rules || []) {
+        for (const rule of parsed.rules) {
           const saved = await prisma.repairRule.create({
             data: {
               documentId,
@@ -178,7 +183,8 @@ export default async (fastify: FastifyInstance): Promise<void> => {
       } catch (error) {
         fastify.log.error(error, "Error processing repair document");
         return reply.status(500).send({
-          error: error instanceof Error ? error.message : "Internal server error",
+          error:
+            error instanceof Error ? error.message : "Internal server error",
         });
       }
     },

@@ -45,7 +45,8 @@ export default async (fastify: FastifyInstance): Promise<void> => {
       preValidation: [fastify.authAccessToken],
       schema: {
         tags: ["AI Functions"],
-        description: "Evaluate if a section has sufficient information for generation",
+        description:
+          "Evaluate if a section has sufficient information for generation",
         body: {
           type: "object",
           properties: {
@@ -67,7 +68,12 @@ export default async (fastify: FastifyInstance): Promise<void> => {
               },
             },
           },
-          required: ["sectionId", "documentId", "sectionTitle", "sectionDescription"],
+          required: [
+            "sectionId",
+            "documentId",
+            "sectionTitle",
+            "sectionDescription",
+          ],
         },
       },
     },
@@ -102,33 +108,42 @@ export default async (fastify: FastifyInstance): Promise<void> => {
 - Orden: ${sectionOrder ?? "N/A"}
 
 CONTEXTO DEL EXPEDIENTE:
-${JSON.stringify(caseContext || {}, null, 2)}`;
+${JSON.stringify(caseContext ?? {}, null, 2)}`;
 
-        if (plan && plan.length > 0) {
+        if (plan != null && plan.length > 0) {
           userPrompt += `\n\nPLAN DEL DOCUMENTO (otras secciones):
 ${plan.map((s) => `${s.order}. ${s.title}: ${s.description}`).join("\n")}`;
         }
 
-        if (previousAnswers && previousAnswers.length > 0) {
+        if (previousAnswers != null && previousAnswers.length > 0) {
           userPrompt += `\n\nRESPUESTAS ANTERIORES DEL USUARIO:
 ${previousAnswers.map((a) => `P: ${a.question}\nR: ${a.answer}`).join("\n\n")}`;
         }
 
         const gateway = getAIGateway();
-        const result = await gateway.completeWithMeta(SYSTEM_PROMPT, userPrompt);
+        const result = await gateway.completeWithMeta(
+          SYSTEM_PROMPT,
+          userPrompt,
+        );
 
         // Parse AI response
-        let parsed: { isSufficient: boolean; questions: string[]; reasoning?: string };
+        let parsed: {
+          isSufficient: boolean;
+          questions: string[];
+          reasoning?: string;
+        };
         try {
           const jsonMatch = result.content.match(/\{[\s\S]*\}/);
           if (!jsonMatch) throw new Error("No JSON found");
           parsed = JSON.parse(jsonMatch[0]);
         } catch {
-          return reply.status(500).send({ error: "Failed to parse AI response" });
+          return reply
+            .status(500)
+            .send({ error: "Failed to parse AI response" });
         }
 
         // If questions were generated, save them to DB
-        if (parsed.questions && parsed.questions.length > 0) {
+        if (parsed.questions.length > 0) {
           // Get current max round for this section
           const existingQuestions = await prisma.sectionQuestion.findMany({
             where: { sectionId },
@@ -136,9 +151,8 @@ ${previousAnswers.map((a) => `P: ${a.question}\nR: ${a.answer}`).join("\n\n")}`;
             take: 1,
           });
 
-          const nextRound = existingQuestions.length > 0
-            ? existingQuestions[0]!.round + 1
-            : 1;
+          const nextRound =
+            existingQuestions.length > 0 ? existingQuestions[0]!.round + 1 : 1;
 
           // Save new questions
           await prisma.sectionQuestion.createMany({
@@ -167,7 +181,7 @@ ${previousAnswers.map((a) => `P: ${a.question}\nR: ${a.answer}`).join("\n\n")}`;
         return reply.status(200).send({
           data: {
             isSufficient: parsed.isSufficient,
-            questions: parsed.questions || [],
+            questions: parsed.questions,
             reasoning: parsed.reasoning,
             provider: result.provider,
           },
@@ -176,7 +190,8 @@ ${previousAnswers.map((a) => `P: ${a.question}\nR: ${a.answer}`).join("\n\n")}`;
       } catch (error) {
         fastify.log.error(error, "Error evaluating sufficiency");
         return reply.status(500).send({
-          error: error instanceof Error ? error.message : "Internal server error",
+          error:
+            error instanceof Error ? error.message : "Internal server error",
         });
       }
     },

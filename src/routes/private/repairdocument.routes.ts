@@ -75,9 +75,10 @@ const routes: FastifyPluginAsync = async (fastify) => {
       try {
         const { id } = request.params as { id: string };
         const doc = await prisma.repairDocument.findUnique({ where: { id } });
-        if (!doc) return reply.status(404).send({ error: "Repair document not found" });
+        if (!doc)
+          return reply.status(404).send({ error: "Repair document not found" });
         return reply.status(200).send(doc);
-      } catch (error) {
+      } catch {
         return reply.status(500).send({ error: "Internal server error" });
       }
     },
@@ -119,7 +120,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
             name: data.name,
             size: data.size,
             storagePath: data.storagePath,
-            status: data.status || "processing",
+            status: data.status ?? "processing",
             uploadedBy: data.uploadedBy,
           },
         });
@@ -160,13 +161,26 @@ const routes: FastifyPluginAsync = async (fastify) => {
     async (request, reply) => {
       try {
         const { id } = request.params as { id: string };
-        const data = request.body as { status?: string; errorMessage?: string | null };
-        const existing = await prisma.repairDocument.findUnique({ where: { id } });
+        const data = request.body as {
+          status?: string;
+          errorMessage?: string | null;
+        };
+        const existing = await prisma.repairDocument.findUnique({
+          where: { id },
+        });
         if (!existing) return reply.status(404).send({ error: "Not found" });
 
-        const doc = await prisma.repairDocument.update({ where: { id }, data: data as any });
+        const doc = await prisma.repairDocument.update({
+          where: { id },
+          data: {
+            ...(data.status != null && { status: data.status }),
+            ...(data.errorMessage !== undefined && {
+              errorMessage: data.errorMessage,
+            }),
+          },
+        });
         return reply.status(200).send(doc);
-      } catch (error) {
+      } catch {
         return reply.status(500).send({ error: "Internal server error" });
       }
     },
@@ -193,13 +207,17 @@ const routes: FastifyPluginAsync = async (fastify) => {
     async (request, reply) => {
       try {
         const { id } = request.params as { id: string };
-        const existing = await prisma.repairDocument.findUnique({ where: { id } });
+        const existing = await prisma.repairDocument.findUnique({
+          where: { id },
+        });
         if (!existing) return reply.status(404).send({ error: "Not found" });
 
         // Cascade delete handled by Prisma schema
         await prisma.repairDocument.delete({ where: { id } });
-        return reply.status(200).send({ message: "Repair document and related data deleted" });
-      } catch (error) {
+        return reply
+          .status(200)
+          .send({ message: "Repair document and related data deleted" });
+      } catch {
         return reply.status(500).send({ error: "Internal server error" });
       }
     },

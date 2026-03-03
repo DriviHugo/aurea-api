@@ -30,10 +30,12 @@ const routes: FastifyPluginAsync = async (fastify) => {
           pendingOnly?: boolean;
         };
 
-        const where: any = {};
-        if (sectionId) where.sectionId = sectionId;
-        if (documentId) where.documentId = documentId;
-        if (pendingOnly) where.answer = null;
+        const where: Record<string, unknown> = {};
+        if (sectionId != null && sectionId.length > 0)
+          where.sectionId = sectionId;
+        if (documentId != null && documentId.length > 0)
+          where.documentId = documentId;
+        if (pendingOnly === true) where.answer = null;
 
         const data = await prisma.sectionQuestion.findMany({
           where,
@@ -41,13 +43,19 @@ const routes: FastifyPluginAsync = async (fastify) => {
         });
 
         // If pendingOnly with documentId, return unique section IDs
-        if (pendingOnly && documentId) {
+        if (
+          pendingOnly === true &&
+          documentId != null &&
+          documentId.length > 0
+        ) {
           const sectionIds = [...new Set(data.map((d) => d.sectionId))];
-          return reply.status(200).send({ data: sectionIds, total: sectionIds.length });
+          return reply
+            .status(200)
+            .send({ data: sectionIds, total: sectionIds.length });
         }
 
         return reply.status(200).send({ data, total: data.length });
-      } catch (error) {
+      } catch (error: unknown) {
         fastify.log.error(error);
         return reply.status(500).send({ error: "Internal server error" });
       }
@@ -71,10 +79,12 @@ const routes: FastifyPluginAsync = async (fastify) => {
     async (request, reply) => {
       try {
         const { id } = request.params as { id: string };
-        const question = await prisma.sectionQuestion.findUnique({ where: { id } });
+        const question = await prisma.sectionQuestion.findUnique({
+          where: { id },
+        });
         if (!question) return reply.status(404).send({ error: "Not found" });
         return reply.status(200).send(question);
-      } catch (error) {
+      } catch {
         return reply.status(500).send({ error: "Internal server error" });
       }
     },
@@ -123,30 +133,43 @@ const routes: FastifyPluginAsync = async (fastify) => {
         const body = request.body;
 
         if (Array.isArray(body)) {
+          const items = body as Array<{
+            sectionId: string;
+            documentId: string;
+            question: string;
+            order: number;
+            round?: number;
+          }>;
           const result = await prisma.sectionQuestion.createMany({
-            data: body.map((item: any) => ({
+            data: items.map((item) => ({
               sectionId: item.sectionId,
               documentId: item.documentId,
               question: item.question,
               order: item.order,
-              round: item.round || 1,
+              round: item.round ?? 1,
             })),
           });
           return reply.status(201).send({ count: result.count });
         }
 
-        const data = body as any;
+        const data = body as {
+          sectionId: string;
+          documentId: string;
+          question: string;
+          order: number;
+          round?: number;
+        };
         const question = await prisma.sectionQuestion.create({
           data: {
             sectionId: data.sectionId,
             documentId: data.documentId,
             question: data.question,
             order: data.order,
-            round: data.round || 1,
+            round: data.round ?? 1,
           },
         });
         return reply.status(201).send(question);
-      } catch (error) {
+      } catch (error: unknown) {
         fastify.log.error(error);
         return reply.status(500).send({ error: "Internal server error" });
       }
@@ -178,7 +201,9 @@ const routes: FastifyPluginAsync = async (fastify) => {
         const { id } = request.params as { id: string };
         const { answer } = request.body as { answer?: string | null };
 
-        const existing = await prisma.sectionQuestion.findUnique({ where: { id } });
+        const existing = await prisma.sectionQuestion.findUnique({
+          where: { id },
+        });
         if (!existing) return reply.status(404).send({ error: "Not found" });
 
         const question = await prisma.sectionQuestion.update({
@@ -186,7 +211,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
           data: { answer: answer ?? null },
         });
         return reply.status(200).send(question);
-      } catch (error) {
+      } catch {
         return reply.status(500).send({ error: "Internal server error" });
       }
     },
@@ -214,7 +239,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
     },
     async (request, reply) => {
       try {
-        const answers = request.body as { id: string; answer: string }[];
+        const answers = request.body as Array<{ id: string; answer: string }>;
 
         const results = await Promise.all(
           answers.map((a) =>
@@ -226,7 +251,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
         );
 
         return reply.status(200).send({ updated: results.length });
-      } catch (error) {
+      } catch (error: unknown) {
         fastify.log.error(error);
         return reply.status(500).send({ error: "Internal server error" });
       }

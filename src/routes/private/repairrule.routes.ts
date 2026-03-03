@@ -32,16 +32,19 @@ const routes: FastifyPluginAsync = async (fastify) => {
           order?: "asc" | "desc";
         };
 
-        const where: any = {};
-        if (documentId) where.documentId = documentId;
-        if (active !== undefined) where.active = active;
+        const where: Record<string, unknown> = {};
+        if (documentId != null && documentId.length > 0)
+          where.documentId = documentId;
+        if (active != null) where.active = active;
 
-        const orderClause: any = {};
-        if (orderBy) {
-          orderClause[orderBy] = order || "asc";
-        } else {
-          orderClause.priority = "asc";
-        }
+        const orderClause =
+          orderBy === "priority"
+            ? { priority: order ?? "asc" }
+            : orderBy === "createdAt"
+              ? { createdAt: order ?? "asc" }
+              : orderBy === "caseSection"
+                ? { caseSection: order ?? "asc" }
+                : { priority: "asc" as const };
 
         const data = await prisma.repairRule.findMany({
           where,
@@ -63,7 +66,8 @@ const routes: FastifyPluginAsync = async (fastify) => {
       preValidation: [fastify.authAccessToken],
       schema: {
         tags: ["Repairs"],
-        description: "Get consolidated active rules grouped by section and category",
+        description:
+          "Get consolidated active rules grouped by section and category",
       },
     },
     async (_request, reply) => {
@@ -74,20 +78,32 @@ const routes: FastifyPluginAsync = async (fastify) => {
         });
 
         // Group by caseSection then by category
-        const grouped: Record<string, Record<string, typeof rules>> = {};
+        const grouped = new Map<string, Map<string, typeof rules>>();
         for (const rule of rules) {
           const section = rule.caseSection;
           const cat = rule.category;
-          if (!grouped[section]) {
-            grouped[section] = {};
+          if (!grouped.has(section)) {
+            grouped.set(section, new Map());
           }
-          if (!grouped[section]![cat]) {
-            grouped[section]![cat] = [];
+          const sectionMap = grouped.get(section)!;
+          if (!sectionMap.has(cat)) {
+            sectionMap.set(cat, []);
           }
-          grouped[section]![cat]!.push(rule);
+          sectionMap.get(cat)!.push(rule);
         }
 
-        return reply.status(200).send(grouped);
+        // Convert to plain object for JSON response
+        const result: Record<string, Record<string, typeof rules>> = {};
+        for (const [section, catMap] of grouped) {
+          // eslint-disable-next-line security/detect-object-injection
+          result[section] = {};
+          for (const [cat, catRules] of catMap) {
+            // eslint-disable-next-line security/detect-object-injection
+            result[section][cat] = catRules;
+          }
+        }
+
+        return reply.status(200).send(result);
       } catch (error) {
         fastify.log.error(error);
         return reply.status(500).send({ error: "Internal server error" });
@@ -115,7 +131,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
         const rule = await prisma.repairRule.findUnique({ where: { id } });
         if (!rule) return reply.status(404).send({ error: "Not found" });
         return reply.status(200).send(rule);
-      } catch (error) {
+      } catch {
         return reply.status(500).send({ error: "Internal server error" });
       }
     },
@@ -140,13 +156,28 @@ const routes: FastifyPluginAsync = async (fastify) => {
             priority: { type: "integer" },
             active: { type: "boolean" },
           },
-          required: ["documentId", "caseSection", "category", "type", "content"],
+          required: [
+            "documentId",
+            "caseSection",
+            "category",
+            "type",
+            "content",
+          ],
         },
       },
     },
     async (request, reply) => {
       try {
-        const data = request.body as any;
+        const data = request.body as {
+          documentId: string;
+          extractionId?: string | null;
+          caseSection: string;
+          category: string;
+          type: "do" | "dont";
+          content: string;
+          priority?: number;
+          active?: boolean;
+        };
         const rule = await prisma.repairRule.create({ data });
         return reply.status(201).send(rule);
       } catch (error) {
@@ -183,13 +214,19 @@ const routes: FastifyPluginAsync = async (fastify) => {
     async (request, reply) => {
       try {
         const { id } = request.params as { id: string };
-        const data = request.body as any;
+        const data = request.body as {
+          active?: boolean;
+          content?: string;
+          priority?: number;
+          category?: string;
+          caseSection?: string;
+        };
         const existing = await prisma.repairRule.findUnique({ where: { id } });
         if (!existing) return reply.status(404).send({ error: "Not found" });
 
         const rule = await prisma.repairRule.update({ where: { id }, data });
         return reply.status(200).send(rule);
-      } catch (error) {
+      } catch {
         return reply.status(500).send({ error: "Internal server error" });
       }
     },
