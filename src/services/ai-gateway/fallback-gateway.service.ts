@@ -82,28 +82,27 @@ export class FallbackAIGatewayService {
 
   async complete(request: AICompletionRequest): Promise<AICompletionResponse> {
     // Determine primary and secondary based on swap state
-    const primaryGateway = this._swapped && this.fallbackGateway
-      ? this.fallbackGateway
-      : this.aliaGateway;
+    const primaryGateway =
+      this._swapped && this.fallbackGateway
+        ? this.fallbackGateway
+        : this.aliaGateway;
     const secondaryGateway = this._swapped
       ? this.aliaGateway
       : this.fallbackGateway;
-    const primaryLabel = this._swapped
-      ? this.fallbackConfig.provider
-      : "ALIA";
+    const primaryLabel = this._swapped ? this.fallbackConfig.provider : "ALIA";
     const secondaryLabel = this._swapped
       ? "ALIA"
       : this.fallbackConfig.provider;
 
     let primaryError: Error | null = null;
 
-    // DEV: Force ALIA failure for testing fallback
-    const forceAliaFail = process.env["FORCE_ALIA_FAIL"] === "true";
-    if (forceAliaFail && !this._swapped) {
+    // DEV: Force fallback for testing — skips whatever the current primary is
+    const forceFallback = process.env["FORCE_FALLBACK"] === "true";
+    if (forceFallback) {
       logger.warn({
-        msg: "[FallbackAIGateway] FORCE_ALIA_FAIL enabled - skipping ALIA",
+        msg: `[FallbackAIGateway] FORCE_FALLBACK enabled - skipping primary (${primaryLabel})`,
       });
-      primaryError = new Error("ALIA forced failure for testing");
+      primaryError = new Error("Primary forced failure for testing");
     }
 
     // 1. Try primary provider (skip if forced fail)
