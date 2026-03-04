@@ -160,24 +160,39 @@ Recuerda responder SOLO con JSON válido.`;
               .send({ error: `Tipo de operación no válido: ${type}` });
         }
 
-        const response = await gateway.completeSimple(systemPrompt, userPrompt);
+        const startTime = Date.now();
+        const aiResponse = await gateway.completeWithMeta(
+          systemPrompt,
+          userPrompt,
+        );
 
-        let result;
+        let result: Record<string, unknown>;
         try {
-          const cleanResponse = response
+          const cleanResponse = aiResponse.content
             .replace(/```json\n?/g, "")
             .replace(/```\n?/g, "")
             .trim();
-          result = JSON.parse(cleanResponse);
+          result = JSON.parse(cleanResponse) as Record<string, unknown>;
         } catch {
-          console.error("[AI-Contrato] Failed to parse AI response:", response);
+          console.error(
+            "[AI-Contrato] Failed to parse AI response:",
+            aiResponse.content,
+          );
           return reply.status(500).send({
             error: "Error al procesar la respuesta de IA",
             details: "La respuesta no es JSON válido",
           });
         }
 
-        return reply.send(result);
+        return reply.send({
+          ...result,
+          _meta: {
+            provider: aiResponse.provider,
+            model: aiResponse.model,
+            tokensUsed: aiResponse.usage.totalTokens,
+            generationTimeMs: Date.now() - startTime,
+          },
+        });
       } catch (error) {
         console.error("[AI-Contrato] Error:", error);
         return reply.status(500).send({

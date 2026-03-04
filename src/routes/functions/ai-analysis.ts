@@ -16,6 +16,7 @@
 import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
 import { getProductionGateway } from "../../services/ai-gateway/production-gateway.js";
 import type { FallbackAIGatewayService } from "../../services/ai-gateway/fallback-gateway.service.js";
+import type { AICompletionResponse } from "../../services/ai-gateway/types.js";
 
 let aiGateway: FallbackAIGatewayService | null = null;
 
@@ -188,25 +189,41 @@ IMPORTANTE: Responde SOLO con un JSON válido.
 }`,
 };
 
-// Generic analysis handler
+// Generic analysis handler - returns parsed JSON merged with _meta (provider info)
+// The _meta field is added to every analysis response so the frontend can show
+// which AI provider (ALIA, Claude, etc.) generated each analysis step.
 async function handleAnalysis(
-  gateway: AIGatewayService,
+  gateway: FallbackAIGatewayService,
   systemPrompt: string,
   userPrompt: string,
   analysisName: string,
-): Promise<unknown> {
-  const response = await gateway.completeSimple(systemPrompt, userPrompt);
+): Promise<Record<string, unknown>> {
+  const startTime = Date.now();
+  const response: AICompletionResponse = await gateway.completeWithMeta(
+    systemPrompt,
+    userPrompt,
+  );
 
   try {
-    const cleanResponse = response
+    const cleanResponse = response.content
       .replace(/```json\n?/g, "")
       .replace(/```\n?/g, "")
       .trim();
-    return JSON.parse(cleanResponse);
+    const parsed = JSON.parse(cleanResponse) as Record<string, unknown>;
+    // Merge AI metadata into the response so frontend can display provider badge
+    return {
+      ...parsed,
+      _meta: {
+        provider: response.provider,
+        model: response.model,
+        tokensUsed: response.usage.totalTokens,
+        generationTimeMs: Date.now() - startTime,
+      },
+    };
   } catch {
     console.error(
       `[AI-Analysis] Failed to parse ${analysisName} response:`,
-      response,
+      response.content,
     );
     throw new Error(
       `Error al procesar la respuesta de IA para ${analysisName}`,
