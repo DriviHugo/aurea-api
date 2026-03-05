@@ -1,0 +1,61 @@
+name: Deploy to staging - GCP
+
+on:
+  push:
+    branches: [main]
+
+concurrency:
+  group: deploy-staging
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: [self-hosted, staging, node22, fnmt-api]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Copy code to app directory
+        run: rsync -a --delete ./ /var/www/fnmt-api-staging
+
+      - name: Use Node.js from VM
+        run: node -v
+
+      - name: Cache npm
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: /var/www/fnmt-api-staging
+
+      - name: Link environment file
+        run: ln -sf /var/www/shared/.env .env
+        working-directory: /var/www/fnmt-api-staging
+
+      - name: Run Prisma migrations
+        run: npx prisma migrate deploy
+        working-directory: /var/www/fnmt-api-staging
+
+      - name: Generate Prisma Client
+        run: npm run db:generate
+        working-directory: /var/www/fnmt-api-staging
+
+      - name: Build project
+        run: npm run build
+        working-directory: /var/www/fnmt-api-staging
+
+      - name: Reload app with PM2
+        run: pm2 reload /var/www/shared/ecosystem.config.js --env production
+
+      - name: Persist PM2 state
+        run: pm2 save
+
+      - name: Save deployed revision
+        run: echo "${{ github.sha }}" > REVISION
+        working-directory: /var/www/fnmt-api-staging
+
+      - name: Show PM2 status
+        run: pm2 status
