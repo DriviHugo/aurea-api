@@ -32,10 +32,10 @@ const routes: FastifyPluginAsync = async (fastify) => {
 
         const where: Record<string, unknown> = {};
         if (sectionId != null && sectionId.length > 0)
-          where['sectionId'] = sectionId;
+          where["sectionId"] = sectionId;
         if (documentId != null && documentId.length > 0)
-          where['documentId'] = documentId;
-        if (pendingOnly === true) where['answer'] = null;
+          where["documentId"] = documentId;
+        if (pendingOnly === true) where["answer"] = null;
 
         const data = await prisma.sectionQuestion.findMany({
           where,

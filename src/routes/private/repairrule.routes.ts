@@ -34,8 +34,8 @@ const routes: FastifyPluginAsync = async (fastify) => {
 
         const where: Record<string, unknown> = {};
         if (documentId != null && documentId.length > 0)
-          where['documentId'] = documentId;
-        if (active != null) where['active'] = active;
+          where["documentId"] = documentId;
+        if (active != null) where["active"] = active;
 
         const orderClause =
           orderBy === "priority"

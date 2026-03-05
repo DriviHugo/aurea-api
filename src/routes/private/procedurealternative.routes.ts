@@ -292,8 +292,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
 
         const updateData: any = {};
         if (expedienteId !== undefined) updateData.caseId = expedienteId;
-        if (procedimiento !== undefined)
-          updateData.procedure = procedimiento;
+        if (procedimiento !== undefined) updateData.procedure = procedimiento;
         if (puntuacion !== undefined) updateData.score = puntuacion;
         if (justificacion !== undefined)
           updateData.justification = justificacion;

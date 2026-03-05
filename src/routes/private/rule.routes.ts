@@ -255,11 +255,17 @@ const routes: FastifyPluginAsync = async (fastify) => {
             approvalDate: data.approvalDate
               ? new Date(data.approvalDate)
               : null,
-            ...(data.evidenceId !== undefined && { evidenceId: data.evidenceId }),
+            ...(data.evidenceId !== undefined && {
+              evidenceId: data.evidenceId,
+            }),
             ...(data.version !== undefined && { version: data.version }),
             ...(data.status !== undefined && { status: data.status }),
-            ...(data.approverId !== undefined && { approverId: data.approverId }),
-            ...(data.approverRole !== undefined && { approverRole: data.approverRole as any }),
+            ...(data.approverId !== undefined && {
+              approverId: data.approverId,
+            }),
+            ...(data.approverRole !== undefined && {
+              approverRole: data.approverRole as any,
+            }),
           },
         });
 
@@ -377,15 +383,25 @@ const routes: FastifyPluginAsync = async (fastify) => {
               : null,
             ...(data.code !== undefined && { code: data.code }),
             ...(data.name !== undefined && { name: data.name }),
-            ...(data.description !== undefined && { description: data.description }),
-            ...(data.severity !== undefined && { severity: data.severity as any }),
-            ...(data.evidenceId !== undefined && { evidenceId: data.evidenceId }),
+            ...(data.description !== undefined && {
+              description: data.description,
+            }),
+            ...(data.severity !== undefined && {
+              severity: data.severity as any,
+            }),
+            ...(data.evidenceId !== undefined && {
+              evidenceId: data.evidenceId,
+            }),
             ...(data.condition !== undefined && { condition: data.condition }),
             ...(data.message !== undefined && { message: data.message }),
             ...(data.version !== undefined && { version: data.version }),
             ...(data.status !== undefined && { status: data.status }),
-            ...(data.approverId !== undefined && { approverId: data.approverId }),
-            ...(data.approverRole !== undefined && { approverRole: data.approverRole as any }),
+            ...(data.approverId !== undefined && {
+              approverId: data.approverId,
+            }),
+            ...(data.approverRole !== undefined && {
+              approverRole: data.approverRole as any,
+            }),
           },
         });
 
