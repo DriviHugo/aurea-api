@@ -22,6 +22,8 @@ const routes: FastifyPluginAsync = async (fastify) => {
           },
         },
         response: {
+          400: { type: "object", properties: { error: { type: "string" } } },
+          500: { type: "object", properties: { error: { type: "string" } } },
           200: {
             type: "object",
             properties: {
@@ -101,6 +103,8 @@ const routes: FastifyPluginAsync = async (fastify) => {
           },
         },
         response: {
+          400: { type: "object", properties: { error: { type: "string" } } },
+          500: { type: "object", properties: { error: { type: "string" } } },
           200: {
             type: "object",
             properties: {
@@ -157,6 +161,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
           },
         },
         response: {
+          500: { type: "object", properties: { error: { type: "string" } } },
           201: {
             type: "object",
             properties: {
@@ -200,8 +205,8 @@ const routes: FastifyPluginAsync = async (fastify) => {
 
         const validacionEvidencia = await prisma.validationEvidence.create({
           data: {
-            validacionId,
-            evidenciaId,
+            validationId: validacionId,
+            evidenceId: evidenciaId,
           },
         });
 
@@ -240,6 +245,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
           },
         },
         response: {
+          500: { type: "object", properties: { error: { type: "string" } } },
           200: {
             type: "object",
             properties: {
@@ -338,6 +344,8 @@ const routes: FastifyPluginAsync = async (fastify) => {
           },
         },
         response: {
+          400: { type: "object", properties: { error: { type: "string" } } },
+          500: { type: "object", properties: { error: { type: "string" } } },
           200: {
             type: "object",
             properties: {

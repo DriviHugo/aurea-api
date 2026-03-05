@@ -20,6 +20,8 @@ const routes: FastifyPluginAsync = async (fastify) => {
           },
         },
         response: {
+          404: { type: "object", properties: { error: { type: "string" } } },
+          500: { type: "object", properties: { error: { type: "string" } } },
           200: {
             type: "object",
             properties: {
@@ -103,6 +105,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
           required: ["id"],
         },
         response: {
+          500: { type: "object", properties: { error: { type: "string" } } },
           200: {
             type: "object",
             properties: {
@@ -198,6 +201,8 @@ const routes: FastifyPluginAsync = async (fastify) => {
           ],
         },
         response: {
+          404: { type: "object", properties: { error: { type: "string" } } },
+          500: { type: "object", properties: { error: { type: "string" } } },
           201: {
             type: "object",
             properties: {
@@ -241,13 +246,13 @@ const routes: FastifyPluginAsync = async (fastify) => {
             sourceType: data.sourceType as any,
             sourceId: data.sourceId,
             sourceName: data.sourceName,
-            section: data.section,
-            range: data.range,
             version: data.version,
             validityStart: new Date(data.validityStart),
             validityEnd: data.validityEnd ? new Date(data.validityEnd) : null,
             textFragment: data.textFragment,
             metadata: data.metadata || {},
+            ...(data.section !== undefined && { section: data.section }),
+            ...(data.range !== undefined && { range: data.range }),
           },
         });
 
@@ -304,6 +309,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
           },
         },
         response: {
+          500: { type: "object", properties: { error: { type: "string" } } },
           200: {
             type: "object",
             properties: {
@@ -404,6 +410,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
           required: ["id"],
         },
         response: {
+          500: { type: "object", properties: { error: { type: "string" } } },
           200: {
             type: "object",
             properties: {

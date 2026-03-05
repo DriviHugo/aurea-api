@@ -23,6 +23,9 @@ const routes: FastifyPluginAsync = async (fastify) => {
           },
         },
         response: {
+          400: { type: "object", properties: { error: { type: "string" } } },
+          404: { type: "object", properties: { error: { type: "string" } } },
+          500: { type: "object", properties: { error: { type: "string" } } },
           200: {
             type: "object",
             properties: {
@@ -64,15 +67,15 @@ const routes: FastifyPluginAsync = async (fastify) => {
 
         const where: any = {};
         if (active !== undefined) where.active = active;
-        if (nivel !== undefined) where.nivel = nivel;
-        if (codigo) where.codigo = { contains: codigo, mode: "insensitive" };
+        if (nivel !== undefined) where.level = nivel;
+        if (codigo) where.code = { contains: codigo, mode: "insensitive" };
 
         const [data, total] = await Promise.all([
           prisma.cpvCode.findMany({
             where,
             skip,
             take: limit,
-            orderBy: { codigo: "asc" },
+            orderBy: { code: "asc" },
           }),
           prisma.cpvCode.count({ where }),
         ]);
@@ -108,6 +111,8 @@ const routes: FastifyPluginAsync = async (fastify) => {
           },
         },
         response: {
+          400: { type: "object", properties: { error: { type: "string" } } },
+          500: { type: "object", properties: { error: { type: "string" } } },
           200: {
             type: "object",
             properties: {
@@ -170,6 +175,8 @@ const routes: FastifyPluginAsync = async (fastify) => {
           },
         },
         response: {
+          404: { type: "object", properties: { error: { type: "string" } } },
+          500: { type: "object", properties: { error: { type: "string" } } },
           201: {
             type: "object",
             properties: {
@@ -237,6 +244,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
           },
         },
         response: {
+          500: { type: "object", properties: { error: { type: "string" } } },
           200: {
             type: "object",
             properties: {
@@ -309,6 +317,8 @@ const routes: FastifyPluginAsync = async (fastify) => {
           },
         },
         response: {
+          400: { type: "object", properties: { error: { type: "string" } } },
+          500: { type: "object", properties: { error: { type: "string" } } },
           200: {
             type: "object",
             properties: {

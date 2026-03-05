@@ -20,6 +20,9 @@ const routes: FastifyPluginAsync = async (fastify) => {
           },
         },
         response: {
+          400: { type: "object", properties: { error: { type: "string" } } },
+          404: { type: "object", properties: { error: { type: "string" } } },
+          500: { type: "object", properties: { error: { type: "string" } } },
           200: {
             type: "object",
             properties: {
@@ -103,6 +106,8 @@ const routes: FastifyPluginAsync = async (fastify) => {
           required: ["id"],
         },
         response: {
+          400: { type: "object", properties: { error: { type: "string" } } },
+          500: { type: "object", properties: { error: { type: "string" } } },
           200: {
             type: "object",
             properties: {
@@ -191,6 +196,8 @@ const routes: FastifyPluginAsync = async (fastify) => {
           ],
         },
         response: {
+          404: { type: "object", properties: { error: { type: "string" } } },
+          500: { type: "object", properties: { error: { type: "string" } } },
           201: {
             type: "object",
             properties: {
@@ -243,16 +250,16 @@ const routes: FastifyPluginAsync = async (fastify) => {
             name: data.name,
             description: data.description,
             severity: data.severity as any,
-            evidenceId: data.evidenceId,
             condition: data.condition,
             message: data.message,
-            version: data.version,
-            status: data.status,
-            approverId: data.approverId,
-            approverRole: data.approverRole as any,
             approvalDate: data.approvalDate
               ? new Date(data.approvalDate)
               : null,
+            ...(data.evidenceId !== undefined && { evidenceId: data.evidenceId }),
+            ...(data.version !== undefined && { version: data.version }),
+            ...(data.status !== undefined && { status: data.status }),
+            ...(data.approverId !== undefined && { approverId: data.approverId }),
+            ...(data.approverRole !== undefined && { approverRole: data.approverRole as any }),
           },
         });
 
@@ -305,6 +312,8 @@ const routes: FastifyPluginAsync = async (fastify) => {
           },
         },
         response: {
+          400: { type: "object", properties: { error: { type: "string" } } },
+          500: { type: "object", properties: { error: { type: "string" } } },
           200: {
             type: "object",
             properties: {
@@ -363,20 +372,20 @@ const routes: FastifyPluginAsync = async (fastify) => {
         const rule = await prisma.rule.update({
           where: { id },
           data: {
-            code: data.code,
-            name: data.name,
-            description: data.description,
-            severity: data.severity as any,
-            evidenceId: data.evidenceId,
-            condition: data.condition,
-            message: data.message,
-            version: data.version,
-            status: data.status,
-            approverId: data.approverId,
-            approverRole: data.approverRole as any,
             approvalDate: data.approvalDate
               ? new Date(data.approvalDate)
               : null,
+            ...(data.code !== undefined && { code: data.code }),
+            ...(data.name !== undefined && { name: data.name }),
+            ...(data.description !== undefined && { description: data.description }),
+            ...(data.severity !== undefined && { severity: data.severity as any }),
+            ...(data.evidenceId !== undefined && { evidenceId: data.evidenceId }),
+            ...(data.condition !== undefined && { condition: data.condition }),
+            ...(data.message !== undefined && { message: data.message }),
+            ...(data.version !== undefined && { version: data.version }),
+            ...(data.status !== undefined && { status: data.status }),
+            ...(data.approverId !== undefined && { approverId: data.approverId }),
+            ...(data.approverRole !== undefined && { approverRole: data.approverRole as any }),
           },
         });
 
@@ -406,6 +415,8 @@ const routes: FastifyPluginAsync = async (fastify) => {
           required: ["id"],
         },
         response: {
+          400: { type: "object", properties: { error: { type: "string" } } },
+          500: { type: "object", properties: { error: { type: "string" } } },
           200: {
             type: "object",
             properties: {

@@ -47,6 +47,9 @@ const routes: FastifyPluginAsync = async (fastify) => {
         description: "Get paginated list of CPV recomendados",
         querystring: paginationQuerySchema,
         response: {
+          400: { type: "object", properties: { error: { type: "string" } } },
+          404: { type: "object", properties: { error: { type: "string" } } },
+          500: { type: "object", properties: { error: { type: "string" } } },
           200: {
             type: "object",
             properties: {
@@ -111,6 +114,8 @@ const routes: FastifyPluginAsync = async (fastify) => {
           required: ["id"],
         },
         response: {
+          400: { type: "object", properties: { error: { type: "string" } } },
+          500: { type: "object", properties: { error: { type: "string" } } },
           200: cpvRecomendadoResponseSchema,
           404: {
             type: "object",
@@ -150,6 +155,8 @@ const routes: FastifyPluginAsync = async (fastify) => {
         description: "Create new CPV recomendado",
         body: cpvRecomendadoSchema,
         response: {
+          404: { type: "object", properties: { error: { type: "string" } } },
+          500: { type: "object", properties: { error: { type: "string" } } },
           201: cpvRecomendadoResponseSchema,
           400: {
             type: "object",
@@ -180,7 +187,13 @@ const routes: FastifyPluginAsync = async (fastify) => {
         }
 
         const cpvRecomendado = await prisma.recommendedCpv.create({
-          data,
+          data: {
+            caseId: data.expedienteId,
+            code: data.codigo,
+            description: data.descripcion,
+            ...(data.puntuacion !== undefined && { score: data.puntuacion }),
+            ...(data.justificacion !== undefined && { justification: data.justificacion }),
+          },
         });
 
         return reply.status(201).send(cpvRecomendado);
@@ -207,6 +220,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
         },
         body: cpvRecomendadoSchema,
         response: {
+          500: { type: "object", properties: { error: { type: "string" } } },
           200: cpvRecomendadoResponseSchema,
           404: {
             type: "object",
@@ -254,7 +268,13 @@ const routes: FastifyPluginAsync = async (fastify) => {
 
         const cpvRecomendado = await prisma.recommendedCpv.update({
           where: { id },
-          data,
+          data: {
+            caseId: data.expedienteId,
+            code: data.codigo,
+            description: data.descripcion,
+            ...(data.puntuacion !== undefined && { score: data.puntuacion }),
+            ...(data.justificacion !== undefined && { justification: data.justificacion }),
+          },
         });
 
         return reply.status(200).send(cpvRecomendado);
@@ -280,6 +300,8 @@ const routes: FastifyPluginAsync = async (fastify) => {
           required: ["id"],
         },
         response: {
+          400: { type: "object", properties: { error: { type: "string" } } },
+          500: { type: "object", properties: { error: { type: "string" } } },
           200: {
             type: "object",
             properties: {

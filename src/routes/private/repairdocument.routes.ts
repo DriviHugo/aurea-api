@@ -30,6 +30,8 @@ const routes: FastifyPluginAsync = async (fastify) => {
         tags: ["Repairs"],
         description: "List all repair documents",
         response: {
+          404: { type: "object", properties: { error: { type: "string" } } },
+          500: { type: "object", properties: { error: { type: "string" } } },
           200: {
             type: "object",
             properties: {
@@ -66,6 +68,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
           required: ["id"],
         },
         response: {
+          500: { type: "object", properties: { error: { type: "string" } } },
           200: repairDocumentResponseSchema,
           404: { type: "object", properties: { error: { type: "string" } } },
         },
@@ -102,7 +105,10 @@ const routes: FastifyPluginAsync = async (fastify) => {
           },
           required: ["name", "size", "storagePath", "uploadedBy"],
         },
-        response: { 201: repairDocumentResponseSchema },
+        response: {
+          201: repairDocumentResponseSchema,
+          500: { type: "object", properties: { error: { type: "string" } } },
+        },
       },
     },
     async (request, reply) => {
@@ -153,6 +159,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
           },
         },
         response: {
+          500: { type: "object", properties: { error: { type: "string" } } },
           200: repairDocumentResponseSchema,
           404: { type: "object", properties: { error: { type: "string" } } },
         },
@@ -199,6 +206,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
           required: ["id"],
         },
         response: {
+          500: { type: "object", properties: { error: { type: "string" } } },
           200: { type: "object", properties: { message: { type: "string" } } },
           404: { type: "object", properties: { error: { type: "string" } } },
         },

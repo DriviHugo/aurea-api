@@ -20,6 +20,8 @@ const routes: FastifyPluginAsync = async (fastify) => {
           },
         },
         response: {
+          404: { type: "object", properties: { error: { type: "string" } } },
+          500: { type: "object", properties: { error: { type: "string" } } },
           200: {
             type: "object",
             properties: {
@@ -94,6 +96,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
           required: ["id"],
         },
         response: {
+          500: { type: "object", properties: { error: { type: "string" } } },
           200: {
             type: "object",
             properties: {
@@ -153,6 +156,8 @@ const routes: FastifyPluginAsync = async (fastify) => {
           required: ["functionCode", "model"],
         },
         response: {
+          404: { type: "object", properties: { error: { type: "string" } } },
+          500: { type: "object", properties: { error: { type: "string" } } },
           201: {
             type: "object",
             properties: {
@@ -192,10 +197,10 @@ const routes: FastifyPluginAsync = async (fastify) => {
         const aiFunctionLog = await prisma.aiFunctionLog.create({
           data: {
             functionCode,
-            functionName,
-            providerName,
             model,
             inputVariables,
+            ...(functionName !== undefined && { functionName }),
+            ...(providerName !== undefined && { providerName }),
           },
         });
 
@@ -234,6 +239,8 @@ const routes: FastifyPluginAsync = async (fastify) => {
           },
         },
         response: {
+          400: { type: "object", properties: { error: { type: "string" } } },
+          500: { type: "object", properties: { error: { type: "string" } } },
           200: {
             type: "object",
             properties: {
@@ -303,6 +310,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
           required: ["id"],
         },
         response: {
+          500: { type: "object", properties: { error: { type: "string" } } },
           200: {
             type: "object",
             properties: {

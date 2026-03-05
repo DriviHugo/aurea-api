@@ -65,6 +65,9 @@ const routes: FastifyPluginAsync = async (fastify) => {
         description: "Get paginated list of audit logs",
         querystring: paginationQuerySchema,
         response: {
+          400: { type: "object", properties: { error: { type: "string" } } },
+          404: { type: "object", properties: { error: { type: "string" } } },
+          500: { type: "object", properties: { error: { type: "string" } } },
           200: {
             type: "object",
             properties: {
@@ -135,6 +138,8 @@ const routes: FastifyPluginAsync = async (fastify) => {
         description: "Get audit log by ID",
         params: idParamSchema,
         response: {
+          400: { type: "object", properties: { error: { type: "string" } } },
+          500: { type: "object", properties: { error: { type: "string" } } },
           200: auditLogResponseSchema,
           404: {
             type: "object",
@@ -175,6 +180,8 @@ const routes: FastifyPluginAsync = async (fastify) => {
         description: "Create new audit log",
         body: auditLogSchema,
         response: {
+          404: { type: "object", properties: { error: { type: "string" } } },
+          500: { type: "object", properties: { error: { type: "string" } } },
           201: auditLogResponseSchema,
           400: {
             type: "object",
@@ -243,6 +250,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
           },
         },
         response: {
+          500: { type: "object", properties: { error: { type: "string" } } },
           200: auditLogResponseSchema,
           404: {
             type: "object",
@@ -314,6 +322,8 @@ const routes: FastifyPluginAsync = async (fastify) => {
         description: "Delete audit log by ID",
         params: idParamSchema,
         response: {
+          400: { type: "object", properties: { error: { type: "string" } } },
+          500: { type: "object", properties: { error: { type: "string" } } },
           200: {
             type: "object",
             properties: {

@@ -21,6 +21,8 @@ const routes: FastifyPluginAsync = async (fastify) => {
           },
         },
         response: {
+          400: { type: "object", properties: { error: { type: "string" } } },
+          500: { type: "object", properties: { error: { type: "string" } } },
           200: {
             type: "object",
             properties: {
@@ -52,7 +54,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
         const { page = 1, limit = 10, expedienteId } = request.query as any;
         const skip = (page - 1) * limit;
 
-        const where = expedienteId ? { expedienteId } : {};
+        const where = expedienteId ? { caseId: expedienteId } : {};
 
         const [data, total] = await Promise.all([
           prisma.procedureAlternative.findMany({
@@ -95,6 +97,8 @@ const routes: FastifyPluginAsync = async (fastify) => {
           },
         },
         response: {
+          400: { type: "object", properties: { error: { type: "string" } } },
+          500: { type: "object", properties: { error: { type: "string" } } },
           200: {
             type: "object",
             properties: {
@@ -155,6 +159,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
           },
         },
         response: {
+          500: { type: "object", properties: { error: { type: "string" } } },
           201: {
             type: "object",
             properties: {
@@ -191,10 +196,10 @@ const routes: FastifyPluginAsync = async (fastify) => {
 
         const alternativa = await prisma.procedureAlternative.create({
           data: {
-            expedienteId,
-            procedimiento,
-            puntuacion,
-            justificacion,
+            caseId: expedienteId,
+            procedure: procedimiento,
+            score: puntuacion,
+            justification: justificacion,
           },
         });
 
@@ -230,6 +235,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
           },
         },
         response: {
+          500: { type: "object", properties: { error: { type: "string" } } },
           200: {
             type: "object",
             properties: {
@@ -274,7 +280,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
         }
 
         // If expedienteId is being updated, verify it exists
-        if (expedienteId && expedienteId !== existingAlternativa.expedienteId) {
+        if (expedienteId && expedienteId !== existingAlternativa.caseId) {
           const expediente = await prisma.case.findUnique({
             where: { id: expedienteId },
           });
@@ -285,12 +291,12 @@ const routes: FastifyPluginAsync = async (fastify) => {
         }
 
         const updateData: any = {};
-        if (expedienteId !== undefined) updateData.expedienteId = expedienteId;
+        if (expedienteId !== undefined) updateData.caseId = expedienteId;
         if (procedimiento !== undefined)
-          updateData.procedimiento = procedimiento;
-        if (puntuacion !== undefined) updateData.puntuacion = puntuacion;
+          updateData.procedure = procedimiento;
+        if (puntuacion !== undefined) updateData.score = puntuacion;
         if (justificacion !== undefined)
-          updateData.justificacion = justificacion;
+          updateData.justification = justificacion;
 
         const alternativa = await prisma.procedureAlternative.update({
           where: { id },
@@ -320,6 +326,8 @@ const routes: FastifyPluginAsync = async (fastify) => {
           },
         },
         response: {
+          400: { type: "object", properties: { error: { type: "string" } } },
+          500: { type: "object", properties: { error: { type: "string" } } },
           200: {
             type: "object",
             properties: {
