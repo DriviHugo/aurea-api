@@ -164,13 +164,18 @@ Recuerda responder SOLO con JSON válido.`;
               .send({ error: `Invalid operation type: ${type}` });
         }
 
-        const response = await gateway.completeSimple(systemPrompt, userPrompt);
+        const startTime = Date.now();
+        const aiResponse = await gateway.completeWithMeta(
+          systemPrompt,
+          userPrompt,
+        );
+        const generationTimeMs = Date.now() - startTime;
 
-        console.log("[AI-Contract] Raw AI response:", response);
+        console.log("[AI-Contract] Raw AI response:", aiResponse.content);
 
         let result;
         try {
-          const cleanResponse = response
+          const cleanResponse = aiResponse.content
             .replace(/```json\n?/g, "")
             .replace(/```\n?/g, "")
             .trim();
@@ -185,12 +190,23 @@ Recuerda responder SOLO con JSON válido.`;
             result.improvedSubject,
           );
         } catch {
-          console.error("[AI-Contract] Failed to parse AI response:", response);
+          console.error(
+            "[AI-Contract] Failed to parse AI response:",
+            aiResponse.content,
+          );
           return reply.status(500).send({
             error: "Error processing AI response",
             details: "Response is not valid JSON",
           });
         }
+
+        // Attach AI metadata to the result
+        result._aiMeta = {
+          provider: aiResponse.provider,
+          model: aiResponse.model,
+          tokensUsed: aiResponse.usage?.totalTokens ?? 0,
+          generationTimeMs,
+        };
 
         return reply.send(result);
       } catch (error) {
