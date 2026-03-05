@@ -61,6 +61,9 @@ const routes: FastifyPluginAsync = async (fastify) => {
         description: "Get all issues with pagination",
         querystring: paginationQuerySchema,
         response: {
+          400: { type: "object", properties: { error: { type: "string" } } },
+          404: { type: "object", properties: { error: { type: "string" } } },
+          500: { type: "object", properties: { error: { type: "string" } } },
           200: {
             type: "object",
             properties: {
@@ -125,6 +128,8 @@ const routes: FastifyPluginAsync = async (fastify) => {
           required: ["id"],
         },
         response: {
+          400: { type: "object", properties: { error: { type: "string" } } },
+          500: { type: "object", properties: { error: { type: "string" } } },
           200: issueResponseSchema,
           404: {
             type: "object",
@@ -164,6 +169,8 @@ const routes: FastifyPluginAsync = async (fastify) => {
         description: "Create new issue",
         body: issueSchema,
         response: {
+          404: { type: "object", properties: { error: { type: "string" } } },
+          500: { type: "object", properties: { error: { type: "string" } } },
           201: issueResponseSchema,
           400: {
             type: "object",
@@ -239,6 +246,8 @@ const routes: FastifyPluginAsync = async (fastify) => {
           },
         },
         response: {
+          400: { type: "object", properties: { error: { type: "string" } } },
+          500: { type: "object", properties: { error: { type: "string" } } },
           200: issueResponseSchema,
           404: {
             type: "object",
@@ -297,6 +306,8 @@ const routes: FastifyPluginAsync = async (fastify) => {
           required: ["id"],
         },
         response: {
+          400: { type: "object", properties: { error: { type: "string" } } },
+          500: { type: "object", properties: { error: { type: "string" } } },
           200: {
             type: "object",
             properties: {

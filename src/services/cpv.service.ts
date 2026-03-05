@@ -36,19 +36,19 @@ export class CpvService {
       where: {
         active: true,
         OR: [
-          { codigo: { startsWith: searchTerm } },
-          { descripcion: { contains: searchTerm, mode: "insensitive" } },
+          { code: { startsWith: searchTerm } },
+          { description: { contains: searchTerm, mode: "insensitive" } },
         ],
       },
       select: {
-        codigo: true,
-        descripcion: true,
+        code: true,
+        description: true,
       },
       take: limit,
-      orderBy: [{ nivel: "asc" }, { codigo: "asc" }],
+      orderBy: [{ level: "asc" }, { code: "asc" }],
     });
 
-    return results;
+    return results.map((r) => ({ codigo: r.code, descripcion: r.description }));
   }
 
   async importCodes(cpvData: CpvImportItem[]): Promise<CpvImportResult> {
@@ -64,20 +64,20 @@ export class CpvService {
       for (const item of cpvData) {
         try {
           await tx.cpvCode.upsert({
-            where: { codigo: item.codigo },
+            where: { code: item.codigo },
             update: {
-              descripcion: item.descripcion,
-              descripcionEn: item.descripcion_en ?? null,
-              nivel: item.nivel,
-              codigoPadre: item.codigo_padre ?? null,
+              description: item.descripcion,
+              descriptionEn: item.descripcion_en ?? null,
+              level: item.nivel,
+              parentCode: item.codigo_padre ?? null,
               active: true,
             },
             create: {
-              codigo: item.codigo,
-              descripcion: item.descripcion,
-              descripcionEn: item.descripcion_en ?? null,
-              nivel: item.nivel,
-              codigoPadre: item.codigo_padre ?? null,
+              code: item.codigo,
+              description: item.descripcion,
+              descriptionEn: item.descripcion_en ?? null,
+              level: item.nivel,
+              parentCode: item.codigo_padre ?? null,
               active: true,
             },
           });

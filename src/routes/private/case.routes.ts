@@ -1,5 +1,5 @@
 import type { FastifyPluginAsync } from "fastify";
-import type { PrismaClient } from "@prisma/client";
+import type { PrismaClient, CaseStatus, ContractType, ProcedureType } from "@prisma/client";
 
 /**
  * Convert snake_case enum value to camelCase for Prisma
@@ -172,6 +172,9 @@ const routes: FastifyPluginAsync = async (fastify) => {
         description: "Get paginated list of cases",
         querystring: paginationQuerySchema,
         response: {
+          400: { type: "object", properties: { error: { type: "string" } } },
+          404: { type: "object", properties: { error: { type: "string" } } },
+          500: { type: "object", properties: { error: { type: "string" } } },
           200: {
             type: "object",
             properties: {
@@ -233,6 +236,8 @@ const routes: FastifyPluginAsync = async (fastify) => {
           required: ["id"],
         },
         response: {
+          400: { type: "object", properties: { error: { type: "string" } } },
+          500: { type: "object", properties: { error: { type: "string" } } },
           200: caseResponseSchema,
           404: {
             type: "object",
@@ -272,6 +277,8 @@ const routes: FastifyPluginAsync = async (fastify) => {
         description: "Create new case",
         body: caseSchema,
         response: {
+          404: { type: "object", properties: { error: { type: "string" } } },
+          500: { type: "object", properties: { error: { type: "string" } } },
           201: caseResponseSchema,
           400: {
             type: "object",
@@ -313,8 +320,8 @@ const routes: FastifyPluginAsync = async (fastify) => {
             unit: data.unit,
             department: data.department,
             creatorId: data.creatorId,
-            status: snakeToCamelValue(data.status) || "draft",
-            contractType: snakeToCamelValue(data.contractType),
+            status: (snakeToCamelValue(data.status) || "draft") as CaseStatus,
+            contractType: snakeToCamelValue(data.contractType) as ContractType,
             subject: data.subject,
             description: data.description,
             estimatedContractValue: data.estimatedContractValue
@@ -330,8 +337,8 @@ const routes: FastifyPluginAsync = async (fastify) => {
             modificationsAmount: data.modificationsAmount
               ? parseFloat(data.modificationsAmount)
               : null,
-            proposedProcedure: snakeToCamelValue(data.proposedProcedure),
-            selectedProcedure: snakeToCamelValue(data.selectedProcedure),
+            proposedProcedure: snakeToCamelValue(data.proposedProcedure) as ProcedureType | null,
+            selectedProcedure: snakeToCamelValue(data.selectedProcedure) as ProcedureType | null,
             selectedCpv: data.selectedCpv,
             hasLots: data.hasLots || false,
             lotsJustification: data.lotsJustification,
@@ -398,6 +405,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
           additionalProperties: true,
         },
         response: {
+          500: { type: "object", properties: { error: { type: "string" } } },
           200: caseResponseSchema,
           404: {
             type: "object",
@@ -458,47 +466,47 @@ const routes: FastifyPluginAsync = async (fastify) => {
 
         // Handle enum fields with conversion
         if (data.status !== undefined) {
-          updateData.status = snakeToCamelValue(data.status);
+          updateData['status'] = snakeToCamelValue(data.status);
         }
         if (data.contractType !== undefined) {
-          updateData.contractType = snakeToCamelValue(data.contractType);
+          updateData['contractType'] = snakeToCamelValue(data.contractType);
         }
         if (data.proposedProcedure !== undefined) {
-          updateData.proposedProcedure = snakeToCamelValue(
+          updateData['proposedProcedure'] = snakeToCamelValue(
             data.proposedProcedure,
           );
         }
         if (data.selectedProcedure !== undefined) {
-          updateData.selectedProcedure = snakeToCamelValue(
+          updateData['selectedProcedure'] = snakeToCamelValue(
             data.selectedProcedure,
           );
         }
         if (data.riskLevel !== undefined) {
-          updateData.riskLevel = data.riskLevel;
+          updateData['riskLevel'] = data.riskLevel;
         }
 
         // Handle numeric fields
         if (data.estimatedContractValue !== undefined) {
-          updateData.estimatedContractValue = parseFloat(
+          updateData['estimatedContractValue'] = parseFloat(
             data.estimatedContractValue,
           );
         }
         if (data.baseTenderBudget !== undefined) {
-          updateData.baseTenderBudget = parseFloat(data.baseTenderBudget);
+          updateData['baseTenderBudget'] = parseFloat(data.baseTenderBudget);
         }
         if (data.vat !== undefined) {
-          updateData.vat = parseFloat(data.vat);
+          updateData['vat'] = parseFloat(data.vat);
         }
         if (data.extensionsAmount !== undefined) {
-          updateData.extensionsAmount = parseFloat(data.extensionsAmount);
+          updateData['extensionsAmount'] = parseFloat(data.extensionsAmount);
         }
         if (data.modificationsAmount !== undefined) {
-          updateData.modificationsAmount = parseFloat(data.modificationsAmount);
+          updateData['modificationsAmount'] = parseFloat(data.modificationsAmount);
         }
 
         // Handle date field
         if (data.dueDate !== undefined) {
-          updateData.dueDate = new Date(data.dueDate);
+          updateData['dueDate'] = new Date(data.dueDate);
         }
 
         fastify.log.info({ updateData }, "Prepared update data");
@@ -542,6 +550,8 @@ const routes: FastifyPluginAsync = async (fastify) => {
           required: ["id"],
         },
         response: {
+          400: { type: "object", properties: { error: { type: "string" } } },
+          500: { type: "object", properties: { error: { type: "string" } } },
           200: {
             type: "object",
             properties: {

@@ -23,6 +23,8 @@ const routes: FastifyPluginAsync = async (fastify) => {
           },
         },
         response: {
+          400: { type: "object", properties: { error: { type: "string" } } },
+          500: { type: "object", properties: { error: { type: "string" } } },
           200: {
             type: "object",
             properties: {
@@ -102,6 +104,8 @@ const routes: FastifyPluginAsync = async (fastify) => {
           required: ["id"],
         },
         response: {
+          400: { type: "object", properties: { error: { type: "string" } } },
+          500: { type: "object", properties: { error: { type: "string" } } },
           200: {
             type: "object",
             properties: {
@@ -158,6 +162,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
           required: ["documentoId", "evidenciaId"],
         },
         response: {
+          500: { type: "object", properties: { error: { type: "string" } } },
           201: {
             type: "object",
             properties: {
@@ -186,9 +191,9 @@ const routes: FastifyPluginAsync = async (fastify) => {
         // Check if relationship already exists
         const existingRelation = await prisma.documentEvidence.findUnique({
           where: {
-            documentoId_evidenciaId: {
-              documentoId,
-              evidenciaId,
+            documentId_evidenceId: {
+              documentId: documentoId,
+              evidenceId: evidenciaId,
             },
           },
         });
@@ -201,8 +206,8 @@ const routes: FastifyPluginAsync = async (fastify) => {
 
         const documentoEvidencia = await prisma.documentEvidence.create({
           data: {
-            documentoId,
-            evidenciaId,
+            documentId: documentoId,
+            evidenceId: evidenciaId,
           },
         });
 
@@ -247,6 +252,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
           required: ["documentoId", "evidenciaId"],
         },
         response: {
+          500: { type: "object", properties: { error: { type: "string" } } },
           200: {
             type: "object",
             properties: {
@@ -293,8 +299,8 @@ const routes: FastifyPluginAsync = async (fastify) => {
         // Check if new relationship already exists (excluding current record)
         const duplicateRelation = await prisma.documentEvidence.findFirst({
           where: {
-            documentoId,
-            evidenciaId,
+            documentId: documentoId,
+            evidenceId: evidenciaId,
             NOT: { id },
           },
         });
@@ -308,8 +314,8 @@ const routes: FastifyPluginAsync = async (fastify) => {
         const documentoEvidencia = await prisma.documentEvidence.update({
           where: { id },
           data: {
-            documentoId,
-            evidenciaId,
+            documentId: documentoId,
+            evidenceId: evidenciaId,
           },
         });
 
@@ -346,6 +352,8 @@ const routes: FastifyPluginAsync = async (fastify) => {
           required: ["id"],
         },
         response: {
+          400: { type: "object", properties: { error: { type: "string" } } },
+          500: { type: "object", properties: { error: { type: "string" } } },
           200: {
             type: "object",
             properties: {

@@ -184,7 +184,7 @@ function getStaticHelp(stepId: string, sectionId?: string): string {
 
   return Object.hasOwn(helps, stepId)
     ? // eslint-disable-next-line security/detect-object-injection
-      helps[stepId]
+      helps[stepId]!
     : DEFAULT_HELP;
 }
 
@@ -215,6 +215,6 @@ function getStaticConsejos(stepId: string, _sectionId?: string): string[] {
 
   return Object.hasOwn(stepConsejos, stepId)
     ? // eslint-disable-next-line security/detect-object-injection
-      stepConsejos[stepId]
+      stepConsejos[stepId]!
     : defaultConsejos;
 }

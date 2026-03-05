@@ -68,6 +68,8 @@ const routes: FastifyPluginAsync = async (fastify) => {
         description: "Get all AI providers with pagination",
         querystring: paginationSchema,
         response: {
+          404: { type: "object", properties: { error: { type: "string" } } },
+          500: { type: "object", properties: { error: { type: "string" } } },
           200: {
             type: "object",
             properties: {
@@ -129,6 +131,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
           },
         },
         response: {
+          500: { type: "object", properties: { error: { type: "string" } } },
           200: aiProviderSchema,
           404: {
             type: "object",
@@ -168,6 +171,8 @@ const routes: FastifyPluginAsync = async (fastify) => {
         description: "Create new AI provider",
         body: createAiProviderSchema,
         response: {
+          404: { type: "object", properties: { error: { type: "string" } } },
+          500: { type: "object", properties: { error: { type: "string" } } },
           201: aiProviderSchema,
           400: {
             type: "object",
@@ -192,11 +197,11 @@ const routes: FastifyPluginAsync = async (fastify) => {
         const aiProvider = await prisma.aiProvider.create({
           data: {
             name: data.name,
-            type: data.type || "custom",
+            type: (data.type || "custom") as any,
             baseUrl: data.baseUrl,
-            apiKeySecretName: data.apiKeySecretName,
             availableModels: data.availableModels,
             defaultParams: data.defaultParams || { temperature: 0.3 },
+            ...(data.apiKeySecretName !== undefined && { apiKeySecretName: data.apiKeySecretName }),
           },
         });
 
@@ -229,6 +234,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
         },
         body: updateAiProviderSchema,
         response: {
+          500: { type: "object", properties: { error: { type: "string" } } },
           200: aiProviderSchema,
           404: {
             type: "object",
@@ -267,7 +273,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
 
         const aiProvider = await prisma.aiProvider.update({
           where: { id },
-          data,
+          data: data as any,
         });
 
         return reply.status(200).send(aiProvider);
@@ -298,6 +304,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
           },
         },
         response: {
+          500: { type: "object", properties: { error: { type: "string" } } },
           200: {
             type: "object",
             properties: {

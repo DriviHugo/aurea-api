@@ -21,6 +21,8 @@ const routes: FastifyPluginAsync = async (fastify) => {
           },
         },
         response: {
+          400: { type: "object", properties: { error: { type: "string" } } },
+          500: { type: "object", properties: { error: { type: "string" } } },
           200: {
             type: "object",
             properties: {
@@ -93,6 +95,8 @@ const routes: FastifyPluginAsync = async (fastify) => {
           },
         },
         response: {
+          400: { type: "object", properties: { error: { type: "string" } } },
+          500: { type: "object", properties: { error: { type: "string" } } },
           200: {
             type: "object",
             properties: {
@@ -142,6 +146,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
         description: "Create new DocumentoGeneracion",
         // No body validation - handle arrays and objects in handler
         response: {
+          500: { type: "object", properties: { error: { type: "string" } } },
           201: {
             type: "object",
             additionalProperties: true,
@@ -189,7 +194,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
           "DocumentGeneration created",
         );
         return reply.status(201).send(documentGeneration);
-      } catch (error) {
+      } catch (error: any) {
         fastify.log.error(
           { error, body: request.body },
           "POST /document-generation - error",
@@ -228,6 +233,8 @@ const routes: FastifyPluginAsync = async (fastify) => {
           },
         },
         response: {
+          400: { type: "object", properties: { error: { type: "string" } } },
+          500: { type: "object", properties: { error: { type: "string" } } },
           200: {
             type: "object",
             properties: {
@@ -290,6 +297,8 @@ const routes: FastifyPluginAsync = async (fastify) => {
           },
         },
         response: {
+          400: { type: "object", properties: { error: { type: "string" } } },
+          500: { type: "object", properties: { error: { type: "string" } } },
           200: {
             type: "object",
             properties: {

@@ -22,6 +22,9 @@ const routes: FastifyPluginAsync = async (fastify) => {
           },
         },
         response: {
+          400: { type: "object", properties: { error: { type: "string" } } },
+          404: { type: "object", properties: { error: { type: "string" } } },
+          500: { type: "object", properties: { error: { type: "string" } } },
           200: {
             type: "object",
             properties: {
@@ -111,6 +114,8 @@ const routes: FastifyPluginAsync = async (fastify) => {
           },
         },
         response: {
+          400: { type: "object", properties: { error: { type: "string" } } },
+          500: { type: "object", properties: { error: { type: "string" } } },
           200: {
             type: "object",
             properties: {
@@ -168,6 +173,8 @@ const routes: FastifyPluginAsync = async (fastify) => {
         description: "Create new document section(s)",
         // No body validation - handle arrays in handler
         response: {
+          404: { type: "object", properties: { error: { type: "string" } } },
+          500: { type: "object", properties: { error: { type: "string" } } },
           201: {
             type: "array",
             items: {
@@ -265,6 +272,8 @@ const routes: FastifyPluginAsync = async (fastify) => {
           },
         },
         response: {
+          400: { type: "object", properties: { error: { type: "string" } } },
+          500: { type: "object", properties: { error: { type: "string" } } },
           200: {
             type: "object",
             properties: {
@@ -379,6 +388,8 @@ const routes: FastifyPluginAsync = async (fastify) => {
           },
         },
         response: {
+          400: { type: "object", properties: { error: { type: "string" } } },
+          500: { type: "object", properties: { error: { type: "string" } } },
           200: {
             type: "object",
             properties: {

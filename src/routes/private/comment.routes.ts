@@ -22,6 +22,9 @@ const routes: FastifyPluginAsync = async (fastify) => {
           },
         },
         response: {
+          400: { type: "object", properties: { error: { type: "string" } } },
+          404: { type: "object", properties: { error: { type: "string" } } },
+          500: { type: "object", properties: { error: { type: "string" } } },
           200: {
             type: "object",
             properties: {
@@ -106,6 +109,8 @@ const routes: FastifyPluginAsync = async (fastify) => {
           },
         },
         response: {
+          400: { type: "object", properties: { error: { type: "string" } } },
+          500: { type: "object", properties: { error: { type: "string" } } },
           200: {
             type: "object",
             properties: {
@@ -179,6 +184,8 @@ const routes: FastifyPluginAsync = async (fastify) => {
           },
         },
         response: {
+          404: { type: "object", properties: { error: { type: "string" } } },
+          500: { type: "object", properties: { error: { type: "string" } } },
           201: {
             type: "object",
             properties: {
@@ -226,10 +233,10 @@ const routes: FastifyPluginAsync = async (fastify) => {
 
         const comentario = await prisma.comment.create({
           data: {
-            revisionId,
-            usuarioId,
-            rol,
-            texto,
+            reviewId: revisionId,
+            userId: usuarioId,
+            role: rol as any,
+            text: texto,
           },
         });
 
@@ -263,6 +270,8 @@ const routes: FastifyPluginAsync = async (fastify) => {
           },
         },
         response: {
+          400: { type: "object", properties: { error: { type: "string" } } },
+          500: { type: "object", properties: { error: { type: "string" } } },
           200: {
             type: "object",
             properties: {
@@ -286,7 +295,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
     async (request, reply) => {
       try {
         const { id } = request.params as { id: string };
-        const updateData = request.body as { rol?: string; texto?: string };
+        const { rol, texto } = request.body as { rol?: string; texto?: string };
 
         const existingComentario = await prisma.comment.findUnique({
           where: { id },
@@ -298,7 +307,10 @@ const routes: FastifyPluginAsync = async (fastify) => {
 
         const comentario = await prisma.comment.update({
           where: { id },
-          data: updateData,
+          data: {
+            ...(rol !== undefined && { role: rol as any }),
+            ...(texto !== undefined && { text: texto }),
+          },
         });
 
         return reply.status(200).send(comentario);
@@ -324,6 +336,8 @@ const routes: FastifyPluginAsync = async (fastify) => {
           },
         },
         response: {
+          400: { type: "object", properties: { error: { type: "string" } } },
+          500: { type: "object", properties: { error: { type: "string" } } },
           200: {
             type: "object",
             properties: {

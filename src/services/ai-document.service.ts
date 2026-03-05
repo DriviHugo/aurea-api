@@ -84,8 +84,8 @@ Por favor, reescribe la sección integrando la sugerencia de manera natural.`;
     await this.prisma.documentSection.update({
       where: { id: seccionId },
       data: {
-        contenido: nuevoContenido,
-        estado: "generado",
+        content: nuevoContenido,
+        status: "generado",
         updatedAt: new Date(),
       },
     });
