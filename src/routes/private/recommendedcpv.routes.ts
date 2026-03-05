@@ -192,7 +192,9 @@ const routes: FastifyPluginAsync = async (fastify) => {
             code: data.codigo,
             description: data.descripcion,
             ...(data.puntuacion !== undefined && { score: data.puntuacion }),
-            ...(data.justificacion !== undefined && { justification: data.justificacion }),
+            ...(data.justificacion !== undefined && {
+              justification: data.justificacion,
+            }),
           },
         });
 
@@ -273,7 +275,9 @@ const routes: FastifyPluginAsync = async (fastify) => {
             code: data.codigo,
             description: data.descripcion,
             ...(data.puntuacion !== undefined && { score: data.puntuacion }),
-            ...(data.justificacion !== undefined && { justification: data.justificacion }),
+            ...(data.justificacion !== undefined && {
+              justification: data.justificacion,
+            }),
           },
         });
 

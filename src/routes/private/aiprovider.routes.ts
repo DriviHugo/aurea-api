@@ -201,7 +201,9 @@ const routes: FastifyPluginAsync = async (fastify) => {
             baseUrl: data.baseUrl,
             availableModels: data.availableModels,
             defaultParams: data.defaultParams || { temperature: 0.3 },
-            ...(data.apiKeySecretName !== undefined && { apiKeySecretName: data.apiKeySecretName }),
+            ...(data.apiKeySecretName !== undefined && {
+              apiKeySecretName: data.apiKeySecretName,
+            }),
           },
         });
 

@@ -1,5 +1,10 @@
 import type { FastifyPluginAsync } from "fastify";
-import type { PrismaClient, CaseStatus, ContractType, ProcedureType } from "@prisma/client";
+import type {
+  PrismaClient,
+  CaseStatus,
+  ContractType,
+  ProcedureType,
+} from "@prisma/client";
 
 /**
  * Convert snake_case enum value to camelCase for Prisma
@@ -337,8 +342,12 @@ const routes: FastifyPluginAsync = async (fastify) => {
             modificationsAmount: data.modificationsAmount
               ? parseFloat(data.modificationsAmount)
               : null,
-            proposedProcedure: snakeToCamelValue(data.proposedProcedure) as ProcedureType | null,
-            selectedProcedure: snakeToCamelValue(data.selectedProcedure) as ProcedureType | null,
+            proposedProcedure: snakeToCamelValue(
+              data.proposedProcedure,
+            ) as ProcedureType | null,
+            selectedProcedure: snakeToCamelValue(
+              data.selectedProcedure,
+            ) as ProcedureType | null,
             selectedCpv: data.selectedCpv,
             hasLots: data.hasLots || false,
             lotsJustification: data.lotsJustification,
@@ -466,47 +475,49 @@ const routes: FastifyPluginAsync = async (fastify) => {
 
         // Handle enum fields with conversion
         if (data.status !== undefined) {
-          updateData['status'] = snakeToCamelValue(data.status);
+          updateData["status"] = snakeToCamelValue(data.status);
         }
         if (data.contractType !== undefined) {
-          updateData['contractType'] = snakeToCamelValue(data.contractType);
+          updateData["contractType"] = snakeToCamelValue(data.contractType);
         }
         if (data.proposedProcedure !== undefined) {
-          updateData['proposedProcedure'] = snakeToCamelValue(
+          updateData["proposedProcedure"] = snakeToCamelValue(
             data.proposedProcedure,
           );
         }
         if (data.selectedProcedure !== undefined) {
-          updateData['selectedProcedure'] = snakeToCamelValue(
+          updateData["selectedProcedure"] = snakeToCamelValue(
             data.selectedProcedure,
           );
         }
         if (data.riskLevel !== undefined) {
-          updateData['riskLevel'] = data.riskLevel;
+          updateData["riskLevel"] = data.riskLevel;
         }
 
         // Handle numeric fields
         if (data.estimatedContractValue !== undefined) {
-          updateData['estimatedContractValue'] = parseFloat(
+          updateData["estimatedContractValue"] = parseFloat(
             data.estimatedContractValue,
           );
         }
         if (data.baseTenderBudget !== undefined) {
-          updateData['baseTenderBudget'] = parseFloat(data.baseTenderBudget);
+          updateData["baseTenderBudget"] = parseFloat(data.baseTenderBudget);
         }
         if (data.vat !== undefined) {
-          updateData['vat'] = parseFloat(data.vat);
+          updateData["vat"] = parseFloat(data.vat);
         }
         if (data.extensionsAmount !== undefined) {
-          updateData['extensionsAmount'] = parseFloat(data.extensionsAmount);
+          updateData["extensionsAmount"] = parseFloat(data.extensionsAmount);
         }
         if (data.modificationsAmount !== undefined) {
-          updateData['modificationsAmount'] = parseFloat(data.modificationsAmount);
+          updateData["modificationsAmount"] = parseFloat(
+            data.modificationsAmount,
+          );
         }
 
         // Handle date field
         if (data.dueDate !== undefined) {
-          updateData['dueDate'] = new Date(data.dueDate);
+          updateData["dueDate"] = new Date(data.dueDate);
         }
 
         fastify.log.info({ updateData }, "Prepared update data");
