@@ -16,10 +16,6 @@
     "build": "npm run clean && tsc -p tsconfig.build.json",
     "typecheck": "tsc -p tsconfig.build.json --noEmit",
     "test": "jest --detectOpenHandles",
-    "test:migration": "tsx test-migration.ts",
-    "test:quick": "npx tsx quick-test.ts",
-    "test:real": "npx tsx test-real-endpoints.ts",
-    "user:create": "node create-user-simple.mjs",
     "lint": "eslint --config eslint.config.js ./src ./test --ext .ts,.tsx",
     "lint:fix": "eslint --config eslint.config.js --fix ./src ./test --ext .ts,.tsx",
     "db:generate": "npx prisma generate",
@@ -31,20 +27,7 @@
     "docker:up": "docker-compose -f ./docker/docker-compose.yml up -d --build",
     "docker:down": "docker-compose -f ./docker/docker-compose.yml down",
     "docker:logs": "docker-compose -f ./docker/docker-compose.yml logs -f",
-    "migrate:inspect": "tsx --env-file=.env migration/inspectors/project-inspector.ts",
-    "migrate:schema": "tsx --env-file=.env migration/ai-migrators/schema-migrator.ts",
-    "migrate:routes": "tsx --env-file=.env migration/ai-migrators/route-generator.ts",
-    "migrate:hooks": "tsx --env-file=.env migration/ai-migrators/hook-transformer.ts",
-    "migrate:functions": "tsx --env-file=.env migration/ai-migrators/function-migrator.ts",
-    "migrate:auth": "tsx --env-file=.env migration/ai-migrators/auth-generator.ts",
-    "migrate:users": "tsx --env-file=.env migration/scripts/migrate-users.ts",
-    "migrate:all": "tsx --env-file=.env migration/migrate-all.ts",
-    "migrate:validate": "tsx migration/scripts/validate-schema.ts",
-    "migrate:frontend": "tsx migration/ai-migrators/component-refactor.ts",
-    "migrate:types": "tsx migration/scripts/generate-types.ts",
-    "migrate:docker": "tsx migration/scripts/setup-docker.ts",
-    "prepare": "husky",
-    "migrate:auto": "tsx migration/migrate.ts"
+    "prepare": "husky"
   },
   "engines": {
     "node": ">=22"
