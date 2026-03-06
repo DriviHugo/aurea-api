@@ -330,7 +330,7 @@ export default async function ssoRoutes(app: FastifyInstance): Promise<void> {
         summary: "Get SSO user info",
         description: "Returns current authenticated user information",
         tags: ["auth", "sso"],
-        security: [{ bearerAuth: [] }],
+        security: [{ cookieAccessTokenAuth: [] }],
         response: {
           200: {
             type: "object",

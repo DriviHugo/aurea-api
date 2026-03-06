@@ -14,7 +14,9 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 async function main() {
-  const env = process.env.SEED_ENV || process.env.NODE_ENV || "dev";
+  const nodeEnv = process.env.SEED_ENV || process.env.NODE_ENV || "dev";
+  const envMap = { development: "dev", production: "prod", test: "test" };
+  const env = envMap[nodeEnv] || nodeEnv;
   const seedsDir = path.join(__dirname, "seeds", env);
 
   if (!fs.existsSync(seedsDir)) {
