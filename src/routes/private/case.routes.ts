@@ -4,6 +4,15 @@ import type {
   CaseStatus,
   ContractType,
   ProcedureType,
+  ProcessingRegime,
+  EmergencyOperationalRoute,
+  DeliveryType,
+  DeliveryFrequency,
+  DeliveryDeadlineUnit,
+  DeliveryLocationMode,
+  FiscalRegime,
+  InnovationLevel,
+  CentralizationNotApplicableReason,
 } from "@prisma/client";
 
 /**
@@ -90,6 +99,33 @@ const STATUS_VALUES = [
   "closed",
 ];
 
+const PROCESSING_REGIME_VALUES = ["ordinaria", "urgente_119", "emergencia_120"];
+
+const EMERGENCY_ROUTE_VALUES = [
+  "am_direct_purchase",
+  "am_second_tender",
+  "sda_invitation",
+  "own_means",
+  "immediate_action",
+];
+
+const EMERGENCY_REASON_VALUES = [
+  "catastrofe",
+  "peligro_grave",
+  "defensa_nacional",
+];
+
+const DELIVERY_TYPE_VALUES = ["single", "successive"];
+const DELIVERY_FREQUENCY_VALUES = ["monthly", "quarterly", "on_demand"];
+const DELIVERY_DEADLINE_UNIT_VALUES = ["days", "weeks"];
+const DELIVERY_LOCATION_MODE_VALUES = ["single_location", "multiple_locations"];
+const FISCAL_REGIME_VALUES = ["IVA", "IGIC", "IPSI"];
+const INNOVATION_LEVEL_VALUES = ["existe", "requiere_adaptacion", "no_existe"];
+const CENTRALIZATION_NOT_APPLICABLE_REASON_VALUES = [
+  "error_identificacion",
+  "causa_juridica",
+];
+
 const caseSchema = {
   type: "object",
   properties: {
@@ -127,6 +163,40 @@ const caseSchema = {
     isUrgent: { type: "boolean" },
     isEmergency: { type: "boolean" },
     urgencyJustification: { type: "string" },
+    processingRegime: { type: "string", enum: PROCESSING_REGIME_VALUES },
+    emergencyOperationalRoute: { type: "string", enum: EMERGENCY_ROUTE_VALUES },
+    emergencyReasons: {
+      type: "array",
+      items: { type: "string", enum: EMERGENCY_REASON_VALUES },
+    },
+    emergencyJustification: { type: "string" },
+    hasOwnMeans: { type: "boolean" },
+    deliveryType: { type: "string", enum: DELIVERY_TYPE_VALUES },
+    deliveryDeadlineValue: { type: "integer" },
+    deliveryDeadlineUnit: {
+      type: "string",
+      enum: DELIVERY_DEADLINE_UNIT_VALUES,
+    },
+    supplyPeriodMonths: { type: "integer" },
+    deliveryFrequency: { type: "string", enum: DELIVERY_FREQUENCY_VALUES },
+    deliveryLocationMode: {
+      type: "string",
+      enum: DELIVERY_LOCATION_MODE_VALUES,
+    },
+    deliveryLocations: { type: ["array", "object"] },
+    overrideInnovation: { type: "boolean" },
+    innovationLevel: { type: "string", enum: INNOVATION_LEVEL_VALUES },
+    includesIDPhases: { type: "boolean" },
+    centralizationNotApplicableReason: {
+      type: "string",
+      enum: CENTRALIZATION_NOT_APPLICABLE_REASON_VALUES,
+    },
+    fiscalRegime: { type: "string", enum: FISCAL_REGIME_VALUES },
+    maxBudget: { type: "number" },
+    pblAdjustedToMax: { type: "boolean" },
+    durationMonths: { type: "integer" },
+    extensionMonths: { type: "integer" },
+    isSubscription: { type: "boolean" },
     completionPercentage: { type: "integer", minimum: 0, maximum: 100 },
     riskLevel: {
       type: "string",
@@ -319,48 +389,100 @@ const routes: FastifyPluginAsync = async (fastify) => {
         const data = request.body as any;
 
         // Convert snake_case enum values to camelCase for Prisma
+        const createData: Record<string, unknown> = {
+          code: data.code,
+          unit: data.unit,
+          department: data.department,
+          creatorId: data.creatorId,
+          status: (snakeToCamelValue(data.status) || "draft") as CaseStatus,
+          contractType: snakeToCamelValue(data.contractType) as ContractType,
+          subject: data.subject,
+          description: data.description,
+          estimatedContractValue: data.estimatedContractValue
+            ? parseFloat(data.estimatedContractValue)
+            : null,
+          baseTenderBudget: data.baseTenderBudget
+            ? parseFloat(data.baseTenderBudget)
+            : null,
+          vat: data.vat ? parseFloat(data.vat) : null,
+          extensionsAmount: data.extensionsAmount
+            ? parseFloat(data.extensionsAmount)
+            : null,
+          modificationsAmount: data.modificationsAmount
+            ? parseFloat(data.modificationsAmount)
+            : null,
+          proposedProcedure: snakeToCamelValue(
+            data.proposedProcedure,
+          ) as ProcedureType | null,
+          selectedProcedure: snakeToCamelValue(
+            data.selectedProcedure,
+          ) as ProcedureType | null,
+          selectedCpv: data.selectedCpv,
+          hasLots: data.hasLots || false,
+          lotsJustification: data.lotsJustification,
+          numLots: data.numLots,
+          isUrgent: data.isUrgent || false,
+          isEmergency: data.isEmergency || false,
+          urgencyJustification: data.urgencyJustification,
+          completionPercentage: data.completionPercentage || 0,
+          riskLevel: data.riskLevel || "green",
+          lastPendingAction: data.lastPendingAction,
+          dueDate: data.dueDate ? new Date(data.dueDate) : null,
+          metadata: data.metadata || {},
+          hasOwnMeans: data.hasOwnMeans || false,
+          overrideInnovation: data.overrideInnovation || false,
+          includesIDPhases: data.includesIDPhases || false,
+          pblAdjustedToMax: data.pblAdjustedToMax || false,
+          isSubscription: data.isSubscription || false,
+        };
+
+        // Conditionally add new enum/nullable fields (avoid undefined with exactOptionalPropertyTypes)
+        if (data.processingRegime)
+          createData["processingRegime"] =
+            data.processingRegime as ProcessingRegime;
+        if (data.emergencyOperationalRoute)
+          createData["emergencyOperationalRoute"] =
+            data.emergencyOperationalRoute as EmergencyOperationalRoute;
+        if (data.emergencyReasons?.length)
+          createData["emergencyReasons"] = data.emergencyReasons;
+        if (data.emergencyJustification)
+          createData["emergencyJustification"] = data.emergencyJustification;
+        if (data.deliveryType)
+          createData["deliveryType"] = data.deliveryType as DeliveryType;
+        if (data.deliveryDeadlineValue != null)
+          createData["deliveryDeadlineValue"] = parseInt(
+            data.deliveryDeadlineValue,
+          );
+        if (data.deliveryDeadlineUnit)
+          createData["deliveryDeadlineUnit"] =
+            data.deliveryDeadlineUnit as DeliveryDeadlineUnit;
+        if (data.supplyPeriodMonths != null)
+          createData["supplyPeriodMonths"] = parseInt(data.supplyPeriodMonths);
+        if (data.deliveryFrequency)
+          createData["deliveryFrequency"] =
+            data.deliveryFrequency as DeliveryFrequency;
+        if (data.deliveryLocationMode)
+          createData["deliveryLocationMode"] =
+            data.deliveryLocationMode as DeliveryLocationMode;
+        if (data.deliveryLocations)
+          createData["deliveryLocations"] = data.deliveryLocations;
+        if (data.innovationLevel)
+          createData["innovationLevel"] =
+            data.innovationLevel as InnovationLevel;
+        if (data.centralizationNotApplicableReason)
+          createData["centralizationNotApplicableReason"] =
+            data.centralizationNotApplicableReason as CentralizationNotApplicableReason;
+        if (data.fiscalRegime)
+          createData["fiscalRegime"] = data.fiscalRegime as FiscalRegime;
+        if (data.maxBudget != null)
+          createData["maxBudget"] = parseFloat(data.maxBudget);
+        if (data.durationMonths != null)
+          createData["durationMonths"] = parseInt(data.durationMonths);
+        if (data.extensionMonths != null)
+          createData["extensionMonths"] = parseInt(data.extensionMonths);
+
         const caseData = await prisma.case.create({
-          data: {
-            code: data.code,
-            unit: data.unit,
-            department: data.department,
-            creatorId: data.creatorId,
-            status: (snakeToCamelValue(data.status) || "draft") as CaseStatus,
-            contractType: snakeToCamelValue(data.contractType) as ContractType,
-            subject: data.subject,
-            description: data.description,
-            estimatedContractValue: data.estimatedContractValue
-              ? parseFloat(data.estimatedContractValue)
-              : null,
-            baseTenderBudget: data.baseTenderBudget
-              ? parseFloat(data.baseTenderBudget)
-              : null,
-            vat: data.vat ? parseFloat(data.vat) : null,
-            extensionsAmount: data.extensionsAmount
-              ? parseFloat(data.extensionsAmount)
-              : null,
-            modificationsAmount: data.modificationsAmount
-              ? parseFloat(data.modificationsAmount)
-              : null,
-            proposedProcedure: snakeToCamelValue(
-              data.proposedProcedure,
-            ) as ProcedureType | null,
-            selectedProcedure: snakeToCamelValue(
-              data.selectedProcedure,
-            ) as ProcedureType | null,
-            selectedCpv: data.selectedCpv,
-            hasLots: data.hasLots || false,
-            lotsJustification: data.lotsJustification,
-            numLots: data.numLots,
-            isUrgent: data.isUrgent || false,
-            isEmergency: data.isEmergency || false,
-            urgencyJustification: data.urgencyJustification,
-            completionPercentage: data.completionPercentage || 0,
-            riskLevel: data.riskLevel || "green",
-            lastPendingAction: data.lastPendingAction,
-            dueDate: data.dueDate ? new Date(data.dueDate) : null,
-            metadata: data.metadata || {},
-          },
+          data: createData as any,
         });
 
         return reply.status(201).send(normalizeCase(caseData));
@@ -462,9 +584,16 @@ const routes: FastifyPluginAsync = async (fastify) => {
           "isUrgent",
           "isEmergency",
           "urgencyJustification",
+          "emergencyJustification",
+          "hasOwnMeans",
+          "overrideInnovation",
+          "includesIDPhases",
+          "pblAdjustedToMax",
+          "isSubscription",
           "completionPercentage",
           "lastPendingAction",
           "metadata",
+          "deliveryLocations",
         ];
 
         for (const field of allowedFields) {
@@ -493,6 +622,39 @@ const routes: FastifyPluginAsync = async (fastify) => {
         if (data.riskLevel !== undefined) {
           updateData["riskLevel"] = data.riskLevel;
         }
+        // New enum fields (stored as-is, no conversion needed)
+        if (data.processingRegime !== undefined) {
+          updateData["processingRegime"] = data.processingRegime;
+        }
+        if (data.emergencyOperationalRoute !== undefined) {
+          updateData["emergencyOperationalRoute"] =
+            data.emergencyOperationalRoute;
+        }
+        if (data.emergencyReasons !== undefined) {
+          updateData["emergencyReasons"] = data.emergencyReasons;
+        }
+        if (data.deliveryType !== undefined) {
+          updateData["deliveryType"] = data.deliveryType;
+        }
+        if (data.deliveryFrequency !== undefined) {
+          updateData["deliveryFrequency"] = data.deliveryFrequency;
+        }
+        if (data.deliveryDeadlineUnit !== undefined) {
+          updateData["deliveryDeadlineUnit"] = data.deliveryDeadlineUnit;
+        }
+        if (data.deliveryLocationMode !== undefined) {
+          updateData["deliveryLocationMode"] = data.deliveryLocationMode;
+        }
+        if (data.fiscalRegime !== undefined) {
+          updateData["fiscalRegime"] = data.fiscalRegime;
+        }
+        if (data.innovationLevel !== undefined) {
+          updateData["innovationLevel"] = data.innovationLevel;
+        }
+        if (data.centralizationNotApplicableReason !== undefined) {
+          updateData["centralizationNotApplicableReason"] =
+            data.centralizationNotApplicableReason;
+        }
 
         // Handle numeric fields
         if (data.estimatedContractValue !== undefined) {
@@ -513,6 +675,25 @@ const routes: FastifyPluginAsync = async (fastify) => {
           updateData["modificationsAmount"] = parseFloat(
             data.modificationsAmount,
           );
+        }
+        if (data.maxBudget !== undefined) {
+          updateData["maxBudget"] = parseFloat(data.maxBudget);
+        }
+
+        // Handle integer fields
+        if (data.deliveryDeadlineValue !== undefined) {
+          updateData["deliveryDeadlineValue"] = parseInt(
+            data.deliveryDeadlineValue,
+          );
+        }
+        if (data.supplyPeriodMonths !== undefined) {
+          updateData["supplyPeriodMonths"] = parseInt(data.supplyPeriodMonths);
+        }
+        if (data.durationMonths !== undefined) {
+          updateData["durationMonths"] = parseInt(data.durationMonths);
+        }
+        if (data.extensionMonths !== undefined) {
+          updateData["extensionMonths"] = parseInt(data.extensionMonths);
         }
 
         // Handle date field

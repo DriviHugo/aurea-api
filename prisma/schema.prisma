@@ -109,6 +109,64 @@ enum RiskLevel {
   red
 }
 
+enum ProcessingRegime {
+  ordinaria
+  urgente_119
+  emergencia_120
+}
+
+enum EmergencyOperationalRoute {
+  am_direct_purchase
+  am_second_tender
+  sda_invitation
+  own_means
+  immediate_action
+}
+
+enum EmergencyReason {
+  catastrofe
+  peligro_grave
+  defensa_nacional
+}
+
+enum DeliveryType {
+  single
+  successive
+}
+
+enum DeliveryFrequency {
+  monthly
+  quarterly
+  on_demand
+}
+
+enum DeliveryDeadlineUnit {
+  days
+  weeks
+}
+
+enum DeliveryLocationMode {
+  single_location
+  multiple_locations
+}
+
+enum FiscalRegime {
+  IVA
+  IGIC
+  IPSI
+}
+
+enum InnovationLevel {
+  existe
+  requiere_adaptacion
+  no_existe
+}
+
+enum CentralizationNotApplicableReason {
+  error_identificacion
+  causa_juridica
+}
+
 // ============ MODELS ============
 
 model Profile {
@@ -167,6 +225,43 @@ model Case {
   isUrgent               Boolean        @default(false)
   isEmergency            Boolean        @default(false)
   urgencyJustification   String?
+
+  // Processing regime (Art. 119/120 LCSP)
+  processingRegime             ProcessingRegime?
+  emergencyOperationalRoute    EmergencyOperationalRoute?
+  emergencyReasons             EmergencyReason[]
+  emergencyJustification       String?
+  hasOwnMeans                  Boolean                          @default(false)
+
+  // Supply delivery terms
+  deliveryType                 DeliveryType?
+  deliveryDeadlineValue        Int?
+  deliveryDeadlineUnit         DeliveryDeadlineUnit?
+  supplyPeriodMonths           Int?
+  deliveryFrequency            DeliveryFrequency?
+  deliveryLocationMode         DeliveryLocationMode?
+  deliveryLocations            Json?
+
+  // Innovation
+  overrideInnovation           Boolean                          @default(false)
+  innovationLevel              InnovationLevel?
+  includesIDPhases             Boolean                          @default(false)
+
+  // Centralization
+  centralizationNotApplicableReason CentralizationNotApplicableReason?
+
+  // Fiscal & budget
+  fiscalRegime                 FiscalRegime?
+  maxBudget                    Decimal?                         @db.Decimal(15, 2)
+  pblAdjustedToMax             Boolean                          @default(false)
+
+  // Contract duration
+  durationMonths               Int?
+  extensionMonths              Int?
+
+  // Subscription
+  isSubscription               Boolean                          @default(false)
+
   completionPercentage   Int            @default(0)
   riskLevel              RiskLevel      @default(green)
   lastPendingAction      String?

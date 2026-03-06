@@ -5,6 +5,16 @@ import {
   type ContractType,
   type ProcedureType,
   type RiskLevel,
+  type ProcessingRegime,
+  type EmergencyOperationalRoute,
+  type EmergencyReason,
+  type DeliveryType,
+  type DeliveryFrequency,
+  type DeliveryDeadlineUnit,
+  type DeliveryLocationMode,
+  type FiscalRegime,
+  type InnovationLevel,
+  type CentralizationNotApplicableReason,
 } from "@prisma/client";
 
 export interface PaginationParams {
@@ -43,6 +53,28 @@ export interface CreateCaseInput {
   isUrgent?: boolean;
   isEmergency?: boolean;
   urgencyJustification?: string;
+  processingRegime?: string;
+  emergencyOperationalRoute?: string;
+  emergencyReasons?: string[];
+  emergencyJustification?: string;
+  hasOwnMeans?: boolean;
+  deliveryType?: string;
+  deliveryDeadlineValue?: number;
+  deliveryDeadlineUnit?: string;
+  supplyPeriodMonths?: number;
+  deliveryFrequency?: string;
+  deliveryLocationMode?: string;
+  deliveryLocations?: Prisma.InputJsonValue;
+  overrideInnovation?: boolean;
+  innovationLevel?: string;
+  includesIDPhases?: boolean;
+  centralizationNotApplicableReason?: string;
+  fiscalRegime?: string;
+  maxBudget?: number;
+  pblAdjustedToMax?: boolean;
+  durationMonths?: number;
+  extensionMonths?: number;
+  isSubscription?: boolean;
   completionPercentage?: number;
   riskLevel?: string;
   lastPendingAction?: string;
@@ -179,6 +211,52 @@ export class CaseService {
     if (input.numLots !== undefined) data.numLots = input.numLots;
     if (input.urgencyJustification !== undefined)
       data.urgencyJustification = input.urgencyJustification;
+    if (input.processingRegime !== undefined)
+      data.processingRegime = input.processingRegime as ProcessingRegime;
+    if (input.emergencyOperationalRoute !== undefined)
+      data.emergencyOperationalRoute =
+        input.emergencyOperationalRoute as EmergencyOperationalRoute;
+    if (input.emergencyReasons !== undefined)
+      data.emergencyReasons = input.emergencyReasons as EmergencyReason[];
+    if (input.emergencyJustification !== undefined)
+      data.emergencyJustification = input.emergencyJustification;
+    if (input.hasOwnMeans !== undefined) data.hasOwnMeans = input.hasOwnMeans;
+    if (input.deliveryType !== undefined)
+      data.deliveryType = input.deliveryType as DeliveryType;
+    if (input.deliveryDeadlineValue !== undefined)
+      data.deliveryDeadlineValue = input.deliveryDeadlineValue;
+    if (input.deliveryDeadlineUnit !== undefined)
+      data.deliveryDeadlineUnit =
+        input.deliveryDeadlineUnit as DeliveryDeadlineUnit;
+    if (input.supplyPeriodMonths !== undefined)
+      data.supplyPeriodMonths = input.supplyPeriodMonths;
+    if (input.deliveryFrequency !== undefined)
+      data.deliveryFrequency = input.deliveryFrequency as DeliveryFrequency;
+    if (input.deliveryLocationMode !== undefined)
+      data.deliveryLocationMode =
+        input.deliveryLocationMode as DeliveryLocationMode;
+    if (input.deliveryLocations !== undefined)
+      data.deliveryLocations = input.deliveryLocations ?? Prisma.JsonNull;
+    if (input.overrideInnovation !== undefined)
+      data.overrideInnovation = input.overrideInnovation;
+    if (input.innovationLevel !== undefined)
+      data.innovationLevel = input.innovationLevel as InnovationLevel;
+    if (input.includesIDPhases !== undefined)
+      data.includesIDPhases = input.includesIDPhases;
+    if (input.centralizationNotApplicableReason !== undefined)
+      data.centralizationNotApplicableReason =
+        input.centralizationNotApplicableReason as CentralizationNotApplicableReason;
+    if (input.fiscalRegime !== undefined)
+      data.fiscalRegime = input.fiscalRegime as FiscalRegime;
+    if (input.maxBudget !== undefined) data.maxBudget = input.maxBudget;
+    if (input.pblAdjustedToMax !== undefined)
+      data.pblAdjustedToMax = input.pblAdjustedToMax;
+    if (input.durationMonths !== undefined)
+      data.durationMonths = input.durationMonths;
+    if (input.extensionMonths !== undefined)
+      data.extensionMonths = input.extensionMonths;
+    if (input.isSubscription !== undefined)
+      data.isSubscription = input.isSubscription;
     if (input.lastPendingAction !== undefined)
       data.lastPendingAction = input.lastPendingAction;
     if (input.dueDate !== undefined) data.dueDate = input.dueDate;
@@ -245,6 +323,54 @@ export class CaseService {
       updateData.isEmergency = input.isEmergency;
     if (input.urgencyJustification !== undefined)
       updateData.urgencyJustification = input.urgencyJustification;
+    if (input.processingRegime !== undefined)
+      updateData.processingRegime = input.processingRegime as ProcessingRegime;
+    if (input.emergencyOperationalRoute !== undefined)
+      updateData.emergencyOperationalRoute =
+        input.emergencyOperationalRoute as EmergencyOperationalRoute;
+    if (input.emergencyReasons !== undefined)
+      updateData.emergencyReasons = input.emergencyReasons as EmergencyReason[];
+    if (input.emergencyJustification !== undefined)
+      updateData.emergencyJustification = input.emergencyJustification;
+    if (input.hasOwnMeans !== undefined)
+      updateData.hasOwnMeans = input.hasOwnMeans;
+    if (input.deliveryType !== undefined)
+      updateData.deliveryType = input.deliveryType as DeliveryType;
+    if (input.deliveryDeadlineValue !== undefined)
+      updateData.deliveryDeadlineValue = input.deliveryDeadlineValue;
+    if (input.deliveryDeadlineUnit !== undefined)
+      updateData.deliveryDeadlineUnit =
+        input.deliveryDeadlineUnit as DeliveryDeadlineUnit;
+    if (input.supplyPeriodMonths !== undefined)
+      updateData.supplyPeriodMonths = input.supplyPeriodMonths;
+    if (input.deliveryFrequency !== undefined)
+      updateData.deliveryFrequency =
+        input.deliveryFrequency as DeliveryFrequency;
+    if (input.deliveryLocationMode !== undefined)
+      updateData.deliveryLocationMode =
+        input.deliveryLocationMode as DeliveryLocationMode;
+    if (input.deliveryLocations !== undefined)
+      updateData.deliveryLocations = input.deliveryLocations;
+    if (input.overrideInnovation !== undefined)
+      updateData.overrideInnovation = input.overrideInnovation;
+    if (input.innovationLevel !== undefined)
+      updateData.innovationLevel = input.innovationLevel as InnovationLevel;
+    if (input.includesIDPhases !== undefined)
+      updateData.includesIDPhases = input.includesIDPhases;
+    if (input.centralizationNotApplicableReason !== undefined)
+      updateData.centralizationNotApplicableReason =
+        input.centralizationNotApplicableReason as CentralizationNotApplicableReason;
+    if (input.fiscalRegime !== undefined)
+      updateData.fiscalRegime = input.fiscalRegime as FiscalRegime;
+    if (input.maxBudget !== undefined) updateData.maxBudget = input.maxBudget;
+    if (input.pblAdjustedToMax !== undefined)
+      updateData.pblAdjustedToMax = input.pblAdjustedToMax;
+    if (input.durationMonths !== undefined)
+      updateData.durationMonths = input.durationMonths;
+    if (input.extensionMonths !== undefined)
+      updateData.extensionMonths = input.extensionMonths;
+    if (input.isSubscription !== undefined)
+      updateData.isSubscription = input.isSubscription;
     if (input.completionPercentage !== undefined)
       updateData.completionPercentage = input.completionPercentage;
     if (input.riskLevel !== undefined)
