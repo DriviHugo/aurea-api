@@ -1,4 +1,4 @@
-name: boilerplate-api
+name: aurea-api
 
 services:
   redis:
@@ -6,7 +6,7 @@ services:
     ports:
       - 35302:6379
     volumes:
-      - ./redis/volumes/data:/data
+      - redis-data:/data
     restart: unless-stopped
     networks:
       - net
@@ -17,36 +17,16 @@ services:
       retries: 5
       start_period: 5s
 
-  mongo:
-    image: mongo:8
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: mongo
-      MONGO_INITDB_ROOT_PASSWORD: mongo
-      MONGO_INITDB_DATABASE: boilerplate-api
-    ports:
-      - 26943:27017
-    volumes:
-      - ./mongo/volumes/data:/data/db
-    restart: unless-stopped
-    networks:
-      - net
-    healthcheck:
-      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
-
   postgres:
     image: postgres:17
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: boilerplate-api
+      POSTGRES_DB: myproject
     ports:
       - "54320:5432"
     volumes:
-      - ./postgres/volumes/data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
     restart: unless-stopped
     networks:
       - net
@@ -61,20 +41,13 @@ services:
     image: dbgate/dbgate
     restart: unless-stopped
     environment:
-      CONNECTIONS: con1,con2,con3
+      CONNECTIONS: con1,con3
       LABEL_con1: Postgres
       SERVER_con1: postgres
       USER_con1: postgres
       PASSWORD_con1: postgres
       PORT_con1: 5432
       ENGINE_con1: postgres@dbgate-plugin-postgres
-
-      LABEL_con2: MongoDB
-      SERVER_con2: mongo
-      USER_con2: mongo
-      PASSWORD_con2: mongo
-      PORT_con2: 27017
-      ENGINE_con2: mongo@dbgate-plugin-mongo
 
       LABEL_con3: Redis
       SERVER_con3: redis
@@ -87,7 +60,6 @@ services:
       - "55401:3000"
     depends_on:
       - postgres
-      - mongo
       - redis
     networks:
       - net
@@ -138,6 +110,8 @@ services:
 volumes:
   dbgate-data:
   minio-data:
+  postgres_data:
+  redis-data:
 
 networks:
   net:

@@ -1,48 +1,70 @@
-# This is initial skeleton for production. Needs traefik, nginx and better configurations.
-
-name: boilerplate-api
+name: aurea-api
 
 services:
   redis:
     image: redis:7.4-alpine
     ports:
-      - 34302:6379
+      - 127.0.0.1:6379:6379
     volumes:
-      - ./redis/volumes/data:/data
+      - redis-data:/data
     restart: unless-stopped
     networks:
       - net
-
-  mongo:
-    image: mongo:8
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: mongo
-      MONGO_INITDB_ROOT_PASSWORD: mongo
-      MONGO_INITDB_DATABASE: boilerplate-api
-    ports:
-      - 25943:27017
-    volumes:
-      - ./mongo/volumes/data:/data/db
-    restart: unless-stopped
-    networks:
-      - net
+    healthcheck:
+      test: [ "CMD-SHELL", "redis-cli ping | grep PONG" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s      
 
   postgres:
     image: postgres:17
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: boilerplate-api
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     ports:
-      - "54320:5432"
+      - "127.0.0.1:5432:5432"
     volumes:
-      - ./postgres/volumes/data:/var/lib/postgresql/data
+      - postgres-data:/var/lib/postgresql/data
     restart: unless-stopped
     networks:
       - net
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s  
+
+  minio:
+    image: minio/minio:latest
+    command: server /data --console-address ":9001"
+    ports:
+      - "127.0.0.1:9000:9000" # API endpoint
+      - "127.0.0.1:9001:9001" # Web console
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    volumes:
+      - minio-data:/data
+    restart: unless-stopped
+    networks:
+      - net
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+      start_period: 10s
 
 volumes:
-  dbgate-data:
+  minio-data:
+    external: true
+  postgres-data:
+    external: true
+  redis-data:
+    external: true
 
 networks:
   net:
