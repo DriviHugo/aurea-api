@@ -143,12 +143,17 @@ async function handleAnalysis(
  */
 function extractJson(text: string): Record<string, unknown> {
   // Strip markdown code fences
-  let clean = text.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
+  let clean = text
+    .replace(/```json\n?/g, "")
+    .replace(/```\n?/g, "")
+    .trim();
 
   // 1. Try direct parse
   try {
     return JSON.parse(clean) as Record<string, unknown>;
-  } catch { /* continue */ }
+  } catch {
+    /* continue */
+  }
 
   // 2. Find the first { and extract balanced JSON
   const startIdx = clean.indexOf("{");
@@ -162,19 +167,39 @@ function extractJson(text: string): Record<string, unknown> {
 
   for (let i = startIdx; i < clean.length; i++) {
     const ch = clean[i];
-    if (escape) { escape = false; continue; }
-    if (ch === "\\") { escape = true; continue; }
-    if (ch === '"') { inString = !inString; continue; }
+    if (escape) {
+      escape = false;
+      continue;
+    }
+    if (ch === "\\") {
+      escape = true;
+      continue;
+    }
+    if (ch === '"') {
+      inString = !inString;
+      continue;
+    }
     if (inString) continue;
     if (ch === "{") depth++;
-    if (ch === "}") { depth--; if (depth === 0) { endIdx = i; break; } }
+    if (ch === "}") {
+      depth--;
+      if (depth === 0) {
+        endIdx = i;
+        break;
+      }
+    }
   }
 
   if (endIdx !== -1) {
     // Found balanced braces
     try {
-      return JSON.parse(clean.substring(startIdx, endIdx + 1)) as Record<string, unknown>;
-    } catch { /* continue to truncation repair */ }
+      return JSON.parse(clean.substring(startIdx, endIdx + 1)) as Record<
+        string,
+        unknown
+      >;
+    } catch {
+      /* continue to truncation repair */
+    }
   }
 
   // 3. JSON is truncated (ALIA hit token limit) — try to close it
@@ -183,8 +208,11 @@ function extractJson(text: string): Record<string, unknown> {
   truncated = truncated.replace(/,\s*"[^"]*"?\s*:\s*"[^"]*$/, "");
   truncated = truncated.replace(/,\s*"[^"]*$/, "");
   // Close open brackets/braces
-  const openBraces = (truncated.match(/{/g) || []).length - (truncated.match(/}/g) || []).length;
-  const openBrackets = (truncated.match(/\[/g) || []).length - (truncated.match(/]/g) || []).length;
+  const openBraces =
+    (truncated.match(/{/g) || []).length - (truncated.match(/}/g) || []).length;
+  const openBrackets =
+    (truncated.match(/\[/g) || []).length -
+    (truncated.match(/]/g) || []).length;
   for (let i = 0; i < openBrackets; i++) truncated += "]";
   for (let i = 0; i < openBraces; i++) truncated += "}";
 
