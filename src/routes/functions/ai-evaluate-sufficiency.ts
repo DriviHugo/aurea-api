@@ -55,8 +55,8 @@ export default async (fastify: FastifyInstance): Promise<void> => {
             sectionTitle: { type: "string" },
             sectionDescription: { type: "string" },
             sectionOrder: { type: "integer" },
-            caseContext: { type: "object" },
-            plan: { type: "array" },
+            caseContext: { type: "object", additionalProperties: true },
+            plan: { type: "array", items: { type: "object", properties: { order: { type: "integer" }, title: { type: "string" }, description: { type: "string" } } } },
             previousAnswers: {
               type: "array",
               items: {

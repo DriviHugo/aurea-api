@@ -183,7 +183,7 @@ const caseSchema = {
       type: "string",
       enum: DELIVERY_LOCATION_MODE_VALUES,
     },
-    deliveryLocations: { type: ["array", "object"] },
+    deliveryLocations: { type: "array", nullable: true, items: { type: "object" } },
     overrideInnovation: { type: "boolean" },
     innovationLevel: { type: "string", enum: INNOVATION_LEVEL_VALUES },
     includesIDPhases: { type: "boolean" },
