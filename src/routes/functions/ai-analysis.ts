@@ -17,6 +17,7 @@ import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
 import { getProductionGateway } from "../../services/ai-gateway/production-gateway.js";
 import type { FallbackAIGatewayService } from "../../services/ai-gateway/fallback-gateway.service.js";
 import type { AICompletionResponse } from "../../services/ai-gateway/types.js";
+import logger from "../../config/logger.js";
 
 let aiGateway: FallbackAIGatewayService | null = null;
 
@@ -25,168 +26,77 @@ function getAIGateway(): FallbackAIGatewayService {
   return aiGateway;
 }
 
+// Suffix appended to every user prompt to reinforce JSON-only output.
+// ALIA tends to ignore system-prompt instructions and produce markdown instead.
+const JSON_SUFFIX = `
+
+INSTRUCCIÓN CRÍTICA: Tu respuesta debe ser ÚNICAMENTE un objeto JSON válido.
+NO incluyas texto explicativo, markdown, encabezados ni comentarios.
+Empieza tu respuesta directamente con { y termina con }.`;
+
 // System prompts for each analysis type
 const PROMPTS = {
-  cpv: `Eres un experto en clasificación CPV (Common Procurement Vocabulary) para contratación pública española.
-Analiza el objeto del contrato y sugiere los códigos CPV más apropiados.
+  cpv: `Eres un clasificador CPV automático. Respondes EXCLUSIVAMENTE con JSON.
+Tu única función es devolver un JSON con códigos CPV para contratación pública española.
+NUNCA escribas texto, explicaciones, markdown ni encabezados. Solo JSON puro.
+Formato exacto de respuesta:
+{"codes":[{"code":"XXXXXXXX-X","description":"Descripción","isPrimary":true,"relevance":95,"justification":"Razón"}],"observations":""}`,
 
-IMPORTANTE: Responde SOLO con un JSON válido, sin texto adicional ni markdown.
-{
-  "codes": [
-    {
-      "code": "XXXXXXXX-X",
-      "description": "Descripción oficial del código CPV",
-      "isPrimary": true,
-      "relevance": 95,
-      "justification": "Por qué este código es apropiado"
-    }
-  ],
-  "observations": "Observaciones adicionales"
-}`,
-
-  tipo: `Eres un experto en contratación pública española (LCSP 9/2017).
-Determina el tipo de contrato más adecuado según el objeto.
-
+  tipo: `Eres un clasificador de tipos de contrato. Respondes EXCLUSIVAMENTE con JSON.
+Tu única función es devolver un JSON indicando el tipo de contrato según la LCSP 9/2017.
+NUNCA escribas texto, explicaciones, markdown ni encabezados. Solo JSON puro.
 Tipos válidos: "obras" | "servicios" | "suministros" | "concesion_obras" | "concesion_servicios" | "administrativo_especial" | "privado"
+Formato exacto de respuesta:
+{"recommendedType":"servicios","justification":"Razón","lcspArticles":["Art. 17"],"alternatives":[{"type":"suministros","reason":"Motivo"}]}`,
 
-IMPORTANTE: Responde SOLO con un JSON válido.
-{
-  "recommendedType": "servicios",
-  "justification": "Explicación detallada",
-  "lcspArticles": ["Art. 17", "Art. 18"],
-  "alternatives": [
-    {
-      "type": "suministros",
-      "reason": "Podría considerarse si..."
-    }
-  ]
-}`,
+  emergencia: `Eres un evaluador de emergencias contractuales. Respondes EXCLUSIVAMENTE con JSON.
+Tu única función es evaluar si un contrato justifica tramitación de emergencia según Art. 120 LCSP.
+NUNCA escribas texto, explicaciones, markdown ni encabezados. Solo JSON puro.
+Criterios: catástrofes, grave peligro, defensa nacional.
+Formato exacto de respuesta:
+{"isEmergency":false,"emergencyProbability":"nula","justification":"Razón","warnings":[],"missingRequirements":[]}`,
 
-  emergencia: `Eres un experto en contratación pública española, especializado en el Art. 120 LCSP (tramitación de emergencia).
-Analiza si el objeto del contrato podría justificar una tramitación de emergencia.
+  centralizacion: `Eres un evaluador de contratación centralizada. Respondes EXCLUSIVAMENTE con JSON.
+Tu única función es evaluar si un contrato está cubierto por instrumentos centralizados (DGRCC).
+NUNCA escribas texto, explicaciones, markdown ni encabezados. Solo JSON puro.
+Instrumentos: Acuerdos Marco (AM), Sistemas Dinámicos de Adquisición (SDA), Contrato Centralizado (CC).
+Formato exacto de respuesta:
+{"applies":false,"instrumentId":null,"inCentralizedProcurement":false,"inFrameworkAgreement":false,"recommendedLot":null,"recommendedModality":null,"modalityJustification":"","recommendation":"Razón"}`,
 
-Criterios Art. 120 LCSP:
-- Catástrofes, calamidades o similar
-- Situaciones que supongan grave peligro
-- Necesidades de defensa nacional
+  mediopropio: `Eres un evaluador de medios propios. Respondes EXCLUSIVAMENTE con JSON.
+Tu única función es evaluar si un contrato podría ser prestado por un medio propio (Arts. 32-33 LCSP).
+NUNCA escribas texto, explicaciones, markdown ni encabezados. Solo JSON puro.
+Formato exacto de respuesta:
+{"ownMeansExists":false,"probability":"nula","suggestedOwnMeans":[],"justification":"Razón","requirementsToVerify":[]}`,
 
-IMPORTANTE: Responde SOLO con un JSON válido.
-{
-  "isEmergency": false,
-  "emergencyProbability": "nula",
-  "justification": "Explicación detallada",
-  "warnings": ["Advertencia si aplica"],
-  "missingRequirements": ["Requisito que faltaría"]
-}`,
+  subscripcion: `Eres un evaluador de suscripciones. Respondes EXCLUSIVAMENTE con JSON.
+Tu única función es evaluar si un contrato tiene características de suscripción o servicio recurrente.
+NUNCA escribas texto, explicaciones, markdown ni encabezados. Solo JSON puro.
+Formato exacto de respuesta:
+{"isSubscription":false,"probability":"nula","recurrenceType":"no_aplica","subscriptionCategory":null,"justification":"Razón","estimatedValueImplications":"","suggestedDuration":{"minMonths":12,"maxMonths":48,"recommendedMonths":24}}`,
 
-  centralizacion: `Eres un experto en contratación centralizada del Estado español (DGRCC).
-Analiza si el objeto del contrato podría estar cubierto por un instrumento de contratación centralizada.
+  innovacion: `Eres un evaluador de innovación. Respondes EXCLUSIVAMENTE con JSON.
+Tu única función es evaluar el nivel de innovación requerido para un contrato público.
+NUNCA escribas texto, explicaciones, markdown ni encabezados. Solo JSON puro.
+Niveles: "existe" | "requiere_adaptacion" | "no_existe"
+Formato exacto de respuesta:
+{"innovationLevel":"existe","justification":"Razón","recommendations":[],"suggestedProcedures":[]}`,
 
-Instrumentos disponibles: Acuerdos Marco (AM), Sistemas Dinámicos de Adquisición (SDA), Contrato Centralizado (CC).
+  duracion: `Eres un estimador de plazos contractuales. Respondes EXCLUSIVAMENTE con JSON.
+NUNCA escribas texto, explicaciones, markdown ni encabezados. Solo JSON puro.
+Formato exacto de respuesta:
+{"months":12,"extensionMonths":12,"justification":"Razón con artículos LCSP"}`,
 
-IMPORTANTE: Responde SOLO con un JSON válido.
-{
-  "applies": false,
-  "instrumentId": null,
-  "inCentralizedProcurement": false,
-  "inFrameworkAgreement": false,
-  "recommendedLot": null,
-  "recommendedModality": null,
-  "modalityJustification": "",
-  "recommendation": "Explicación detallada"
-}`,
+  lotes: `Eres un evaluador de división en lotes. Respondes EXCLUSIVAMENTE con JSON.
+Evalúa según Art. 99.3 LCSP (favorecer PYMES, naturaleza divisible, evitar monopolio).
+NUNCA escribas texto, explicaciones, markdown ni encabezados. Solo JSON puro.
+Formato exacto de respuesta:
+{"recommendsDivision":false,"justification":"Razón","lots":[]}`,
 
-  mediopropio: `Eres un experto en encargos a medios propios personificados (Arts. 32-33 LCSP).
-Analiza si el objeto del contrato podría ser prestado por un medio propio de la Administración.
-
-IMPORTANTE: Responde SOLO con un JSON válido.
-{
-  "ownMeansExists": false,
-  "probability": "nula",
-  "suggestedOwnMeans": [],
-  "justification": "Explicación detallada",
-  "requirementsToVerify": ["Requisito a verificar"]
-}`,
-
-  subscripcion: `Eres un experto en contratos de suministro y servicios recurrentes según la LCSP.
-Analiza si el objeto del contrato tiene características de suscripción o servicio recurrente.
-
-IMPORTANTE: Responde SOLO con un JSON válido.
-{
-  "isSubscription": false,
-  "probability": "nula",
-  "recurrenceType": "no_aplica",
-  "subscriptionCategory": null,
-  "justification": "Explicación",
-  "estimatedValueImplications": "Impacto en el valor estimado",
-  "suggestedDuration": {
-    "minMonths": 12,
-    "maxMonths": 48,
-    "recommendedMonths": 24
-  }
-}`,
-
-  innovacion: `Eres un experto en compra pública de innovación y procedimientos especiales de la LCSP.
-Analiza el nivel de innovación requerido para el objeto del contrato.
-
-Niveles: "existe" (solución en mercado), "requiere_adaptacion" (adaptación necesaria), "no_existe" (desarrollo nuevo)
-
-IMPORTANTE: Responde SOLO con un JSON válido.
-{
-  "innovationLevel": "existe",
-  "justification": "Explicación detallada",
-  "recommendations": ["Recomendación 1"],
-  "suggestedProcedures": ["Abierto", "Licitación con negociación"]
-}`,
-
-  duracion: `Eres un experto en plazos de contratos públicos según la LCSP.
-Estima la duración recomendada para el contrato según su tipo y objeto.
-
-IMPORTANTE: Responde SOLO con un JSON válido.
-{
-  "months": 12,
-  "extensionMonths": 12,
-  "justification": "Explicación con referencia a artículos LCSP"
-}`,
-
-  lotes: `Eres un experto en división en lotes de contratos públicos (Art. 99.3 LCSP).
-Analiza si el contrato debería dividirse en lotes.
-
-Criterios Art. 99.3 LCSP:
-- Favorecer participación de PYMES
-- Naturaleza del objeto permite división
-- Riesgo de monopolio
-
-IMPORTANTE: Responde SOLO con un JSON válido.
-{
-  "recommendsDivision": false,
-  "justification": "Explicación detallada",
-  "lots": [
-    {
-      "number": 1,
-      "name": "Nombre del lote",
-      "description": "Descripción",
-      "percentage": 50
-    }
-  ]
-}`,
-
-  partidas: `Eres un experto en presupuestación de contratos públicos.
-Propón las partidas presupuestarias para el objeto del contrato.
-
-IMPORTANTE: Responde SOLO con un JSON válido.
-{
-  "items": [
-    {
-      "lotNumber": 1,
-      "concept": "Descripción de la partida",
-      "quantity": 1,
-      "unitPrice": 1000.00,
-      "costType": "fijo",
-      "periodicity": null
-    }
-  ]
-}`,
+  partidas: `Eres un presupuestador de contratos públicos. Respondes EXCLUSIVAMENTE con JSON.
+NUNCA escribas texto, explicaciones, markdown ni encabezados. Solo JSON puro.
+Formato exacto de respuesta:
+{"items":[{"lotNumber":1,"concept":"Descripción","quantity":1,"unitPrice":1000.00,"costType":"fijo","periodicity":null}]}`,
 };
 
 // Generic analysis handler - returns parsed JSON merged with _meta (provider info)
@@ -201,33 +111,115 @@ async function handleAnalysis(
   const startTime = Date.now();
   const response: AICompletionResponse = await gateway.completeWithMeta(
     systemPrompt,
-    userPrompt,
+    userPrompt + JSON_SUFFIX,
   );
 
+  const buildMeta = () => ({
+    provider: response.provider,
+    model: response.model,
+    tokensUsed: response.usage.totalTokens,
+    generationTimeMs: Date.now() - startTime,
+  });
+
   try {
-    const cleanResponse = response.content
-      .replace(/```json\n?/g, "")
-      .replace(/```\n?/g, "")
-      .trim();
-    const parsed = JSON.parse(cleanResponse) as Record<string, unknown>;
-    // Merge AI metadata into the response so frontend can display provider badge
-    return {
-      ...parsed,
-      _meta: {
-        provider: response.provider,
-        model: response.model,
-        tokensUsed: response.usage.totalTokens,
-        generationTimeMs: Date.now() - startTime,
-      },
-    };
-  } catch {
-    console.error(
-      `[AI-Analysis] Failed to parse ${analysisName} response:`,
-      response.content,
-    );
+    const parsed = extractJson(response.content);
+    return { ...parsed, _meta: buildMeta() };
+  } catch (parseErr) {
+    logger.error({
+      msg: `[AI-Analysis] Failed to parse ${analysisName} response`,
+      error: (parseErr as Error).message,
+      responseContent: response.content.substring(0, 500),
+    });
     throw new Error(
       `Error al procesar la respuesta de IA para ${analysisName}`,
     );
+  }
+}
+
+/**
+ * Extract a JSON object from AI response text.
+ * Handles: pure JSON, markdown code blocks, JSON wrapped in explanatory text,
+ * and truncated JSON (attempts to close open braces/brackets).
+ */
+function extractJson(text: string): Record<string, unknown> {
+  // Strip markdown code fences
+  let clean = text
+    .replace(/```json\n?/g, "")
+    .replace(/```\n?/g, "")
+    .trim();
+
+  // 1. Try direct parse
+  try {
+    return JSON.parse(clean) as Record<string, unknown>;
+  } catch {
+    /* continue */
+  }
+
+  // 2. Find the first { and extract balanced JSON
+  const startIdx = clean.indexOf("{");
+  if (startIdx === -1) throw new Error("No JSON object found in response");
+
+  // Extract from first { to matching }, handling nesting
+  let depth = 0;
+  let inString = false;
+  let escape = false;
+  let endIdx = -1;
+
+  for (let i = startIdx; i < clean.length; i++) {
+    const ch = clean[i];
+    if (escape) {
+      escape = false;
+      continue;
+    }
+    if (ch === "\\") {
+      escape = true;
+      continue;
+    }
+    if (ch === '"') {
+      inString = !inString;
+      continue;
+    }
+    if (inString) continue;
+    if (ch === "{") depth++;
+    if (ch === "}") {
+      depth--;
+      if (depth === 0) {
+        endIdx = i;
+        break;
+      }
+    }
+  }
+
+  if (endIdx !== -1) {
+    // Found balanced braces
+    try {
+      return JSON.parse(clean.substring(startIdx, endIdx + 1)) as Record<
+        string,
+        unknown
+      >;
+    } catch {
+      /* continue to truncation repair */
+    }
+  }
+
+  // 3. JSON is truncated (ALIA hit token limit) — try to close it
+  let truncated = clean.substring(startIdx);
+  // Remove any trailing incomplete string value
+  truncated = truncated.replace(/,\s*"[^"]*"?\s*:\s*"[^"]*$/, "");
+  truncated = truncated.replace(/,\s*"[^"]*$/, "");
+  // Close open brackets/braces
+  const openBraces =
+    (truncated.match(/{/g) || []).length - (truncated.match(/}/g) || []).length;
+  const openBrackets =
+    (truncated.match(/\[/g) || []).length -
+    (truncated.match(/]/g) || []).length;
+  for (let i = 0; i < openBrackets; i++) truncated += "]";
+  for (let i = 0; i < openBraces; i++) truncated += "}";
+
+  try {
+    return JSON.parse(truncated) as Record<string, unknown>;
+  } catch {
+    throw new Error("No valid JSON object found in response");
   }
 }
 
