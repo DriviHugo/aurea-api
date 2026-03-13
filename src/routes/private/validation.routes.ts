@@ -36,7 +36,11 @@ const routes: FastifyPluginAsync = async (fastify) => {
                   properties: {
                     id: { type: "string", format: "uuid" },
                     caseId: { type: "string", format: "uuid" },
-                    documentId: { type: "string", nullable: true, format: "uuid" },
+                    documentId: {
+                      type: "string",
+                      nullable: true,
+                      format: "uuid",
+                    },
                     ruleId: { type: "string", format: "uuid" },
                     passed: { type: "boolean" },
                     foundValue: { type: "string", nullable: true },
@@ -179,12 +183,14 @@ const routes: FastifyPluginAsync = async (fastify) => {
             foundValue: { type: "string", nullable: true },
             explanation: { type: "string", minLength: 1 },
             structureScore: {
-              type: "integer", nullable: true,
+              type: "integer",
+              nullable: true,
               minimum: 0,
               maximum: 100,
             },
             contentScore: {
-              type: "integer", nullable: true,
+              type: "integer",
+              nullable: true,
               minimum: 0,
               maximum: 100,
             },
@@ -292,12 +298,14 @@ const routes: FastifyPluginAsync = async (fastify) => {
             foundValue: { type: "string", nullable: true },
             explanation: { type: "string", minLength: 1 },
             structureScore: {
-              type: "integer", nullable: true,
+              type: "integer",
+              nullable: true,
               minimum: 0,
               maximum: 100,
             },
             contentScore: {
-              type: "integer", nullable: true,
+              type: "integer",
+              nullable: true,
               minimum: 0,
               maximum: 100,
             },
