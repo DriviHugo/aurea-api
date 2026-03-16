@@ -17,7 +17,7 @@ interface WizardHelpRequest {
 const SYSTEM_PROMPT = `Eres un experto en contratación pública española (LCSP 9/2017).
 Tu tarea es proporcionar ayuda contextual y concisa para el asistente de creación de expedientes.
 
-Responde SIEMPRE en formato JSON con esta estructura:
+Responde SIEMPRE en formato JSON válido con esta estructura:
 {
   "ayuda": "Texto de ayuda principal (2-3 párrafos máximo)",
   "section": "Nombre de la sección",
@@ -26,7 +26,11 @@ Responde SIEMPRE en formato JSON con esta estructura:
   "errorComun": "Error común a evitar (opcional)"
 }
 
-Sé conciso y práctico. No incluyas información innecesaria.`;
+IMPORTANTE:
+- No incluyas comentarios, texto fuera del JSON, ni explicaciones adicionales.
+- No uses comas finales, ni caracteres de control, ni saltos de línea innecesarios.
+- Responde solo con el JSON, sin ningún texto extra.
+- Sé conciso y práctico. No incluyas información innecesaria.`;
 
 const STEP_CONTEXTS: Record<string, string> = {
   objeto:
@@ -120,7 +124,16 @@ Proporciona ayuda contextual y práctica para este paso.`;
           userPrompt,
         );
 
-        const jsonMatch = response.match(/\{[\s\S]*\}/);
+        // Sanitize AI response to remove bad control characters and ensure valid JSON
+        let sanitized = response;
+        // Remove comments, trailing commas, and control characters
+        sanitized = sanitized.replace(/\r|\n|\t/g, " "); // Replace newlines/tabs with space
+        sanitized = sanitized.replace(/[\u0000-\u001F\u007F]/g, ""); // Remove control chars
+        sanitized = sanitized.replace(/\/\*.*?\*\//g, ""); // Remove JS comments
+        sanitized = sanitized.replace(/,\s*}/g, "}"); // Remove trailing commas
+        sanitized = sanitized.replace(/,\s*]/g, "]"); // Remove trailing commas in arrays
+
+        const jsonMatch = sanitized.match(/\{[\s\S]*\}/);
         if (!jsonMatch) {
           return reply.status(200).send({
             ayuda: response,
@@ -128,8 +141,19 @@ Proporciona ayuda contextual y práctica para este paso.`;
           });
         }
 
-        const parsed = JSON.parse(jsonMatch[0]) as Record<string, unknown>;
-        return reply.status(200).send(parsed);
+        try {
+          const parsed = JSON.parse(jsonMatch[0]) as Record<string, unknown>;
+          return reply.status(200).send(parsed);
+        } catch (parseError) {
+          console.error(
+            "[ai-wizard-help] JSON parse error after sanitization:",
+            parseError,
+          );
+          return reply.status(200).send({
+            ayuda: response,
+            section: sectionId ?? stepId,
+          });
+        }
       } catch (error) {
         console.error("[ai-wizard-help] Error:", error);
         return reply.status(200).send({

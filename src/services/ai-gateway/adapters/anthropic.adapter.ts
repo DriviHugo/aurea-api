@@ -2,14 +2,14 @@
  * Anthropic Adapter - Claude Sonnet 3.5/4
  */
 
-import type {
-  AIConfig,
-  AIProviderAdapter,
-  AICompletionRequest,
-  AICompletionResponse,
-  AIMessage,
+import {
+  type AIConfig,
+  type AIProviderAdapter,
+  type AICompletionRequest,
+  type AICompletionResponse,
+  type AIMessage,
+  AIProvider,
 } from "../types.js";
-import { AIProvider } from "../types.js";
 
 export class AnthropicAdapter implements AIProviderAdapter {
   constructor(private config: AIConfig) {}

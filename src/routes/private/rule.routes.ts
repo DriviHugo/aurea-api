@@ -311,10 +311,15 @@ const routes: FastifyPluginAsync = async (fastify) => {
             status: { type: "string" },
             approverId: { type: "string", nullable: true, format: "uuid" },
             approverRole: {
-              type: "string", nullable: true,
+              type: "string",
+              nullable: true,
               enum: ["processor", "legal", "auditor", "supervisor", "admin"],
             },
-            approvalDate: { type: "string", nullable: true, format: "date-time" },
+            approvalDate: {
+              type: "string",
+              nullable: true,
+              format: "date-time",
+            },
           },
         },
         response: {
