@@ -1,14 +1,535 @@
-// Full English schema - tables and fields in English in PostgreSQL
+generator client {
+  provider = "prisma-client-js"
+}
 
 datasource db {
   provider = "postgresql"
 }
 
-generator client {
-  provider = "prisma-client-js"
+model Profile {
+  id                String              @id @db.Uuid
+  email             String?             @unique
+  password          String?
+  name              String
+  lastName          String?
+  unit              String?
+  active            Boolean             @default(true)
+  showWizardHelp    Boolean             @default(true)
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  aiVersionsCreated AiFunctionVersion[] @relation("AiFunctionVersionCreator")
+  auditLogs         AuditLog[]
+  casesCreated      Case[]              @relation("CaseCreator")
+  comments          Comment[]
+  documentsCreated  Document[]          @relation("DocumentCreator")
+  issuesReported    Issue[]
+  reviews           Review[]
+  rulesApproved     Rule[]              @relation("RuleApprover")
+  validations       Validation[]
 }
 
-// ============ ENUMS ============
+model UserRoleAssignment {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @db.Uuid
+  role      UserRole
+  createdAt DateTime @default(now())
+
+  @@unique([userId, role])
+}
+
+model Case {
+  id                                String                             @id @default(uuid()) @db.Uuid
+  code                              String                             @unique
+  unit                              String
+  department                        String
+  creatorId                         String                             @db.Uuid
+  status                            CaseStatus                         @default(draft)
+  contractType                      ContractType
+  subject                           String
+  description                       String?
+  estimatedContractValue            Decimal?                           @db.Decimal(15, 2)
+  baseTenderBudget                  Decimal?                           @db.Decimal(15, 2)
+  vat                               Decimal?                           @db.Decimal(15, 2)
+  extensionsAmount                  Decimal?                           @db.Decimal(15, 2)
+  modificationsAmount               Decimal?                           @db.Decimal(15, 2)
+  proposedProcedure                 ProcedureType?
+  selectedProcedure                 ProcedureType?
+  selectedCpv                       String?
+  hasLots                           Boolean                            @default(false)
+  lotsJustification                 String?
+  numLots                           Int?
+  isUrgent                          Boolean                            @default(false)
+  isEmergency                       Boolean                            @default(false)
+  urgencyJustification              String?
+  completionPercentage              Int                                @default(0)
+  riskLevel                         RiskLevel                          @default(green)
+  lastPendingAction                 String?
+  dueDate                           DateTime?
+  metadata                          Json                               @default("{}")
+  createdAt                         DateTime                           @default(now())
+  updatedAt                         DateTime                           @updatedAt
+  centralizationNotApplicableReason CentralizationNotApplicableReason?
+  deliveryDeadlineUnit              DeliveryDeadlineUnit?
+  deliveryDeadlineValue             Int?
+  deliveryFrequency                 DeliveryFrequency?
+  deliveryLocationMode              DeliveryLocationMode?
+  deliveryLocations                 Json?
+  deliveryType                      DeliveryType?
+  durationMonths                    Int?
+  emergencyJustification            String?
+  emergencyOperationalRoute         EmergencyOperationalRoute?
+  emergencyReasons                  EmergencyReason[]
+  extensionMonths                   Int?
+  fiscalRegime                      FiscalRegime?
+  hasOwnMeans                       Boolean                            @default(false)
+  includesIDPhases                  Boolean                            @default(false)
+  innovationLevel                   InnovationLevel?
+  isSubscription                    Boolean                            @default(false)
+  maxBudget                         Decimal?                           @db.Decimal(15, 2)
+  overrideInnovation                Boolean                            @default(false)
+  pblAdjustedToMax                  Boolean                            @default(false)
+  processingRegime                  ProcessingRegime?
+  supplyPeriodMonths                Int?
+  auditLogs                         AuditLog[]
+  creator                           Profile                            @relation("CaseCreator", fields: [creatorId], references: [id])
+  documents                         Document[]
+  procedureAlternatives             ProcedureAlternative[]
+  recommendedCpvs                   RecommendedCpv[]
+  reviews                           Review[]
+  validations                       Validation[]
+
+  @@index([status])
+  @@index([creatorId])
+  @@index([unit])
+}
+
+model ProcedureAlternative {
+  id            String        @id @default(uuid()) @db.Uuid
+  caseId        String        @db.Uuid
+  procedure     ProcedureType
+  score         Int?
+  justification String
+  createdAt     DateTime      @default(now())
+  case          Case          @relation(fields: [caseId], references: [id], onDelete: Cascade)
+}
+
+model RecommendedCpv {
+  id            String   @id @default(uuid()) @db.Uuid
+  caseId        String   @db.Uuid
+  code          String
+  description   String
+  score         Int?
+  justification String?
+  createdAt     DateTime @default(now())
+  case          Case     @relation(fields: [caseId], references: [id], onDelete: Cascade)
+}
+
+model CpvCode {
+  id            String   @id @default(uuid()) @db.Uuid
+  code          String   @unique
+  description   String
+  descriptionEn String?
+  level         Int
+  parentCode    String?
+  active        Boolean  @default(true)
+  createdAt     DateTime @default(now())
+
+  @@index([code])
+  @@index([level])
+  @@index([active])
+}
+
+model Evidence {
+  id                  String               @id @default(uuid()) @db.Uuid
+  sourceType          SourceType
+  sourceId            String
+  sourceName          String
+  section             String?
+  range               String?
+  version             String
+  validityStart       DateTime             @db.Date
+  validityEnd         DateTime?            @db.Date
+  textFragment        String
+  metadata            Json                 @default("{}")
+  createdAt           DateTime             @default(now())
+  documentEvidences   DocumentEvidence[]
+  rules               Rule[]
+  validationEvidences ValidationEvidence[]
+}
+
+model Rule {
+  id           String       @id @default(uuid()) @db.Uuid
+  code         String       @unique
+  name         String
+  description  String
+  severity     RuleSeverity
+  evidenceId   String?      @db.Uuid
+  condition    String
+  message      String
+  version      Int          @default(1)
+  status       String       @default("draft")
+  approverId   String?      @db.Uuid
+  approverRole UserRole?
+  approvalDate DateTime?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  approver     Profile?     @relation("RuleApprover", fields: [approverId], references: [id])
+  evidence     Evidence?    @relation(fields: [evidenceId], references: [id])
+  validations  Validation[]
+}
+
+model Document {
+  id                String               @id @default(uuid()) @db.Uuid
+  caseId            String               @db.Uuid
+  type              DocumentType
+  name              String
+  version           Int                  @default(1)
+  hash              String?
+  status            ReviewStatus         @default(pending)
+  content           Json?
+  docxUrl           String?
+  pdfUrl            String?
+  creatorId         String               @db.Uuid
+  createdAt         DateTime             @default(now())
+  updatedAt         DateTime             @updatedAt
+  case              Case                 @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  creator           Profile              @relation("DocumentCreator", fields: [creatorId], references: [id])
+  documentEvidences DocumentEvidence[]
+  generations       DocumentGeneration[]
+  sections          DocumentSection[]
+  versions          DocumentVersion[]
+  reviews           Review[]
+  validations       Validation[]
+
+  @@index([caseId])
+}
+
+model DocumentSection {
+  id               String   @id @default(uuid()) @db.Uuid
+  documentId       String   @db.Uuid
+  order            Int
+  title            String
+  description      String?
+  content          String?
+  status           String   @default("pending")
+  tokensUsed       Int?
+  generationTimeMs Int?
+  lcspArticles     String[]
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  aiModel          String?
+  aiProvider       String?
+  document         Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@unique([documentId, order])
+  @@index([documentId])
+  @@index([status])
+}
+
+model DocumentGeneration {
+  id             String    @id @default(uuid()) @db.Uuid
+  documentId     String    @db.Uuid
+  version        Int       @default(1)
+  plan           Json      @default("{}")
+  status         String    @default("planning")
+  currentSection Int       @default(0)
+  totalSections  Int?
+  globalReview   Json?
+  errors         Json?
+  userId         String    @db.Uuid
+  createdAt      DateTime  @default(now())
+  completedAt    DateTime?
+  document       Document  @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@index([documentId])
+  @@index([status])
+}
+
+model DocumentVersion {
+  id                String   @id @default(uuid()) @db.Uuid
+  documentId        String   @db.Uuid
+  version           Int
+  contentSnapshot   Json
+  sectionsSnapshot  Json?
+  changeDescription String?
+  userId            String   @db.Uuid
+  createdAt         DateTime @default(now())
+  document          Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@unique([documentId, version])
+  @@index([documentId])
+}
+
+model DocumentEvidence {
+  id         String   @id @default(uuid()) @db.Uuid
+  documentId String   @db.Uuid
+  evidenceId String   @db.Uuid
+  createdAt  DateTime @default(now())
+  document   Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  evidence   Evidence @relation(fields: [evidenceId], references: [id], onDelete: Cascade)
+
+  @@unique([documentId, evidenceId])
+}
+
+model Validation {
+  id                  String               @id @default(uuid()) @db.Uuid
+  caseId              String               @db.Uuid
+  documentId          String?              @db.Uuid
+  ruleId              String               @db.Uuid
+  passed              Boolean
+  foundValue          String?
+  explanation         String
+  structureScore      Int?
+  contentScore        Int?
+  userId              String               @db.Uuid
+  createdAt           DateTime             @default(now())
+  case                Case                 @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  document            Document?            @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  rule                Rule                 @relation(fields: [ruleId], references: [id])
+  user                Profile              @relation(fields: [userId], references: [id])
+  validationEvidences ValidationEvidence[]
+
+  @@index([caseId])
+}
+
+model ValidationEvidence {
+  id           String     @id @default(uuid()) @db.Uuid
+  validationId String     @db.Uuid
+  evidenceId   String     @db.Uuid
+  createdAt    DateTime   @default(now())
+  evidence     Evidence   @relation(fields: [evidenceId], references: [id], onDelete: Cascade)
+  validation   Validation @relation(fields: [validationId], references: [id], onDelete: Cascade)
+
+  @@unique([validationId, evidenceId])
+}
+
+model Review {
+  id                String         @id @default(uuid()) @db.Uuid
+  caseId            String         @db.Uuid
+  documentId        String?        @db.Uuid
+  userId            String         @db.Uuid
+  role              UserRole
+  changeDescription String
+  decision          ReviewDecision
+  reason            String?
+  createdAt         DateTime       @default(now())
+  comments          Comment[]
+  case              Case           @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  document          Document?      @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  user              Profile        @relation(fields: [userId], references: [id])
+
+  @@index([caseId])
+}
+
+model Comment {
+  id        String   @id @default(uuid()) @db.Uuid
+  reviewId  String   @db.Uuid
+  userId    String   @db.Uuid
+  role      UserRole
+  text      String
+  createdAt DateTime @default(now())
+  review    Review   @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  user      Profile  @relation(fields: [userId], references: [id])
+}
+
+model AuditLog {
+  id           String   @id @default(uuid()) @db.Uuid
+  caseId       String?  @db.Uuid
+  userId       String?  @db.Uuid
+  action       String
+  entity       String
+  entityId     String?  @db.Uuid
+  previousData Json?
+  newData      Json?
+  ipAddress    String?
+  createdAt    DateTime @default(now())
+  case         Case?    @relation(fields: [caseId], references: [id])
+  user         Profile? @relation(fields: [userId], references: [id])
+
+  @@index([caseId])
+  @@index([createdAt(sort: Desc)])
+}
+
+model AiProvider {
+  id                 String              @id @default(uuid()) @db.Uuid
+  name               String              @unique
+  type               AiProviderType      @default(custom)
+  baseUrl            String
+  apiKeySecretName   String?
+  availableModels    String[]
+  defaultParams      Json                @default("{\"temperature\": 0.3}")
+  active             Boolean             @default(true)
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  aiFunctions        AiFunction[]
+  aiFunctionVersions AiFunctionVersion[]
+}
+
+model AiFunction {
+  id                 String              @id @default(uuid()) @db.Uuid
+  code               String              @unique
+  name               String
+  description        String?
+  category           String
+  providerId         String?             @db.Uuid
+  model              String
+  systemPrompt       String
+  userPromptTemplate String?
+  toolSchema         Json?
+  params             Json                @default("{\"temperature\": 0.3}")
+  active             Boolean             @default(true)
+  currentVersion     Int                 @default(1)
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  provider           AiProvider?         @relation(fields: [providerId], references: [id])
+  versions           AiFunctionVersion[]
+}
+
+model AiFunctionVersion {
+  id                 String      @id @default(uuid()) @db.Uuid
+  functionId         String      @db.Uuid
+  version            Int
+  systemPrompt       String
+  userPromptTemplate String?
+  toolSchema         Json?
+  params             Json?
+  model              String
+  providerId         String?     @db.Uuid
+  changeReason       String?
+  createdBy          String?     @db.Uuid
+  createdAt          DateTime    @default(now())
+  creator            Profile?    @relation("AiFunctionVersionCreator", fields: [createdBy], references: [id])
+  function           AiFunction  @relation(fields: [functionId], references: [id], onDelete: Cascade)
+  provider           AiProvider? @relation(fields: [providerId], references: [id])
+
+  @@unique([functionId, version])
+}
+
+model AiFunctionLog {
+  id             String   @id @default(uuid()) @db.Uuid
+  functionCode   String
+  functionName   String?
+  providerName   String?
+  model          String
+  inputVariables Json     @default("{}")
+  systemPrompt   String?
+  userPrompt     String?
+  response       Json?
+  tokensInput    Int?
+  tokensOutput   Int?
+  durationMs     Int?
+  status         String   @default("success")
+  errorMessage   String?
+  userId         String?  @db.Uuid
+  createdAt      DateTime @default(now())
+
+  @@index([createdAt(sort: Desc)])
+  @@index([functionCode])
+}
+
+model Issue {
+  id               String   @id @default(uuid()) @db.Uuid
+  userId           String   @db.Uuid
+  location         String
+  functionality    String
+  description      String
+  expectedBehavior String
+  screenshotUrl    String?
+  status           String   @default("pending")
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  user             Profile  @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model TestCase {
+  id              String         @id @default(uuid()) @db.Uuid
+  description     String
+  observations    String?
+  status          TestCaseStatus @default(pending)
+  promotingUnit   String?
+  contractingBody String?
+  createdBy       String?        @db.Uuid
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  @@index([createdAt(sort: Desc)])
+}
+
+model RepairDocument {
+  id           String             @id @default(uuid()) @db.Uuid
+  name         String
+  size         Int
+  storagePath  String
+  status       String             @default("processing")
+  errorMessage String?
+  uploadedBy   String             @db.Uuid
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+  extractions  RepairExtraction[]
+  rules        RepairRule[]
+
+  @@index([createdAt(sort: Desc)])
+}
+
+model RepairExtraction {
+  id                 String         @id @default(uuid()) @db.Uuid
+  documentId         String         @db.Uuid
+  affectedSection    String?
+  errorType          String?
+  literalDescription String
+  normReference      String?
+  consequence        String?
+  originalText       String?
+  createdAt          DateTime       @default(now())
+  document           RepairDocument @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  rules              RepairRule[]
+
+  @@index([documentId])
+}
+
+model RepairRule {
+  id           String            @id @default(uuid()) @db.Uuid
+  documentId   String            @db.Uuid
+  extractionId String?           @db.Uuid
+  caseSection  String
+  category     String
+  type         RepairRuleType
+  content      String
+  priority     Int               @default(0)
+  active       Boolean           @default(true)
+  createdAt    DateTime          @default(now())
+  document     RepairDocument    @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  extraction   RepairExtraction? @relation(fields: [extractionId], references: [id])
+  usages       RuleUsage[]
+
+  @@index([documentId])
+  @@index([active])
+}
+
+model RuleUsage {
+  id         String     @id @default(uuid()) @db.Uuid
+  documentId String     @db.Uuid
+  sectionId  String     @db.Uuid
+  ruleId     String     @db.Uuid
+  createdAt  DateTime   @default(now())
+  rule       RepairRule @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+
+  @@index([documentId, sectionId])
+}
+
+model SectionQuestion {
+  id         String   @id @default(uuid()) @db.Uuid
+  sectionId  String   @db.Uuid
+  documentId String   @db.Uuid
+  question   String
+  answer     String?
+  order      Int
+  round      Int      @default(1)
+  createdAt  DateTime @default(now())
+
+  @@index([sectionId])
+  @@index([documentId])
+}
 
 enum CaseStatus {
   intake
@@ -167,480 +688,6 @@ enum CentralizationNotApplicableReason {
   causa_juridica
 }
 
-// ============ MODELS ============
-
-model Profile {
-  id             String   @id @db.Uuid
-  email          String?  @unique
-  password       String?
-  name           String
-  lastName       String?
-  unit           String?
-  active         Boolean  @default(true)
-  showWizardHelp Boolean  @default(true)
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-
-  casesCreated      Case[]              @relation("CaseCreator")
-  documentsCreated  Document[]          @relation("DocumentCreator")
-  validations       Validation[]
-  reviews           Review[]
-  comments          Comment[]
-  auditLogs         AuditLog[]
-  rulesApproved     Rule[]              @relation("RuleApprover")
-  issuesReported    Issue[]
-  aiVersionsCreated AiFunctionVersion[] @relation("AiFunctionVersionCreator")
-}
-
-model UserRoleAssignment {
-  id        String   @id @default(uuid()) @db.Uuid
-  userId    String   @db.Uuid
-  role      UserRole
-  createdAt DateTime @default(now())
-
-  @@unique([userId, role])
-}
-
-model Case {
-  id                     String         @id @default(uuid()) @db.Uuid
-  code                   String         @unique
-  unit                   String
-  department             String
-  creatorId              String         @db.Uuid
-  status                 CaseStatus     @default(draft)
-  contractType           ContractType
-  subject                String
-  description            String?
-  estimatedContractValue Decimal?       @db.Decimal(15, 2)
-  baseTenderBudget       Decimal?       @db.Decimal(15, 2)
-  vat                    Decimal?       @db.Decimal(15, 2)
-  extensionsAmount       Decimal?       @db.Decimal(15, 2)
-  modificationsAmount    Decimal?       @db.Decimal(15, 2)
-  proposedProcedure      ProcedureType?
-  selectedProcedure      ProcedureType?
-  selectedCpv            String?
-  hasLots                Boolean        @default(false)
-  lotsJustification      String?
-  numLots                Int?
-  isUrgent               Boolean        @default(false)
-  isEmergency            Boolean        @default(false)
-  urgencyJustification   String?
-
-  // Processing regime (Art. 119/120 LCSP)
-  processingRegime             ProcessingRegime?
-  emergencyOperationalRoute    EmergencyOperationalRoute?
-  emergencyReasons             EmergencyReason[]
-  emergencyJustification       String?
-  hasOwnMeans                  Boolean                          @default(false)
-
-  // Supply delivery terms
-  deliveryType                 DeliveryType?
-  deliveryDeadlineValue        Int?
-  deliveryDeadlineUnit         DeliveryDeadlineUnit?
-  supplyPeriodMonths           Int?
-  deliveryFrequency            DeliveryFrequency?
-  deliveryLocationMode         DeliveryLocationMode?
-  deliveryLocations            Json?
-
-  // Innovation
-  overrideInnovation           Boolean                          @default(false)
-  innovationLevel              InnovationLevel?
-  includesIDPhases             Boolean                          @default(false)
-
-  // Centralization
-  centralizationNotApplicableReason CentralizationNotApplicableReason?
-
-  // Fiscal & budget
-  fiscalRegime                 FiscalRegime?
-  maxBudget                    Decimal?                         @db.Decimal(15, 2)
-  pblAdjustedToMax             Boolean                          @default(false)
-
-  // Contract duration
-  durationMonths               Int?
-  extensionMonths              Int?
-
-  // Subscription
-  isSubscription               Boolean                          @default(false)
-
-  completionPercentage   Int            @default(0)
-  riskLevel              RiskLevel      @default(green)
-  lastPendingAction      String?
-  dueDate                DateTime?
-  metadata               Json           @default("{}")
-  createdAt              DateTime       @default(now())
-  updatedAt              DateTime       @updatedAt
-
-  creator               Profile                @relation("CaseCreator", fields: [creatorId], references: [id])
-  procedureAlternatives ProcedureAlternative[]
-  recommendedCpvs       RecommendedCpv[]
-  documents             Document[]
-  validations           Validation[]
-  reviews               Review[]
-  auditLogs             AuditLog[]
-
-  @@index([status])
-  @@index([creatorId])
-  @@index([unit])
-}
-
-model ProcedureAlternative {
-  id            String        @id @default(uuid()) @db.Uuid
-  caseId        String        @db.Uuid
-  procedure     ProcedureType
-  score         Int?          @db.Integer
-  justification String
-  createdAt     DateTime      @default(now())
-
-  case Case @relation(fields: [caseId], references: [id], onDelete: Cascade)
-}
-
-model RecommendedCpv {
-  id            String   @id @default(uuid()) @db.Uuid
-  caseId        String   @db.Uuid
-  code          String
-  description   String
-  score         Int?     @db.Integer
-  justification String?
-  createdAt     DateTime @default(now())
-
-  case Case @relation(fields: [caseId], references: [id], onDelete: Cascade)
-}
-
-model CpvCode {
-  id            String   @id @default(uuid()) @db.Uuid
-  code          String   @unique
-  description   String
-  descriptionEn String?
-  level         Int      @db.Integer
-  parentCode    String?
-  active        Boolean  @default(true)
-  createdAt     DateTime @default(now())
-
-  @@index([code])
-  @@index([level])
-  @@index([active])
-}
-
-model Evidence {
-  id            String     @id @default(uuid()) @db.Uuid
-  sourceType    SourceType
-  sourceId      String
-  sourceName    String
-  section       String?
-  range         String?
-  version       String
-  validityStart DateTime   @db.Date
-  validityEnd   DateTime?  @db.Date
-  textFragment  String
-  metadata      Json       @default("{}")
-  createdAt     DateTime   @default(now())
-
-  rules               Rule[]
-  documentEvidences   DocumentEvidence[]
-  validationEvidences ValidationEvidence[]
-}
-
-model Rule {
-  id           String       @id @default(uuid()) @db.Uuid
-  code         String       @unique
-  name         String
-  description  String
-  severity     RuleSeverity
-  evidenceId   String?      @db.Uuid
-  condition    String
-  message      String
-  version      Int          @default(1)
-  status       String       @default("draft")
-  approverId   String?      @db.Uuid
-  approverRole UserRole?
-  approvalDate DateTime?
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt
-
-  evidence    Evidence?    @relation(fields: [evidenceId], references: [id])
-  approver    Profile?     @relation("RuleApprover", fields: [approverId], references: [id])
-  validations Validation[]
-}
-
-model Document {
-  id        String       @id @default(uuid()) @db.Uuid
-  caseId    String       @db.Uuid
-  type      DocumentType
-  name      String
-  version   Int          @default(1)
-  hash      String?
-  status    ReviewStatus @default(pending)
-  content   Json?
-  docxUrl   String?
-  pdfUrl    String?
-  creatorId String       @db.Uuid
-  createdAt DateTime     @default(now())
-  updatedAt DateTime     @updatedAt
-
-  case              Case                 @relation(fields: [caseId], references: [id], onDelete: Cascade)
-  creator           Profile              @relation("DocumentCreator", fields: [creatorId], references: [id])
-  documentEvidences DocumentEvidence[]
-  validations       Validation[]
-  reviews           Review[]
-  sections          DocumentSection[]
-  generations       DocumentGeneration[]
-  versions          DocumentVersion[]
-
-  @@index([caseId])
-}
-
-model DocumentSection {
-  id               String   @id @default(uuid()) @db.Uuid
-  documentId       String   @db.Uuid
-  order            Int
-  title            String
-  description      String?
-  content          String?
-  status           String   @default("pending")
-  tokensUsed       Int?
-  generationTimeMs Int?
-  aiProvider       String?  // e.g. "alia", "anthropic", "openai"
-  aiModel          String?  // e.g. "BSC-LT/ALIA-40b-instruct_Q8_0", "claude-sonnet-4-20250514"
-  lcspArticles     String[]
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
-
-  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
-
-  @@unique([documentId, order])
-  @@index([documentId])
-  @@index([status])
-}
-
-model DocumentGeneration {
-  id             String    @id @default(uuid()) @db.Uuid
-  documentId     String    @db.Uuid
-  version        Int       @default(1)
-  plan           Json      @default("{}")
-  status         String    @default("planning")
-  currentSection Int       @default(0)
-  totalSections  Int?
-  globalReview   Json?
-  errors         Json?
-  userId         String    @db.Uuid
-  createdAt      DateTime  @default(now())
-  completedAt    DateTime?
-
-  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
-
-  @@index([documentId])
-  @@index([status])
-}
-
-model DocumentVersion {
-  id                String   @id @default(uuid()) @db.Uuid
-  documentId        String   @db.Uuid
-  version           Int
-  contentSnapshot   Json
-  sectionsSnapshot  Json?
-  changeDescription String?
-  userId            String   @db.Uuid
-  createdAt         DateTime @default(now())
-
-  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
-
-  @@unique([documentId, version])
-  @@index([documentId])
-}
-
-model DocumentEvidence {
-  id         String   @id @default(uuid()) @db.Uuid
-  documentId String   @db.Uuid
-  evidenceId String   @db.Uuid
-  createdAt  DateTime @default(now())
-
-  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
-  evidence Evidence @relation(fields: [evidenceId], references: [id], onDelete: Cascade)
-
-  @@unique([documentId, evidenceId])
-}
-
-model Validation {
-  id             String   @id @default(uuid()) @db.Uuid
-  caseId         String   @db.Uuid
-  documentId     String?  @db.Uuid
-  ruleId         String   @db.Uuid
-  passed         Boolean
-  foundValue     String?
-  explanation    String
-  structureScore Int?
-  contentScore   Int?
-  userId         String   @db.Uuid
-  createdAt      DateTime @default(now())
-
-  case                Case                 @relation(fields: [caseId], references: [id], onDelete: Cascade)
-  document            Document?            @relation(fields: [documentId], references: [id], onDelete: Cascade)
-  rule                Rule                 @relation(fields: [ruleId], references: [id])
-  user                Profile              @relation(fields: [userId], references: [id])
-  validationEvidences ValidationEvidence[]
-
-  @@index([caseId])
-}
-
-model ValidationEvidence {
-  id           String   @id @default(uuid()) @db.Uuid
-  validationId String   @db.Uuid
-  evidenceId   String   @db.Uuid
-  createdAt    DateTime @default(now())
-
-  validation Validation @relation(fields: [validationId], references: [id], onDelete: Cascade)
-  evidence   Evidence   @relation(fields: [evidenceId], references: [id], onDelete: Cascade)
-
-  @@unique([validationId, evidenceId])
-}
-
-model Review {
-  id                String         @id @default(uuid()) @db.Uuid
-  caseId            String         @db.Uuid
-  documentId        String?        @db.Uuid
-  userId            String         @db.Uuid
-  role              UserRole
-  changeDescription String
-  decision          ReviewDecision
-  reason            String?
-  createdAt         DateTime       @default(now())
-
-  case     Case      @relation(fields: [caseId], references: [id], onDelete: Cascade)
-  document Document? @relation(fields: [documentId], references: [id], onDelete: Cascade)
-  user     Profile   @relation(fields: [userId], references: [id])
-  comments Comment[]
-
-  @@index([caseId])
-}
-
-model Comment {
-  id        String   @id @default(uuid()) @db.Uuid
-  reviewId  String   @db.Uuid
-  userId    String   @db.Uuid
-  role      UserRole
-  text      String
-  createdAt DateTime @default(now())
-
-  review Review  @relation(fields: [reviewId], references: [id], onDelete: Cascade)
-  user   Profile @relation(fields: [userId], references: [id])
-}
-
-model AuditLog {
-  id           String   @id @default(uuid()) @db.Uuid
-  caseId       String?  @db.Uuid
-  userId       String?  @db.Uuid
-  action       String
-  entity       String
-  entityId     String?  @db.Uuid
-  previousData Json?
-  newData      Json?
-  ipAddress    String?
-  createdAt    DateTime @default(now())
-
-  case Case?    @relation(fields: [caseId], references: [id], onDelete: SetNull)
-  user Profile? @relation(fields: [userId], references: [id])
-
-  @@index([caseId])
-  @@index([createdAt(sort: Desc)])
-}
-
-model AiProvider {
-  id               String         @id @default(uuid()) @db.Uuid
-  name             String         @unique
-  type             AiProviderType @default(custom)
-  baseUrl          String
-  apiKeySecretName String?
-  availableModels  String[]
-  defaultParams    Json           @default("{\"temperature\": 0.3}")
-  active           Boolean        @default(true)
-  createdAt        DateTime       @default(now())
-  updatedAt        DateTime       @updatedAt
-
-  aiFunctions        AiFunction[]
-  aiFunctionVersions AiFunctionVersion[]
-}
-
-model AiFunction {
-  id                 String   @id @default(uuid()) @db.Uuid
-  code               String   @unique
-  name               String
-  description        String?
-  category           String
-  providerId         String?  @db.Uuid
-  model              String
-  systemPrompt       String
-  userPromptTemplate String?
-  toolSchema         Json?
-  params             Json     @default("{\"temperature\": 0.3}")
-  active             Boolean  @default(true)
-  currentVersion     Int      @default(1)
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
-
-  provider AiProvider?         @relation(fields: [providerId], references: [id])
-  versions AiFunctionVersion[]
-}
-
-model AiFunctionVersion {
-  id                 String   @id @default(uuid()) @db.Uuid
-  functionId         String   @db.Uuid
-  version            Int
-  systemPrompt       String
-  userPromptTemplate String?
-  toolSchema         Json?
-  params             Json?
-  model              String
-  providerId         String?  @db.Uuid
-  changeReason       String?
-  createdBy          String?  @db.Uuid
-  createdAt          DateTime @default(now())
-
-  function AiFunction  @relation(fields: [functionId], references: [id], onDelete: Cascade)
-  provider AiProvider? @relation(fields: [providerId], references: [id])
-  creator  Profile?    @relation("AiFunctionVersionCreator", fields: [createdBy], references: [id])
-
-  @@unique([functionId, version])
-}
-
-model AiFunctionLog {
-  id             String   @id @default(uuid()) @db.Uuid
-  functionCode   String
-  functionName   String?
-  providerName   String?
-  model          String
-  inputVariables Json     @default("{}")
-  systemPrompt   String?
-  userPrompt     String?
-  response       Json?
-  tokensInput    Int?
-  tokensOutput   Int?
-  durationMs     Int?
-  status         String   @default("success")
-  errorMessage   String?
-  userId         String?  @db.Uuid
-  createdAt      DateTime @default(now())
-
-  @@index([createdAt(sort: Desc)])
-  @@index([functionCode])
-}
-
-model Issue {
-  id               String   @id @default(uuid()) @db.Uuid
-  userId           String   @db.Uuid
-  location         String
-  functionality    String
-  description      String
-  expectedBehavior String
-  screenshotUrl    String?
-  status           String   @default("pending")
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
-
-  user Profile @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-// ============ TEST CASES ============
-
 enum TestCaseStatus {
   pending
   passed
@@ -649,105 +696,7 @@ enum TestCaseStatus {
   validate
 }
 
-model TestCase {
-  id                  String         @id @default(uuid()) @db.Uuid
-  description         String
-  observations        String?
-  status              TestCaseStatus @default(pending)
-  promotingUnit       String?
-  contractingBody     String?
-  createdBy           String?        @db.Uuid
-  createdAt           DateTime       @default(now())
-  updatedAt           DateTime       @updatedAt
-
-  @@index([createdAt(sort: Desc)])
-}
-
-// ============ REPAIRS (REPAROS) ============
-
-model RepairDocument {
-  id           String   @id @default(uuid()) @db.Uuid
-  name         String
-  size         Int
-  storagePath  String
-  status       String   @default("processing")
-  errorMessage String?
-  uploadedBy   String   @db.Uuid
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-
-  extractions RepairExtraction[]
-  rules       RepairRule[]
-
-  @@index([createdAt(sort: Desc)])
-}
-
-model RepairExtraction {
-  id                String   @id @default(uuid()) @db.Uuid
-  documentId        String   @db.Uuid
-  affectedSection   String?
-  errorType         String?
-  literalDescription String
-  normReference     String?
-  consequence       String?
-  originalText      String?
-  createdAt         DateTime @default(now())
-
-  document RepairDocument @relation(fields: [documentId], references: [id], onDelete: Cascade)
-  rules    RepairRule[]
-
-  @@index([documentId])
-}
-
 enum RepairRuleType {
   do
   dont
-}
-
-model RepairRule {
-  id              String         @id @default(uuid()) @db.Uuid
-  documentId      String         @db.Uuid
-  extractionId    String?        @db.Uuid
-  caseSection     String
-  category        String
-  type            RepairRuleType
-  content         String
-  priority        Int            @default(0)
-  active          Boolean        @default(true)
-  createdAt       DateTime       @default(now())
-
-  document    RepairDocument     @relation(fields: [documentId], references: [id], onDelete: Cascade)
-  extraction  RepairExtraction?  @relation(fields: [extractionId], references: [id])
-  usages      RuleUsage[]
-
-  @@index([documentId])
-  @@index([active])
-}
-
-model RuleUsage {
-  id         String   @id @default(uuid()) @db.Uuid
-  documentId String   @db.Uuid
-  sectionId  String   @db.Uuid
-  ruleId     String   @db.Uuid
-  createdAt  DateTime @default(now())
-
-  rule RepairRule @relation(fields: [ruleId], references: [id], onDelete: Cascade)
-
-  @@index([documentId, sectionId])
-}
-
-// ============ SUFFICIENCY (SUFICIENCIA) ============
-
-model SectionQuestion {
-  id         String   @id @default(uuid()) @db.Uuid
-  sectionId  String   @db.Uuid
-  documentId String   @db.Uuid
-  question   String
-  answer     String?
-  order      Int
-  round      Int      @default(1)
-  createdAt  DateTime @default(now())
-
-  @@index([sectionId])
-  @@index([documentId])
 }
