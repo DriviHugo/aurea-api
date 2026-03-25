@@ -2,13 +2,13 @@
  * Ollama Adapter - Local LLM (Llama 3.3 70B, DeepSeek)
  */
 
-import type {
-  AIConfig,
-  AIProviderAdapter,
-  AICompletionRequest,
-  AICompletionResponse,
+import {
+  AIProvider,
+  type AIConfig,
+  type AIProviderAdapter,
+  type AICompletionRequest,
+  type AICompletionResponse,
 } from "../types.js";
-import { AIProvider } from "../types.js";
 
 export class OllamaAdapter implements AIProviderAdapter {
   constructor(private config: AIConfig) {}

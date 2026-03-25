@@ -2,14 +2,14 @@
  * Google Gemini Adapter - Gemini 2.0 Flash
  */
 
-import type {
-  AIConfig,
-  AIProviderAdapter,
-  AICompletionRequest,
-  AICompletionResponse,
-  AIMessage,
+import {
+  AIProvider,
+  type AIConfig,
+  type AIProviderAdapter,
+  type AICompletionRequest,
+  type AICompletionResponse,
+  type AIMessage,
 } from "../types.js";
-import { AIProvider } from "../types.js";
 
 export class GeminiAdapter implements AIProviderAdapter {
   constructor(private config: AIConfig) {}

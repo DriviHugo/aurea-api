@@ -18,13 +18,17 @@ let gateway: FallbackAIGatewayService | null = null;
  */
 export function getProductionGateway(): FallbackAIGatewayService {
   if (!gateway) {
+    const temperature = parseFloat(process.env["AI_TEMPERATURE"] ?? "0.7");
+
     // ALIA config (primary) - NextBit256 sovereign AI
     const aliaConfig = {
       provider: AIProvider.ALIA,
-      model: "alia-40b-instruct",
-      baseUrl: "https://api.nextbit256.com/onemillion/llm/v1",
-      apiKey: "pk_drlI7lTM1mLjOU1Nm8_4GgLgbf3awmT-jD-OOB-3Xus=",
-      temperature: 0.7,
+      model: process.env["ALIA_MODEL"] ?? "alia-40b-instruct",
+      baseUrl:
+        process.env["ALIA_BASE_URL"] ??
+        "https://api.nextbit256.com/onemillion/llm/v1",
+      apiKey: process.env["ALIA_API_KEY"] ?? "",
+      temperature,
       maxTokens: 4096,
     };
 
@@ -44,7 +48,7 @@ export function getProductionGateway(): FallbackAIGatewayService {
       provider: AIProvider.ANTHROPIC,
       model: envModel.trim() !== "" ? envModel : "claude-sonnet-4-20250514",
       apiKey: anthropicKey,
-      temperature: 0.7,
+      temperature,
       maxTokens: 4096,
     };
 

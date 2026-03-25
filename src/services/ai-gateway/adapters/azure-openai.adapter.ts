@@ -2,13 +2,13 @@
  * Azure OpenAI Adapter - Government Cloud (ENS Alto)
  */
 
-import type {
-  AIConfig,
-  AIProviderAdapter,
-  AICompletionRequest,
-  AICompletionResponse,
+import {
+  AIProvider,
+  type AIConfig,
+  type AIProviderAdapter,
+  type AICompletionRequest,
+  type AICompletionResponse,
 } from "../types.js";
-import { AIProvider } from "../types.js";
 
 export class AzureOpenAIAdapter implements AIProviderAdapter {
   constructor(private config: AIConfig) {}

@@ -2,13 +2,13 @@
  * OpenAI Adapter - GPT-4 Turbo
  */
 
-import type {
-  AIConfig,
-  AIProviderAdapter,
-  AICompletionRequest,
-  AICompletionResponse,
+import {
+  AIProvider,
+  type AIConfig,
+  type AIProviderAdapter,
+  type AICompletionRequest,
+  type AICompletionResponse,
 } from "../types.js";
-import { AIProvider } from "../types.js";
 
 export class OpenAIAdapter implements AIProviderAdapter {
   constructor(private config: AIConfig) {}
