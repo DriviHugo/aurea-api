@@ -39,10 +39,12 @@ export class AIDocumentService {
     // ALIA config (preferente)
     const aliaConfig = {
       provider: AIProvider.ALIA,
-      model: "alia-40b-instruct",
-      baseUrl: "https://api.nextbit256.com/onemillion/llm/v1",
-      apiKey: "pk_drlI7lTM1mLjOU1Nm8_4GgLgbf3awmT-jD-OOB-3Xus=",
-      temperature: 0.7,
+      model: process.env["ALIA_MODEL"] ?? "alia-40b-instruct",
+      baseUrl:
+        process.env["ALIA_BASE_URL"] ??
+        "https://api.nextbit256.com/onemillion/llm/v1",
+      apiKey: process.env["ALIA_API_KEY"] ?? "",
+      temperature: parseFloat(process.env["AI_TEMPERATURE"] ?? "0.7"),
       maxTokens: 4096,
     };
     // Fallback config (Claude Sonnet 4.5, luego Llama 3.3 70b on-prem)
@@ -50,7 +52,7 @@ export class AIDocumentService {
       provider: AIProvider.ANTHROPIC,
       model: "claude-3-5-sonnet-20241022",
       apiKey: process.env["ANTHROPIC_API_KEY"] ?? "",
-      temperature: 0.7,
+      temperature: parseFloat(process.env["AI_TEMPERATURE"] ?? "0.7"),
       maxTokens: 4096,
     };
     this.aiGateway = new FallbackAIGatewayService(aliaConfig, fallbackConfig);

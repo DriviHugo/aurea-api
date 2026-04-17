@@ -3,12 +3,12 @@
  */
 
 import {
+  AIProvider,
   type AIConfig,
   type AIProviderAdapter,
   type AICompletionRequest,
   type AICompletionResponse,
   type AIMessage,
-  AIProvider,
 } from "../types.js";
 
 export class AnthropicAdapter implements AIProviderAdapter {

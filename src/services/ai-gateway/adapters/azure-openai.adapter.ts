@@ -3,11 +3,11 @@
  */
 
 import {
+  AIProvider,
   type AIConfig,
   type AIProviderAdapter,
   type AICompletionRequest,
   type AICompletionResponse,
-  AIProvider,
 } from "../types.js";
 
 export class AzureOpenAIAdapter implements AIProviderAdapter {
