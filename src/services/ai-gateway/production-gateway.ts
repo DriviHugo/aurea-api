@@ -33,15 +33,8 @@ export function getProductionGateway(): FallbackAIGatewayService {
     };
 
     // Fallback config (Anthropic Claude)
-    // Uses ANTHROPIC_API_KEY or AI_API_KEY from environment
-    const envAnthropicKey = process.env["ANTHROPIC_API_KEY"] ?? "";
-    const envAiKey = process.env["AI_API_KEY"] ?? "";
-    const anthropicKey =
-      envAnthropicKey.trim() !== ""
-        ? envAnthropicKey
-        : envAiKey.trim() !== ""
-          ? envAiKey
-          : "";
+    // Uses ANTHROPIC_API_KEY only
+    const anthropicKey = process.env["ANTHROPIC_API_KEY"] ?? "";
 
     const envModel = process.env["AI_MODEL"] ?? "";
     const fallbackConfig = {
