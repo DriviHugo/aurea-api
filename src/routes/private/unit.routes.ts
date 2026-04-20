@@ -30,6 +30,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
               },
             },
           },
+          500: { type: "object", properties: { error: { type: "string" } } },
         },
       },
     },
