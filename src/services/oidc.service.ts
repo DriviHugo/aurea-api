@@ -231,7 +231,7 @@ export class OIDCService {
     // Create local session
     const sessionId = uuidv4();
     const accessToken = signAccessToken({ jti: sessionId, sub: user.id });
-    const refreshToken = signRefreshToken(sessionId);
+    const refreshToken = signRefreshToken({ jti: sessionId, sub: user.id });
 
     logger.info({
       event: "oidc_login_success",

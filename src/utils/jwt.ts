@@ -35,15 +35,26 @@ export function verifyAccessToken(token: string): { jti: string; sub: string } {
   }
 }
 
-export function signRefreshToken(jti: string): string {
-  return jwt.sign({ jti }, REFRESH_TOKEN_SECRET, {
+export function signRefreshToken({
+  jti,
+  sub,
+}: {
+  jti: string;
+  sub: string;
+}): string {
+  return jwt.sign({ jti, sub }, REFRESH_TOKEN_SECRET, {
     expiresIn: REFRESH_TOKEN_EXPIRATION,
   });
 }
 
-export function verifyRefreshToken(token: string): { jti: string } {
+export function verifyRefreshToken(
+  token: string,
+): { jti: string; sub: string } {
   try {
-    return jwt.verify(token, REFRESH_TOKEN_SECRET) as { jti: string };
+    return jwt.verify(token, REFRESH_TOKEN_SECRET) as {
+      jti: string;
+      sub: string;
+    };
   } catch {
     throw new Errors.unauthorizedToken();
   }
