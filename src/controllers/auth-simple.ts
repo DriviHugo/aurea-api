@@ -9,6 +9,7 @@ import {
   signAccessToken,
   signRefreshToken,
   ACCESS_TOKEN_EXPIRATION_IN_SECONDS,
+  REFRESH_TOKEN_EXPIRATION_IN_SECONDS,
 } from "../utils/jwt.js";
 
 interface LoginBody {
@@ -50,17 +51,44 @@ export const login = async (
     const accessToken = signAccessToken({ sub: user.id, jti: sessionId });
     const refreshToken = signRefreshToken(sessionId);
 
-    return res.send({
-      access_token: accessToken,
-      refresh_token: refreshToken,
-      expires_in: ACCESS_TOKEN_EXPIRATION_IN_SECONDS,
-      user: {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        lastName: user.lastName,
-      },
-    });
+    return res
+      .setCookie(
+        process.env["NODE_ENV"] === "production"
+          ? "__Secure-access_token"
+          : "access_token",
+        accessToken,
+        {
+          httpOnly: true,
+          secure: process.env["NODE_ENV"] === "production",
+          sameSite: "lax",
+          path: "/api/private",
+          maxAge: ACCESS_TOKEN_EXPIRATION_IN_SECONDS,
+          signed: true,
+        },
+      )
+      .setCookie(
+        process.env["NODE_ENV"] === "production"
+          ? "__Secure-refresh_token"
+          : "refresh_token",
+        refreshToken,
+        {
+          httpOnly: true,
+          secure: process.env["NODE_ENV"] === "production",
+          sameSite: "lax",
+          path: "/api/private/auth/refresh",
+          maxAge: REFRESH_TOKEN_EXPIRATION_IN_SECONDS,
+          signed: true,
+        },
+      )
+      .send({
+        expires_in: ACCESS_TOKEN_EXPIRATION_IN_SECONDS,
+        user: {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          lastName: user.lastName,
+        },
+      });
   } catch (error) {
     console.error("Login error:", error);
     return res.status(500).send({
@@ -102,17 +130,45 @@ export const register = async (
   const accessToken = signAccessToken({ sub: user.id, jti: sessionId });
   const refreshToken = signRefreshToken(sessionId);
 
-  return res.status(201).send({
-    access_token: accessToken,
-    refresh_token: refreshToken,
-    expires_in: ACCESS_TOKEN_EXPIRATION_IN_SECONDS,
-    user: {
-      id: user.id,
-      email: user.email,
-      name: user.name,
-      lastName: user.lastName,
-    },
-  });
+  return res
+    .setCookie(
+      process.env["NODE_ENV"] === "production"
+        ? "__Secure-access_token"
+        : "access_token",
+      accessToken,
+      {
+        httpOnly: true,
+        secure: process.env["NODE_ENV"] === "production",
+        sameSite: "lax",
+        path: "/api/private",
+        maxAge: ACCESS_TOKEN_EXPIRATION_IN_SECONDS,
+        signed: true,
+      },
+    )
+    .setCookie(
+      process.env["NODE_ENV"] === "production"
+        ? "__Secure-refresh_token"
+        : "refresh_token",
+      refreshToken,
+      {
+        httpOnly: true,
+        secure: process.env["NODE_ENV"] === "production",
+        sameSite: "lax",
+        path: "/api/private/auth/refresh",
+        maxAge: REFRESH_TOKEN_EXPIRATION_IN_SECONDS,
+        signed: true,
+      },
+    )
+    .status(201)
+    .send({
+      expires_in: ACCESS_TOKEN_EXPIRATION_IN_SECONDS,
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        lastName: user.lastName,
+      },
+    });
 };
 
 export const me = async (

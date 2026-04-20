@@ -20,34 +20,24 @@ const authAccessTokenPlugin = fp(async (fastify: FastifyInstance) => {
   fastify.decorate(
     "authAccessToken",
     async (request: FastifyRequest, _reply: FastifyReply) => {
-      let accessToken: string | null = null;
-
-      const authHeader = request.headers.authorization;
-      if (authHeader?.startsWith("Bearer ") === true) {
-        accessToken = authHeader.substring(7);
+      const keyAccessToken =
+        process.env["NODE_ENV"] === "production"
+          ? "__Secure-access_token"
+          : "access_token";
+      // eslint-disable-next-line security/detect-object-injection
+      if (!request.cookies[keyAccessToken]) {
+        throw new Errors.unauthorizedToken();
       }
 
-      if (accessToken === null) {
-        const keyAccessToken =
-          process.env["NODE_ENV"] === "production"
-            ? "__Secure-access_token"
-            : "access_token";
-        // eslint-disable-next-line security/detect-object-injection
-        const cookieValue = request.cookies[keyAccessToken];
-        if (cookieValue !== undefined && cookieValue !== "") {
-          const cookieToken = request.unsignCookie(cookieValue);
-          if (cookieToken.valid === true) {
-            accessToken = cookieToken.value;
-          }
-        }
-      }
+      // eslint-disable-next-line security/detect-object-injection
+      const accessToken = request.unsignCookie(request.cookies[keyAccessToken]);
 
-      if (accessToken === null) {
+      if (!accessToken.valid) {
         throw new Errors.unauthorizedToken();
       }
 
       try {
-        const { sub, jti } = verifyAccessToken(accessToken);
+        const { sub, jti } = verifyAccessToken(accessToken.value);
         request.userId = sub;
         request.sessionId = jti;
       } catch {
