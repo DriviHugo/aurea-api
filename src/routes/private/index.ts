@@ -34,6 +34,7 @@ import repairruleRoutes from "./repairrule.routes.js";
 import ruleusageRoutes from "./ruleusage.routes.js";
 import sectionquestionRoutes from "./sectionquestion.routes.js";
 import unitRoutes from "./unit.routes.js";
+import authSimpleRoutes from "./auth-simple.js";
 
 // Custom routes
 import adminRoutes from "./admin.js";
@@ -87,6 +88,7 @@ export default async (fastify: FastifyInstance): Promise<void> => {
   fastify.register(ruleusageRoutes, { prefix: "/rule-usage" });
   fastify.register(sectionquestionRoutes, { prefix: "/section-question" });
   fastify.register(unitRoutes, { prefix: "/unit" });
+  fastify.register(authSimpleRoutes, { prefix: "/auth" });
 
   // Custom routes - Admin user management
   fastify.register(adminRoutes);
