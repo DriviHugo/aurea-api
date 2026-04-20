@@ -39,4 +39,16 @@ export default async function authRoutes(app: FastifyInstance): Promise<void> {
     preValidation: [app.authAccessToken],
     handler: authController.me,
   });
+
+  // Refresh access token - requiere refresh cookie
+  app.post("/refresh", {
+    preValidation: [app.authRefreshToken],
+    handler: authController.refreshAccessToken,
+  });
+
+  // Logout - clear cookies
+  app.post("/logout", {
+    preValidation: [app.authAccessToken],
+    handler: authController.logout,
+  });
 }

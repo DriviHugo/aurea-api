@@ -49,7 +49,7 @@ export const login = async (
 
     const sessionId = generateRandomHexToken(32);
     const accessToken = signAccessToken({ sub: user.id, jti: sessionId });
-    const refreshToken = signRefreshToken(sessionId);
+    const refreshToken = signRefreshToken({ jti: sessionId, sub: user.id });
 
     return res
       .setCookie(
@@ -128,7 +128,7 @@ export const register = async (
 
   const sessionId = generateRandomHexToken(32);
   const accessToken = signAccessToken({ sub: user.id, jti: sessionId });
-  const refreshToken = signRefreshToken(sessionId);
+  const refreshToken = signRefreshToken({ jti: sessionId, sub: user.id });
 
   return res
     .setCookie(
@@ -192,4 +192,52 @@ export const me = async (
   }
 
   return res.send({ user });
+};
+
+export const refreshAccessToken = async (
+  req: FastifyRequest,
+  res: FastifyReply,
+): Promise<void> => {
+  const userId = req.refreshUserId;
+  const sessionId = req.refreshOpaqueToken;
+
+  const accessToken = signAccessToken({ sub: userId, jti: sessionId });
+
+  return res
+    .setCookie(
+      process.env["NODE_ENV"] === "production"
+        ? "__Secure-access_token"
+        : "access_token",
+      accessToken,
+      {
+        httpOnly: true,
+        secure: process.env["NODE_ENV"] === "production",
+        sameSite: "lax",
+        path: "/api/private",
+        maxAge: ACCESS_TOKEN_EXPIRATION_IN_SECONDS,
+        signed: true,
+      },
+    )
+    .send({ expires_in: ACCESS_TOKEN_EXPIRATION_IN_SECONDS });
+};
+
+export const logout = async (
+  _req: FastifyRequest,
+  res: FastifyReply,
+): Promise<void> => {
+  return res
+    .clearCookie(
+      process.env["NODE_ENV"] === "production"
+        ? "__Secure-access_token"
+        : "access_token",
+      { path: "/api/private" },
+    )
+    .clearCookie(
+      process.env["NODE_ENV"] === "production"
+        ? "__Secure-refresh_token"
+        : "refresh_token",
+      { path: "/api/private/auth/refresh" },
+    )
+    .status(204)
+    .send();
 };

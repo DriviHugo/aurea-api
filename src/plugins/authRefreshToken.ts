@@ -6,6 +6,7 @@ import { Errors } from "../errors/appErrorFactory.js";
 declare module "fastify" {
   interface FastifyRequest {
     refreshOpaqueToken: string;
+    refreshUserId: string;
   }
   interface FastifyInstance {
     authRefreshToken: (
@@ -38,8 +39,9 @@ const authRefreshTokenPlugin = fp(async (fastify: FastifyInstance) => {
       }
 
       try {
-        const { jti } = verifyRefreshToken(refreshToken.value);
+        const { jti, sub } = verifyRefreshToken(refreshToken.value);
         request.refreshOpaqueToken = jti;
+        request.refreshUserId = sub;
       } catch {
         throw new Errors.unauthorizedToken();
       }
