@@ -289,19 +289,40 @@ const routes: FastifyPluginAsync = async (fastify) => {
     },
     async (request, reply) => {
       try {
+        const userId = (request as { userId: string }).userId;
         const { page = 1, limit = 10 } = request.query as {
           page?: number;
           limit?: number;
         };
         const skip = (page - 1) * limit;
 
+        const [profile, adminRole] = await Promise.all([
+          prisma.profile.findUnique({
+            where: { id: userId },
+            select: { unit: true },
+          }),
+          prisma.userRoleAssignment.findFirst({
+            where: { userId, role: "admin" },
+            select: { id: true },
+          }),
+        ]);
+
+        const isAdmin = Boolean(adminRole);
+        const unit = profile?.unit?.trim() ?? "";
+        const where = isAdmin
+          ? undefined
+          : unit
+            ? { unit }
+            : { creatorId: userId };
+
         const [cases, total] = await Promise.all([
           prisma.case.findMany({
             skip,
             take: limit,
             orderBy: { createdAt: "desc" },
+            where,
           }),
-          prisma.case.count(),
+          prisma.case.count({ where }),
         ]);
 
         const totalPages = Math.ceil(total / limit);
