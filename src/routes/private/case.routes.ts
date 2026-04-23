@@ -1,5 +1,6 @@
 import type { FastifyPluginAsync } from "fastify";
 import type {
+  Prisma,
   PrismaClient,
   CaseStatus,
   ContractType,
@@ -309,7 +310,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
 
         const isAdmin = Boolean(adminRole);
         const unit = profile?.unit?.trim() ?? "";
-        const where = isAdmin
+        const where: Prisma.CaseWhereInput | undefined = isAdmin
           ? undefined
           : unit
             ? { unit }
@@ -320,9 +321,9 @@ const routes: FastifyPluginAsync = async (fastify) => {
             skip,
             take: limit,
             orderBy: { createdAt: "desc" },
-            where,
+            ...(where ? { where } : {}),
           }),
-          prisma.case.count({ where }),
+          prisma.case.count(where ? { where } : {}),
         ]);
 
         const totalPages = Math.ceil(total / limit);
