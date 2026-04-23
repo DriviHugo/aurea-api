@@ -47,9 +47,10 @@ export function signRefreshToken({
   });
 }
 
-export function verifyRefreshToken(
-  token: string,
-): { jti: string; sub: string } {
+export function verifyRefreshToken(token: string): {
+  jti: string;
+  sub: string;
+} {
   try {
     return jwt.verify(token, REFRESH_TOKEN_SECRET) as {
       jti: string;
