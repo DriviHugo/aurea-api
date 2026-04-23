@@ -323,7 +323,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
             orderBy: { createdAt: "desc" },
             ...(where ? { where } : {}),
           }),
-          prisma.case.count(where ? { where } : {}),
+          where ? prisma.case.count({ where }) : prisma.case.count(),
         ]);
 
         const totalPages = Math.ceil(total / limit);
