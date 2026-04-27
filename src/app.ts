@@ -96,6 +96,9 @@ fastify.addHook("preParsing", async (request, _reply, payload) => {
 fastify.register(privateRoutes, { prefix: `${regularRoutePath}/private` });
 fastify.register(publicRoutes, { prefix: `${regularRoutePath}/public` });
 fastify.register(functionsRoutes, { prefix: `${regularRoutePath}/functions` });
+fastify.register(functionsRoutes, {
+  prefix: `${regularRoutePath}/private/functions`,
+});
 
 // Health check endpoint (no prefix, available at /health)
 fastify.get("/health", async () => {
