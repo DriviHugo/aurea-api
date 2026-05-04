@@ -155,19 +155,21 @@ const CONTRACT_FILTER_MAP: Record<string, ContractType> = {
   mixed: "mixed",
 };
 
-const SORT_FIELD_MAP: Record<string, keyof Prisma.CaseOrderByWithRelationInput> =
-  {
-    updated_at: "updatedAt",
-    updatedAt: "updatedAt",
-    fecha_vencimiento: "dueDate",
-    dueDate: "dueDate",
-    valor_estimado: "estimatedContractValue",
-    estimatedContractValue: "estimatedContractValue",
-    completitud: "completionPercentage",
-    completionPercentage: "completionPercentage",
-    created_at: "createdAt",
-    createdAt: "createdAt",
-  };
+const SORT_FIELD_MAP: Record<
+  string,
+  keyof Prisma.CaseOrderByWithRelationInput
+> = {
+  updated_at: "updatedAt",
+  updatedAt: "updatedAt",
+  fecha_vencimiento: "dueDate",
+  dueDate: "dueDate",
+  valor_estimado: "estimatedContractValue",
+  estimatedContractValue: "estimatedContractValue",
+  completitud: "completionPercentage",
+  completionPercentage: "completionPercentage",
+  created_at: "createdAt",
+  createdAt: "createdAt",
+};
 
 const PENDING_STATUS_VALUES: CaseStatus[] = ["draft", "withObservations"];
 
@@ -433,10 +435,8 @@ const routes: FastifyPluginAsync = async (fastify) => {
           ? CONTRACT_FILTER_MAP[contractType]
           : undefined;
         const range = parseAmountRange(amountRange);
-        const minAmount =
-          typeof minValue === "number" ? minValue : range?.min;
-        const maxAmount =
-          typeof maxValue === "number" ? maxValue : range?.max;
+        const minAmount = typeof minValue === "number" ? minValue : range?.min;
+        const maxAmount = typeof maxValue === "number" ? maxValue : range?.max;
 
         const where: Prisma.CaseWhereInput = {
           ...viewWhere,
@@ -502,7 +502,10 @@ const routes: FastifyPluginAsync = async (fastify) => {
             prisma.case.count({ where }),
             prisma.case.count({ where: { creatorId: userId } }),
             prisma.case.count({
-              where: { creatorId: userId, status: { in: PENDING_STATUS_VALUES } },
+              where: {
+                creatorId: userId,
+                status: { in: PENDING_STATUS_VALUES },
+              },
             }),
             prisma.case.count({
               where: {
