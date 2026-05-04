@@ -1,6 +1,14 @@
 import type { FastifyPluginAsync } from "fastify";
 import type { PrismaClient } from "@prisma/client";
 
+const isAdminUser = async (prisma: PrismaClient, userId: string) => {
+  const adminRole = await prisma.userRoleAssignment.findFirst({
+    where: { userId, role: "admin" },
+    select: { id: true },
+  });
+  return Boolean(adminRole);
+};
+
 const auditLogSchema = {
   type: "object",
   properties: {
@@ -86,6 +94,12 @@ const routes: FastifyPluginAsync = async (fastify) => {
     },
     async (request, reply) => {
       try {
+        const requestUserId = (request as { userId: string }).userId;
+        const isAdmin = await isAdminUser(prisma, requestUserId);
+        if (!isAdmin) {
+          return reply.status(403).send({ error: "Access denied" });
+        }
+
         const {
           page = 1,
           limit = 10,
@@ -152,6 +166,12 @@ const routes: FastifyPluginAsync = async (fastify) => {
     },
     async (request, reply) => {
       try {
+        const requestUserId = (request as { userId: string }).userId;
+        const isAdmin = await isAdminUser(prisma, requestUserId);
+        if (!isAdmin) {
+          return reply.status(403).send({ error: "Access denied" });
+        }
+
         const { id } = request.params as { id: string };
 
         const auditLog = await prisma.auditLog.findUnique({
@@ -194,6 +214,12 @@ const routes: FastifyPluginAsync = async (fastify) => {
     },
     async (request, reply) => {
       try {
+        const requestUserId = (request as { userId: string }).userId;
+        const isAdmin = await isAdminUser(prisma, requestUserId);
+        if (!isAdmin) {
+          return reply.status(403).send({ error: "Access denied" });
+        }
+
         const data = request.body as any;
 
         // Validate foreign key references if provided
@@ -269,6 +295,12 @@ const routes: FastifyPluginAsync = async (fastify) => {
     },
     async (request, reply) => {
       try {
+        const requestUserId = (request as { userId: string }).userId;
+        const isAdmin = await isAdminUser(prisma, requestUserId);
+        if (!isAdmin) {
+          return reply.status(403).send({ error: "Access denied" });
+        }
+
         const { id } = request.params as { id: string };
         const data = request.body as any;
 
@@ -341,6 +373,12 @@ const routes: FastifyPluginAsync = async (fastify) => {
     },
     async (request, reply) => {
       try {
+        const requestUserId = (request as { userId: string }).userId;
+        const isAdmin = await isAdminUser(prisma, requestUserId);
+        if (!isAdmin) {
+          return reply.status(403).send({ error: "Access denied" });
+        }
+
         const { id } = request.params as { id: string };
 
         const existingAuditLog = await prisma.auditLog.findUnique({

@@ -1,6 +1,14 @@
 import type { FastifyPluginAsync } from "fastify";
 import type { PrismaClient } from "@prisma/client";
 
+const isAdminUser = async (prisma: PrismaClient, userId: string) => {
+  const adminRole = await prisma.userRoleAssignment.findFirst({
+    where: { userId, role: "admin" },
+    select: { id: true },
+  });
+  return Boolean(adminRole);
+};
+
 const routes: FastifyPluginAsync = async (fastify) => {
   const prisma: PrismaClient = fastify.prisma;
 
@@ -54,6 +62,12 @@ const routes: FastifyPluginAsync = async (fastify) => {
     },
     async (request, reply) => {
       try {
+        const requestUserId = (request as { userId: string }).userId;
+        const isAdmin = await isAdminUser(prisma, requestUserId);
+        if (!isAdmin) {
+          return reply.status(403).send({ error: "Access denied" });
+        }
+
         const { page = 1, limit = 10, active } = request.query as any;
         const skip = (page - 1) * limit;
 
@@ -138,6 +152,12 @@ const routes: FastifyPluginAsync = async (fastify) => {
 
         return reply.status(200).send(profile);
       } catch (error) {
+            const requestUserId = (request as { userId: string }).userId;
+            const isAdmin = await isAdminUser(prisma, requestUserId);
+
+            if (!isAdmin && id !== requestUserId) {
+              return reply.status(403).send({ error: "Access denied" });
+            }
         return reply.status(500).send({ error: "Internal server error" });
       }
     },
@@ -192,6 +212,12 @@ const routes: FastifyPluginAsync = async (fastify) => {
     },
     async (request, reply) => {
       try {
+        const requestUserId = (request as { userId: string }).userId;
+        const isAdmin = await isAdminUser(prisma, requestUserId);
+        if (!isAdmin) {
+          return reply.status(403).send({ error: "Access denied" });
+        }
+
         const profileData = request.body as any;
 
         const profile = await prisma.profile.create({
@@ -264,6 +290,13 @@ const routes: FastifyPluginAsync = async (fastify) => {
     async (request, reply) => {
       try {
         const { id } = request.params as { id: string };
+        const requestUserId = (request as { userId: string }).userId;
+        const isAdmin = await isAdminUser(prisma, requestUserId);
+
+        if (!isAdmin && id !== requestUserId) {
+          return reply.status(403).send({ error: "Access denied" });
+        }
+
         const updateData = request.body as any;
 
         const existingProfile = await prisma.profile.findUnique({
@@ -334,6 +367,12 @@ const routes: FastifyPluginAsync = async (fastify) => {
           where: { id },
         });
 
+            const requestUserId = (request as { userId: string }).userId;
+            const isAdmin = await isAdminUser(prisma, requestUserId);
+
+            if (!isAdmin) {
+              return reply.status(403).send({ error: "Access denied" });
+            }
         return reply
           .status(200)
           .send({ message: "Profile deleted successfully" });

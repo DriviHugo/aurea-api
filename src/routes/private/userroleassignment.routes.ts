@@ -1,6 +1,14 @@
 import type { FastifyPluginAsync } from "fastify";
 import type { PrismaClient } from "@prisma/client";
 
+const isAdminUser = async (prisma: PrismaClient, userId: string) => {
+  const adminRole = await prisma.userRoleAssignment.findFirst({
+    where: { userId, role: "admin" },
+    select: { id: true },
+  });
+  return Boolean(adminRole);
+};
+
 const routes: FastifyPluginAsync = async (fastify) => {
   const prisma: PrismaClient = fastify.prisma;
 
@@ -50,8 +58,14 @@ const routes: FastifyPluginAsync = async (fastify) => {
     },
     async (request, reply) => {
       try {
+        const requestUserId = (request as { userId: string }).userId;
         const { page = 1, limit = 10, userId, role } = request.query as any;
         const skip = (page - 1) * limit;
+
+        const isAdmin = await isAdminUser(prisma, requestUserId);
+        if (!isAdmin && (!userId || userId !== requestUserId)) {
+          return reply.status(403).send({ error: "Access denied" });
+        }
 
         const where: any = {};
         if (userId) where.userId = userId;
@@ -121,12 +135,19 @@ const routes: FastifyPluginAsync = async (fastify) => {
       try {
         const { id } = request.params as { id: string };
 
+        const requestUserId = (request as { userId: string }).userId;
+        const isAdmin = await isAdminUser(prisma, requestUserId);
+
         const userRole = await prisma.userRoleAssignment.findUnique({
           where: { id },
         });
 
         if (!userRole) {
           return reply.status(404).send({ error: "User role not found" });
+        }
+
+        if (!isAdmin && userRole.userId !== requestUserId) {
+          return reply.status(403).send({ error: "Access denied" });
         }
 
         return reply.status(200).send(userRole);
@@ -175,6 +196,12 @@ const routes: FastifyPluginAsync = async (fastify) => {
     },
     async (request, reply) => {
       try {
+        const requestUserId = (request as { userId: string }).userId;
+        const isAdmin = await isAdminUser(prisma, requestUserId);
+        if (!isAdmin) {
+          return reply.status(403).send({ error: "Access denied" });
+        }
+
         const { userId, role } = request.body as {
           userId: string;
           role: string;
@@ -249,6 +276,12 @@ const routes: FastifyPluginAsync = async (fastify) => {
     },
     async (request, reply) => {
       try {
+        const requestUserId = (request as { userId: string }).userId;
+        const isAdmin = await isAdminUser(prisma, requestUserId);
+        if (!isAdmin) {
+          return reply.status(403).send({ error: "Access denied" });
+        }
+
         const { id } = request.params as { id: string };
         const updateData = request.body as { userId?: string; role?: string };
 
@@ -315,6 +348,12 @@ const routes: FastifyPluginAsync = async (fastify) => {
     },
     async (request, reply) => {
       try {
+        const requestUserId = (request as { userId: string }).userId;
+        const isAdmin = await isAdminUser(prisma, requestUserId);
+        if (!isAdmin) {
+          return reply.status(403).send({ error: "Access denied" });
+        }
+
         const { id } = request.params as { id: string };
 
         const existingUserRole = await prisma.userRoleAssignment.findUnique({

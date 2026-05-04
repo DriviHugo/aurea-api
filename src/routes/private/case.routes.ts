@@ -127,6 +127,67 @@ const CENTRALIZATION_NOT_APPLICABLE_REASON_VALUES = [
   "causa_juridica",
 ];
 
+const STATUS_FILTER_MAP: Record<string, CaseStatus> = {
+  borrador: "draft",
+  draft: "draft",
+  validado: "validated",
+  validated: "validated",
+  con_observaciones: "withObservations",
+  en_subsanacion: "withObservations",
+  with_observations: "withObservations",
+  withObservations: "withObservations",
+};
+
+const CONTRACT_FILTER_MAP: Record<string, ContractType> = {
+  obras: "works",
+  works: "works",
+  servicios: "services",
+  services: "services",
+  suministros: "supplies",
+  supplies: "supplies",
+  concesion_obras: "worksConcession",
+  works_concession: "worksConcession",
+  worksConcession: "worksConcession",
+  concesion_servicios: "servicesConcession",
+  services_concession: "servicesConcession",
+  servicesConcession: "servicesConcession",
+  mixto: "mixed",
+  mixed: "mixed",
+};
+
+const SORT_FIELD_MAP: Record<string, keyof Prisma.CaseOrderByWithRelationInput> =
+  {
+    updated_at: "updatedAt",
+    updatedAt: "updatedAt",
+    fecha_vencimiento: "dueDate",
+    dueDate: "dueDate",
+    valor_estimado: "estimatedContractValue",
+    estimatedContractValue: "estimatedContractValue",
+    completitud: "completionPercentage",
+    completionPercentage: "completionPercentage",
+    created_at: "createdAt",
+    createdAt: "createdAt",
+  };
+
+const PENDING_STATUS_VALUES: CaseStatus[] = ["draft", "withObservations"];
+
+const parseAmountRange = (value?: string) => {
+  switch (value) {
+    case "0-15000":
+      return { min: 0, max: 15000 };
+    case "15000-50000":
+      return { min: 15000, max: 50000 };
+    case "50000-140000":
+      return { min: 50000, max: 140000 };
+    case "140000-500000":
+      return { min: 140000, max: 500000 };
+    case "500000+":
+      return { min: 500000, max: undefined };
+    default:
+      return null;
+  }
+};
+
 const caseSchema = {
   type: "object",
   properties: {
@@ -255,7 +316,17 @@ const paginationQuerySchema = {
   type: "object",
   properties: {
     page: { type: "integer", minimum: 1, default: 1 },
-    limit: { type: "integer", minimum: 1, maximum: 100, default: 10 },
+    limit: { type: "integer", minimum: 0, maximum: 1000, default: 10 },
+    viewMode: { type: "string", enum: ["mis", "pendientes", "todos"] },
+    search: { type: "string" },
+    status: { type: "string" },
+    contractType: { type: "string" },
+    amountRange: { type: "string" },
+    minValue: { type: "number" },
+    maxValue: { type: "number" },
+    sortKey: { type: "string" },
+    orderBy: { type: "string" },
+    order: { type: "string", enum: ["asc", "desc"] },
   },
 };
 
@@ -283,6 +354,15 @@ const routes: FastifyPluginAsync = async (fastify) => {
               page: { type: "integer" },
               limit: { type: "integer" },
               totalPages: { type: "integer" },
+              summary: {
+                type: "object",
+                properties: {
+                  myTotal: { type: "integer" },
+                  myPending: { type: "integer" },
+                  urgentCount: { type: "integer" },
+                  scopeTotal: { type: "integer" },
+                },
+              },
             },
           },
         },
@@ -291,11 +371,35 @@ const routes: FastifyPluginAsync = async (fastify) => {
     async (request, reply) => {
       try {
         const userId = (request as { userId: string }).userId;
-        const { page = 1, limit = 10 } = request.query as {
+        const {
+          page = 1,
+          limit = 10,
+          viewMode = "todos",
+          search,
+          status,
+          contractType,
+          amountRange,
+          minValue,
+          maxValue,
+          sortKey,
+          orderBy,
+          order,
+        } = request.query as {
           page?: number;
           limit?: number;
+          viewMode?: "mis" | "pendientes" | "todos";
+          search?: string;
+          status?: string;
+          contractType?: string;
+          amountRange?: string;
+          minValue?: number;
+          maxValue?: number;
+          sortKey?: string;
+          orderBy?: string;
+          order?: "asc" | "desc";
         };
-        const skip = (page - 1) * limit;
+        const take = limit === 0 ? undefined : limit;
+        const skip = take ? (page - 1) * take : 0;
 
         const [profile, adminRole] = await Promise.all([
           prisma.profile.findUnique({
@@ -310,23 +414,107 @@ const routes: FastifyPluginAsync = async (fastify) => {
 
         const isAdmin = Boolean(adminRole);
         const unit = profile?.unit?.trim() ?? "";
-        const where: Prisma.CaseWhereInput | undefined = isAdmin
-          ? undefined
+
+        const viewWhere: Prisma.CaseWhereInput = (() => {
+          if (viewMode === "mis") {
+            return { creatorId: userId };
+          }
+
+          if (viewMode === "pendientes") {
+            return { creatorId: userId, status: { in: PENDING_STATUS_VALUES } };
+          }
+
+          if (isAdmin) return {};
+          return unit ? { unit } : { creatorId: userId };
+        })();
+
+        const normalizedStatus = status ? STATUS_FILTER_MAP[status] : undefined;
+        const normalizedContract = contractType
+          ? CONTRACT_FILTER_MAP[contractType]
+          : undefined;
+        const range = parseAmountRange(amountRange);
+        const minAmount =
+          typeof minValue === "number" ? minValue : range?.min;
+        const maxAmount =
+          typeof maxValue === "number" ? maxValue : range?.max;
+
+        const where: Prisma.CaseWhereInput = {
+          ...viewWhere,
+          ...(normalizedStatus ? { status: normalizedStatus } : {}),
+          ...(normalizedContract ? { contractType: normalizedContract } : {}),
+          ...(minAmount !== undefined || maxAmount !== undefined
+            ? {
+                estimatedContractValue: {
+                  ...(minAmount !== undefined ? { gte: minAmount } : {}),
+                  ...(maxAmount !== undefined ? { lte: maxAmount } : {}),
+                },
+              }
+            : {}),
+          ...(search && search.trim().length > 0
+            ? {
+                OR: [
+                  { code: { contains: search.trim(), mode: "insensitive" } },
+                  { subject: { contains: search.trim(), mode: "insensitive" } },
+                  {
+                    description: {
+                      contains: search.trim(),
+                      mode: "insensitive",
+                    },
+                  },
+                ],
+              }
+            : {}),
+        };
+
+        const sortField =
+          (sortKey && SORT_FIELD_MAP[sortKey]) ||
+          (orderBy && SORT_FIELD_MAP[orderBy]) ||
+          "createdAt";
+        const defaultOrder: "asc" | "desc" = (() => {
+          switch (sortKey) {
+            case "fecha_vencimiento":
+              return "asc";
+            case "valor_estimado":
+            case "completitud":
+              return "desc";
+            case "updated_at":
+            default:
+              return "desc";
+          }
+        })();
+        const orderDirection = order ?? defaultOrder;
+
+        const urgentLimitDate = new Date();
+        urgentLimitDate.setDate(urgentLimitDate.getDate() + 7);
+        const scopeWhere: Prisma.CaseWhereInput = isAdmin
+          ? {}
           : unit
             ? { unit }
             : { creatorId: userId };
 
-        const [cases, total] = await Promise.all([
-          prisma.case.findMany({
-            skip,
-            take: limit,
-            orderBy: { createdAt: "desc" },
-            ...(where ? { where } : {}),
-          }),
-          where ? prisma.case.count({ where }) : prisma.case.count(),
-        ]);
+        const [cases, total, myTotal, myPending, urgentCount, scopeTotal] =
+          await Promise.all([
+            prisma.case.findMany({
+              ...(take ? { skip, take } : {}),
+              orderBy: { [sortField]: orderDirection },
+              where,
+            }),
+            prisma.case.count({ where }),
+            prisma.case.count({ where: { creatorId: userId } }),
+            prisma.case.count({
+              where: { creatorId: userId, status: { in: PENDING_STATUS_VALUES } },
+            }),
+            prisma.case.count({
+              where: {
+                creatorId: userId,
+                dueDate: { lte: urgentLimitDate },
+                status: { notIn: ["validated", "closed"] },
+              },
+            }),
+            prisma.case.count({ where: scopeWhere }),
+          ]);
 
-        const totalPages = Math.ceil(total / limit);
+        const totalPages = take ? Math.ceil(total / take) : 1;
 
         return reply.status(200).send({
           data: cases.map(normalizeCase),
@@ -334,6 +522,12 @@ const routes: FastifyPluginAsync = async (fastify) => {
           page,
           limit,
           totalPages,
+          summary: {
+            myTotal,
+            myPending,
+            urgentCount,
+            scopeTotal,
+          },
         });
       } catch (error) {
         return reply.status(500).send({ error: "Internal server error" });
