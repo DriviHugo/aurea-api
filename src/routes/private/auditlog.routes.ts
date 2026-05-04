@@ -73,6 +73,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
         description: "Get paginated list of audit logs",
         querystring: paginationQuerySchema,
         response: {
+          403: { type: "object", properties: { error: { type: "string" } } },
           400: { type: "object", properties: { error: { type: "string" } } },
           404: { type: "object", properties: { error: { type: "string" } } },
           500: { type: "object", properties: { error: { type: "string" } } },
@@ -152,6 +153,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
         description: "Get audit log by ID",
         params: idParamSchema,
         response: {
+          403: { type: "object", properties: { error: { type: "string" } } },
           400: { type: "object", properties: { error: { type: "string" } } },
           500: { type: "object", properties: { error: { type: "string" } } },
           200: auditLogResponseSchema,
@@ -200,6 +202,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
         description: "Create new audit log",
         body: auditLogSchema,
         response: {
+          403: { type: "object", properties: { error: { type: "string" } } },
           404: { type: "object", properties: { error: { type: "string" } } },
           500: { type: "object", properties: { error: { type: "string" } } },
           201: auditLogResponseSchema,
@@ -276,6 +279,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
           },
         },
         response: {
+          403: { type: "object", properties: { error: { type: "string" } } },
           500: { type: "object", properties: { error: { type: "string" } } },
           200: auditLogResponseSchema,
           404: {
@@ -354,6 +358,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
         description: "Delete audit log by ID",
         params: idParamSchema,
         response: {
+          403: { type: "object", properties: { error: { type: "string" } } },
           400: { type: "object", properties: { error: { type: "string" } } },
           500: { type: "object", properties: { error: { type: "string" } } },
           200: {

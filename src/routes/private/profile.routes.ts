@@ -29,6 +29,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
           },
         },
         response: {
+          403: { type: "object", properties: { error: { type: "string" } } },
           404: { type: "object", properties: { error: { type: "string" } } },
           500: { type: "object", properties: { error: { type: "string" } } },
           200: {
@@ -114,6 +115,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
           },
         },
         response: {
+          403: { type: "object", properties: { error: { type: "string" } } },
           500: { type: "object", properties: { error: { type: "string" } } },
           200: {
             type: "object",
@@ -139,12 +141,17 @@ const routes: FastifyPluginAsync = async (fastify) => {
       },
     },
     async (request, reply) => {
-      try {
-        const { id } = request.params as { id: string };
+      const { id } = request.params as { id: string };
+      const requestUserId = (request as { userId: string }).userId;
 
-        const profile = await prisma.profile.findUnique({
-          where: { id },
-        });
+      try {
+        const isAdmin = await isAdminUser(prisma, requestUserId);
+
+        if (!isAdmin && id !== requestUserId) {
+          return reply.status(403).send({ error: "Access denied" });
+        }
+
+        const profile = await prisma.profile.findUnique({ where: { id } });
 
         if (!profile) {
           return reply.status(404).send({ error: "Profile not found" });
@@ -152,12 +159,6 @@ const routes: FastifyPluginAsync = async (fastify) => {
 
         return reply.status(200).send(profile);
       } catch (error) {
-            const requestUserId = (request as { userId: string }).userId;
-            const isAdmin = await isAdminUser(prisma, requestUserId);
-
-            if (!isAdmin && id !== requestUserId) {
-              return reply.status(403).send({ error: "Access denied" });
-            }
         return reply.status(500).send({ error: "Internal server error" });
       }
     },
@@ -185,6 +186,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
           },
         },
         response: {
+          403: { type: "object", properties: { error: { type: "string" } } },
           404: { type: "object", properties: { error: { type: "string" } } },
           500: { type: "object", properties: { error: { type: "string" } } },
           201: {
@@ -263,6 +265,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
           },
         },
         response: {
+          403: { type: "object", properties: { error: { type: "string" } } },
           500: { type: "object", properties: { error: { type: "string" } } },
           200: {
             type: "object",
@@ -335,6 +338,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
           },
         },
         response: {
+          403: { type: "object", properties: { error: { type: "string" } } },
           500: { type: "object", properties: { error: { type: "string" } } },
           200: {
             type: "object",
@@ -353,6 +357,13 @@ const routes: FastifyPluginAsync = async (fastify) => {
     },
     async (request, reply) => {
       try {
+        const requestUserId = (request as { userId: string }).userId;
+        const isAdmin = await isAdminUser(prisma, requestUserId);
+
+        if (!isAdmin) {
+          return reply.status(403).send({ error: "Access denied" });
+        }
+
         const { id } = request.params as { id: string };
 
         const existingProfile = await prisma.profile.findUnique({
@@ -366,13 +377,6 @@ const routes: FastifyPluginAsync = async (fastify) => {
         await prisma.profile.delete({
           where: { id },
         });
-
-            const requestUserId = (request as { userId: string }).userId;
-            const isAdmin = await isAdminUser(prisma, requestUserId);
-
-            if (!isAdmin) {
-              return reply.status(403).send({ error: "Access denied" });
-            }
         return reply
           .status(200)
           .send({ message: "Profile deleted successfully" });

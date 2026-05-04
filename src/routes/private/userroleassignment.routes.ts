@@ -30,6 +30,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
           },
         },
         response: {
+          403: { type: "object", properties: { error: { type: "string" } } },
           404: { type: "object", properties: { error: { type: "string" } } },
           500: { type: "object", properties: { error: { type: "string" } } },
           200: {
@@ -112,6 +113,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
           },
         },
         response: {
+          403: { type: "object", properties: { error: { type: "string" } } },
           500: { type: "object", properties: { error: { type: "string" } } },
           200: {
             type: "object",
@@ -174,6 +176,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
           },
         },
         response: {
+          403: { type: "object", properties: { error: { type: "string" } } },
           404: { type: "object", properties: { error: { type: "string" } } },
           500: { type: "object", properties: { error: { type: "string" } } },
           201: {
@@ -249,6 +252,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
           },
         },
         response: {
+          403: { type: "object", properties: { error: { type: "string" } } },
           500: { type: "object", properties: { error: { type: "string" } } },
           200: {
             type: "object",
@@ -330,6 +334,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
           },
         },
         response: {
+          403: { type: "object", properties: { error: { type: "string" } } },
           500: { type: "object", properties: { error: { type: "string" } } },
           200: {
             type: "object",
