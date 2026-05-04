@@ -51,8 +51,8 @@ export default async (fastify: FastifyInstance): Promise<void> => {
         limit?: number;
       };
       const cpvService = createCpvService(fastify.prisma);
-      const resultados = await cpvService.search(query, limit);
-      return reply.send({ resultados });
+      const results = await cpvService.search(query, limit);
+      return reply.send({ results });
     },
   });
 

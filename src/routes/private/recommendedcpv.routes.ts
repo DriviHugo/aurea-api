@@ -4,24 +4,24 @@ import type { PrismaClient } from "@prisma/client";
 const cpvRecomendadoSchema = {
   type: "object",
   properties: {
-    expedienteId: { type: "string", format: "uuid" },
-    codigo: { type: "string" },
-    descripcion: { type: "string" },
-    puntuacion: { type: "integer", nullable: true },
-    justificacion: { type: "string", nullable: true },
+    caseId: { type: "string", format: "uuid" },
+    code: { type: "string" },
+    description: { type: "string" },
+    score: { type: "integer", nullable: true },
+    justification: { type: "string", nullable: true },
   },
-  required: ["expedienteId", "codigo", "descripcion"],
+  required: ["caseId", "code", "description"],
 };
 
 const cpvRecomendadoResponseSchema = {
   type: "object",
   properties: {
     id: { type: "string", format: "uuid" },
-    expedienteId: { type: "string", format: "uuid" },
-    codigo: { type: "string" },
-    descripcion: { type: "string" },
-    puntuacion: { type: "integer", nullable: true },
-    justificacion: { type: "string", nullable: true },
+    caseId: { type: "string", format: "uuid" },
+    code: { type: "string" },
+    description: { type: "string" },
+    score: { type: "integer", nullable: true },
+    justification: { type: "string", nullable: true },
     createdAt: { type: "string", format: "date-time" },
   },
 };
@@ -170,30 +170,30 @@ const routes: FastifyPluginAsync = async (fastify) => {
     async (request, reply) => {
       try {
         const data = request.body as {
-          expedienteId: string;
-          codigo: string;
-          descripcion: string;
-          puntuacion?: number;
-          justificacion?: string;
+          caseId: string;
+          code: string;
+          description: string;
+          score?: number;
+          justification?: string;
         };
 
-        // Verify expediente exists
-        const expediente = await prisma.case.findUnique({
-          where: { id: data.expedienteId },
+        // Verify case exists
+        const caseRecord = await prisma.case.findUnique({
+          where: { id: data.caseId },
         });
 
-        if (!expediente) {
-          return reply.status(400).send({ error: "Expediente not found" });
+        if (!caseRecord) {
+          return reply.status(400).send({ error: "Case not found" });
         }
 
         const cpvRecomendado = await prisma.recommendedCpv.create({
           data: {
-            caseId: data.expedienteId,
-            code: data.codigo,
-            description: data.descripcion,
-            ...(data.puntuacion !== undefined && { score: data.puntuacion }),
-            ...(data.justificacion !== undefined && {
-              justification: data.justificacion,
+            caseId: data.caseId,
+            code: data.code,
+            description: data.description,
+            ...(data.score !== undefined && { score: data.score }),
+            ...(data.justification !== undefined && {
+              justification: data.justification,
             }),
           },
         });
@@ -243,11 +243,11 @@ const routes: FastifyPluginAsync = async (fastify) => {
       try {
         const { id } = request.params as { id: string };
         const data = request.body as {
-          expedienteId: string;
-          codigo: string;
-          descripcion: string;
-          puntuacion?: number;
-          justificacion?: string;
+          caseId: string;
+          code: string;
+          description: string;
+          score?: number;
+          justification?: string;
         };
 
         // Check if CPV recomendado exists
@@ -259,24 +259,24 @@ const routes: FastifyPluginAsync = async (fastify) => {
           return reply.status(404).send({ error: "CPV recomendado not found" });
         }
 
-        // Verify expediente exists
-        const expediente = await prisma.case.findUnique({
-          where: { id: data.expedienteId },
+        // Verify case exists
+        const caseRecord = await prisma.case.findUnique({
+          where: { id: data.caseId },
         });
 
-        if (!expediente) {
-          return reply.status(400).send({ error: "Expediente not found" });
+        if (!caseRecord) {
+          return reply.status(400).send({ error: "Case not found" });
         }
 
         const cpvRecomendado = await prisma.recommendedCpv.update({
           where: { id },
           data: {
-            caseId: data.expedienteId,
-            code: data.codigo,
-            description: data.descripcion,
-            ...(data.puntuacion !== undefined && { score: data.puntuacion }),
-            ...(data.justificacion !== undefined && {
-              justification: data.justificacion,
+            caseId: data.caseId,
+            code: data.code,
+            description: data.description,
+            ...(data.score !== undefined && { score: data.score }),
+            ...(data.justification !== undefined && {
+              justification: data.justification,
             }),
           },
         });

@@ -1,16 +1,16 @@
 /**
  * AI Analysis Functions - Contract Analysis Endpoints
  * Provides AI-powered analysis for public procurement contracts:
- * - ai-analizar-cpv: CPV code suggestion
- * - ai-analizar-tipo: Contract type recommendation
- * - ai-analizar-emergencia: Emergency situation analysis
- * - ai-analizar-centralizacion: Centralized procurement analysis
- * - ai-analizar-medio-propio: Own means analysis
- * - ai-analizar-subscripcion: Subscription analysis
- * - ai-analizar-innovacion: Innovation analysis
- * - ai-analizar-duracion: Duration estimation
- * - ai-analizar-lotes: Lot division analysis
- * - ai-analizar-partidas: Budget items analysis
+ * - ai-analyze-cpv: CPV code suggestion
+ * - ai-analyze-contract-type: Contract type recommendation
+ * - ai-analyze-emergency: Emergency situation analysis
+ * - ai-analyze-centralization: Centralized procurement analysis
+ * - ai-analyze-own-means: Own means analysis
+ * - ai-analyze-subscription: Subscription analysis
+ * - ai-analyze-innovation: Innovation analysis
+ * - ai-analyze-duration: Duration estimation
+ * - ai-analyze-lots: Lot division analysis
+ * - ai-analyze-budget-items: Budget items analysis
  */
 
 import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
@@ -227,18 +227,15 @@ function optionalField(value: string | undefined, label: string): string {
   return value !== undefined && value !== "" ? `${label}: ${value}` : "";
 }
 
-// Normalize field names: accept both Spanish (objeto/unidad/organo) and English (subject/unit/department)
 function normalizeAnalysisBody(body: Record<string, unknown>) {
   return {
     subject: (body["subject"] || "") as string,
     unit: body["unit"] as string | undefined,
     department: body["department"] as string | undefined,
-    mainCpv: (body["mainCpv"] || body["cpvPrincipal"]) as string | undefined,
-    contractType: (body["contractType"] || body["tipoContrato"]) as
-      | string
-      | undefined,
-    numLotes: body["numLotes"] as number | undefined,
-    lotes: body["lotes"] as LoteInfo[] | undefined,
+    mainCpv: body["mainCpv"] as string | undefined,
+    contractType: body["contractType"] as string | undefined,
+    numLots: body["numLots"] as number | undefined,
+    lots: body["lots"] as LotInfo[] | undefined,
   };
 }
 
@@ -251,32 +248,29 @@ interface BaseAnalysisBody {
 
 interface TipoAnalysisBody extends BaseAnalysisBody {
   mainCpv?: string;
-  cpvPrincipal?: string;
 }
 
 interface BudgetAnalysisBody extends BaseAnalysisBody {
   mainCpv?: string;
-  cpvPrincipal?: string;
   contractType?: string;
-  tipoContrato?: string;
 }
 
-interface LoteInfo {
-  numero: number;
-  nombre: string;
-  porcentaje: number;
+interface LotInfo {
+  number: number;
+  name: string;
+  percentage: number;
 }
 
 interface PartidasBody extends BudgetAnalysisBody {
-  numLotes?: number;
-  lotes?: LoteInfo[];
+  numLots?: number;
+  lots?: LotInfo[];
 }
 
 export default async function aiAnalysisRoutes(
   app: FastifyInstance,
 ): Promise<void> {
   // CPV Analysis
-  app.post("/ai-analizar-cpv", {
+  app.post("/ai-analyze-cpv", {
     preValidation: [app.authAccessToken],
     handler: async (
       req: FastifyRequest<{ Body: BaseAnalysisBody }>,
@@ -306,7 +300,7 @@ ${optionalField(department, "ÓRGANO")}`;
   });
 
   // Contract Type Analysis
-  app.post("/ai-analizar-tipo", {
+  app.post("/ai-analyze-contract-type", {
     preValidation: [app.authAccessToken],
     handler: async (
       req: FastifyRequest<{ Body: TipoAnalysisBody }>,
@@ -337,7 +331,7 @@ ${optionalField(department, "ÓRGANO")}`;
   });
 
   // Emergency Analysis
-  app.post("/ai-analizar-emergencia", {
+  app.post("/ai-analyze-emergency", {
     preValidation: [app.authAccessToken],
     handler: async (
       req: FastifyRequest<{ Body: BaseAnalysisBody }>,
@@ -367,7 +361,7 @@ ${optionalField(department, "ÓRGANO")}`;
   });
 
   // Centralization Analysis
-  app.post("/ai-analizar-centralizacion", {
+  app.post("/ai-analyze-centralization", {
     preValidation: [app.authAccessToken],
     handler: async (
       req: FastifyRequest<{ Body: BaseAnalysisBody }>,
@@ -397,7 +391,7 @@ ${optionalField(department, "ÓRGANO")}`;
   });
 
   // Medio Propio Analysis
-  app.post("/ai-analizar-medio-propio", {
+  app.post("/ai-analyze-own-means", {
     preValidation: [app.authAccessToken],
     handler: async (
       req: FastifyRequest<{ Body: BaseAnalysisBody }>,
@@ -427,7 +421,7 @@ ${optionalField(department, "ÓRGANO")}`;
   });
 
   // Subscription Analysis
-  app.post("/ai-analizar-subscripcion", {
+  app.post("/ai-analyze-subscription", {
     preValidation: [app.authAccessToken],
     handler: async (
       req: FastifyRequest<{ Body: TipoAnalysisBody }>,
@@ -458,7 +452,7 @@ ${optionalField(department, "ÓRGANO")}`;
   });
 
   // Innovation Analysis
-  app.post("/ai-analizar-innovacion", {
+  app.post("/ai-analyze-innovation", {
     preValidation: [app.authAccessToken],
     handler: async (
       req: FastifyRequest<{ Body: TipoAnalysisBody }>,
@@ -489,7 +483,7 @@ ${optionalField(department, "ÓRGANO")}`;
   });
 
   // Duration Analysis
-  app.post("/ai-analizar-duracion", {
+  app.post("/ai-analyze-duration", {
     preValidation: [app.authAccessToken],
     handler: async (
       req: FastifyRequest<{ Body: BudgetAnalysisBody }>,
@@ -519,7 +513,7 @@ ${optionalField(mainCpv, "CPV PRINCIPAL")}`;
   });
 
   // Lots Analysis
-  app.post("/ai-analizar-lotes", {
+  app.post("/ai-analyze-lots", {
     preValidation: [app.authAccessToken],
     handler: async (
       req: FastifyRequest<{ Body: BudgetAnalysisBody }>,
@@ -549,13 +543,13 @@ ${optionalField(mainCpv, "CPV PRINCIPAL")}`;
   });
 
   // Budget Items Analysis
-  app.post("/ai-analizar-partidas", {
+  app.post("/ai-analyze-budget-items", {
     preValidation: [app.authAccessToken],
     handler: async (
       req: FastifyRequest<{ Body: PartidasBody }>,
       reply: FastifyReply,
     ) => {
-      const { subject, contractType, mainCpv, numLotes, lotes } =
+      const { subject, contractType, mainCpv, numLots, lots } =
         normalizeAnalysisBody(req.body as Record<string, unknown>);
       let userPrompt = `Propón las partidas presupuestarias para:
 
@@ -563,11 +557,11 @@ OBJETO: ${subject}
 ${optionalField(contractType, "TIPO")}
 ${optionalField(mainCpv, "CPV PRINCIPAL")}`;
 
-      if (numLotes !== undefined && numLotes > 1 && lotes !== undefined) {
-        userPrompt += `\n\nDIVISIÓN EN ${numLotes} LOTES:
-${lotes.map((l) => `- Lote ${l.numero}: ${l.nombre} (${l.porcentaje}%)`).join("\n")}
+      if (numLots !== undefined && numLots > 1 && lots !== undefined) {
+        userPrompt += `\n\nDIVISIÓN EN ${numLots} LOTES:
+    ${lots.map((l) => `- Lote ${l.number}: ${l.name} (${l.percentage}%)`).join("\n")}
 
-Asigna las partidas al lote correspondiente usando el campo loteNumero.`;
+    Asigna las partidas al lote correspondiente usando el campo lotNumber.`;
       }
 
       try {

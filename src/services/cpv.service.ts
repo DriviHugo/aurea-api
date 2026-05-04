@@ -5,16 +5,16 @@
 import type { PrismaClient } from "@prisma/client";
 
 export interface CpvSearchResult {
-  codigo: string;
-  descripcion: string;
+  code: string;
+  description: string;
 }
 
 export interface CpvImportItem {
-  codigo: string;
-  descripcion: string;
-  descripcion_en?: string;
-  nivel: number;
-  codigo_padre?: string;
+  code: string;
+  description: string;
+  descriptionEn?: string;
+  level: number;
+  parentCode?: string;
 }
 
 export interface CpvImportResult {
@@ -48,7 +48,7 @@ export class CpvService {
       orderBy: [{ level: "asc" }, { code: "asc" }],
     });
 
-    return results.map((r) => ({ codigo: r.code, descripcion: r.description }));
+    return results.map((r) => ({ code: r.code, description: r.description }));
   }
 
   async importCodes(cpvData: CpvImportItem[]): Promise<CpvImportResult> {
@@ -64,27 +64,27 @@ export class CpvService {
       for (const item of cpvData) {
         try {
           await tx.cpvCode.upsert({
-            where: { code: item.codigo },
+            where: { code: item.code },
             update: {
-              description: item.descripcion,
-              descriptionEn: item.descripcion_en ?? null,
-              level: item.nivel,
-              parentCode: item.codigo_padre ?? null,
+              description: item.description,
+              descriptionEn: item.descriptionEn ?? null,
+              level: item.level,
+              parentCode: item.parentCode ?? null,
               active: true,
             },
             create: {
-              code: item.codigo,
-              description: item.descripcion,
-              descriptionEn: item.descripcion_en ?? null,
-              level: item.nivel,
-              parentCode: item.codigo_padre ?? null,
+              code: item.code,
+              description: item.description,
+              descriptionEn: item.descriptionEn ?? null,
+              level: item.level,
+              parentCode: item.parentCode ?? null,
               active: true,
             },
           });
           inserted++;
         } catch (itemError) {
           errors.push(
-            `Error en código ${item.codigo}: ${itemError instanceof Error ? itemError.message : "Error desconocido"}`,
+            `Error en código ${item.code}: ${itemError instanceof Error ? itemError.message : "Error desconocido"}`,
           );
         }
       }

@@ -18,8 +18,8 @@ const routes: FastifyPluginAsync = async (fastify) => {
             page: { type: "integer", minimum: 1, default: 1 },
             limit: { type: "integer", minimum: 1, maximum: 100, default: 10 },
             active: { type: "boolean" },
-            nivel: { type: "integer", minimum: 1 },
-            codigo: { type: "string" },
+            level: { type: "integer", minimum: 1 },
+            code: { type: "string" },
           },
         },
         response: {
@@ -35,11 +35,11 @@ const routes: FastifyPluginAsync = async (fastify) => {
                   type: "object",
                   properties: {
                     id: { type: "string" },
-                    codigo: { type: "string" },
-                    descripcion: { type: "string" },
-                    descripcionEn: { type: "string", nullable: true },
-                    nivel: { type: "integer" },
-                    codigoPadre: { type: "string", nullable: true },
+                    code: { type: "string" },
+                    description: { type: "string" },
+                    descriptionEn: { type: "string", nullable: true },
+                    level: { type: "integer" },
+                    parentCode: { type: "string", nullable: true },
                     active: { type: "boolean" },
                     createdAt: { type: "string", format: "date-time" },
                   },
@@ -60,15 +60,15 @@ const routes: FastifyPluginAsync = async (fastify) => {
           page = 1,
           limit = 10,
           active,
-          nivel,
-          codigo,
+          level,
+          code,
         } = request.query as any;
         const skip = (page - 1) * limit;
 
         const where: any = {};
         if (active !== undefined) where.active = active;
-        if (nivel !== undefined) where.level = nivel;
-        if (codigo) where.code = { contains: codigo, mode: "insensitive" };
+        if (level !== undefined) where.level = level;
+        if (code) where.code = { contains: code, mode: "insensitive" };
 
         const [data, total] = await Promise.all([
           prisma.cpvCode.findMany({
@@ -117,11 +117,11 @@ const routes: FastifyPluginAsync = async (fastify) => {
             type: "object",
             properties: {
               id: { type: "string" },
-              codigo: { type: "string" },
-              descripcion: { type: "string" },
-              descripcionEn: { type: "string", nullable: true },
-              nivel: { type: "integer" },
-              codigoPadre: { type: "string", nullable: true },
+              code: { type: "string" },
+              description: { type: "string" },
+              descriptionEn: { type: "string", nullable: true },
+              level: { type: "integer" },
+              parentCode: { type: "string", nullable: true },
               active: { type: "boolean" },
               createdAt: { type: "string", format: "date-time" },
             },
@@ -164,13 +164,13 @@ const routes: FastifyPluginAsync = async (fastify) => {
         description: "Create new CPV code",
         body: {
           type: "object",
-          required: ["codigo", "descripcion", "nivel"],
+          required: ["code", "description", "level"],
           properties: {
-            codigo: { type: "string", minLength: 1 },
-            descripcion: { type: "string", minLength: 1 },
-            descripcionEn: { type: "string", nullable: true },
-            nivel: { type: "integer", minimum: 1 },
-            codigoPadre: { type: "string", nullable: true },
+            code: { type: "string", minLength: 1 },
+            description: { type: "string", minLength: 1 },
+            descriptionEn: { type: "string", nullable: true },
+            level: { type: "integer", minimum: 1 },
+            parentCode: { type: "string", nullable: true },
             active: { type: "boolean", default: true },
           },
         },
@@ -181,11 +181,11 @@ const routes: FastifyPluginAsync = async (fastify) => {
             type: "object",
             properties: {
               id: { type: "string" },
-              codigo: { type: "string" },
-              descripcion: { type: "string" },
-              descripcionEn: { type: "string", nullable: true },
-              nivel: { type: "integer" },
-              codigoPadre: { type: "string", nullable: true },
+              code: { type: "string" },
+              description: { type: "string" },
+              descriptionEn: { type: "string", nullable: true },
+              level: { type: "integer" },
+              parentCode: { type: "string", nullable: true },
               active: { type: "boolean" },
               createdAt: { type: "string", format: "date-time" },
             },
@@ -203,9 +203,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
       try {
         const data = request.body as any;
 
-        const cpvCodigo = await prisma.cpvCode.create({
-          data,
-        });
+        const cpvCodigo = await prisma.cpvCode.create({ data });
 
         return reply.status(201).send(cpvCodigo);
       } catch (error: any) {
@@ -235,11 +233,11 @@ const routes: FastifyPluginAsync = async (fastify) => {
         body: {
           type: "object",
           properties: {
-            codigo: { type: "string", minLength: 1 },
-            descripcion: { type: "string", minLength: 1 },
-            descripcionEn: { type: "string", nullable: true },
-            nivel: { type: "integer", minimum: 1 },
-            codigoPadre: { type: "string", nullable: true },
+            code: { type: "string", minLength: 1 },
+            description: { type: "string", minLength: 1 },
+            descriptionEn: { type: "string", nullable: true },
+            level: { type: "integer", minimum: 1 },
+            parentCode: { type: "string", nullable: true },
             active: { type: "boolean" },
           },
         },
@@ -249,11 +247,11 @@ const routes: FastifyPluginAsync = async (fastify) => {
             type: "object",
             properties: {
               id: { type: "string" },
-              codigo: { type: "string" },
-              descripcion: { type: "string" },
-              descripcionEn: { type: "string", nullable: true },
-              nivel: { type: "integer" },
-              codigoPadre: { type: "string", nullable: true },
+              code: { type: "string" },
+              description: { type: "string" },
+              descriptionEn: { type: "string", nullable: true },
+              level: { type: "integer" },
+              parentCode: { type: "string", nullable: true },
               active: { type: "boolean" },
               createdAt: { type: "string", format: "date-time" },
             },

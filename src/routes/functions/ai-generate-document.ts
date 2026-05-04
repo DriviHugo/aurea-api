@@ -1,7 +1,7 @@
 import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
 import { getProductionGateway } from "../../services/ai-gateway/production-gateway.js";
 
-interface ExpedienteData {
+interface CaseContext {
   code: string;
   subject: string;
   description?: string;
@@ -20,36 +20,27 @@ interface ExpedienteData {
 }
 
 interface Section {
-  orden?: number;
-  titulo?: string;
-  descripcion?: string;
-  articulosLCSP?: string[];
-  // English field names (from frontend after api-client conversion)
   order?: number;
   title?: string;
   description?: string;
+  lcspArticles?: string[];
 }
 
 interface RequestBody {
   phase: "plan" | "generate_section" | "review";
   documentType?: string;
-  expediente?: ExpedienteData;
   documentId?: string;
   sectionId?: string;
   plan?: Section[];
   currentSection?: number;
-  caseContext?: ExpedienteData;
+  caseContext?: CaseContext;
   previousSections?: Array<{
-    titulo?: string;
-    contenido?: string;
     title?: string;
     content?: string;
   }>;
   comments?: string;
   fullContent?: string;
   sections?: Array<{
-    titulo?: string;
-    contenido?: string;
     title?: string;
     content?: string;
   }>;
@@ -62,257 +53,261 @@ function getGateway() {
 const DOCUMENT_SECTIONS: Record<string, Section[]> = {
   informe_necesidad: [
     {
-      orden: 1,
-      titulo: "Identificación del órgano proponente",
-      descripcion: "Datos del órgano que propone la contratación",
-      articulosLCSP: ["Art. 116 LCSP"],
+      order: 1,
+      title: "Identificación del órgano proponente",
+      description: "Datos del órgano que propone la contratación",
+      lcspArticles: ["Art. 116 LCSP"],
     },
     {
-      orden: 2,
-      titulo: "Justificación de la necesidad",
-      descripcion: "Motivos que justifican la necesidad de contratar",
-      articulosLCSP: ["Art. 28 LCSP"],
+      order: 2,
+      title: "Justificación de la necesidad",
+      description: "Motivos que justifican la necesidad de contratar",
+      lcspArticles: ["Art. 28 LCSP"],
     },
     {
-      orden: 3,
-      titulo: "Objeto del contrato",
-      descripcion: "Descripción clara del objeto a contratar",
-      articulosLCSP: ["Art. 99 LCSP"],
+      order: 3,
+      title: "Objeto del contrato",
+      description: "Descripción clara del objeto a contratar",
+      lcspArticles: ["Art. 99 LCSP"],
     },
     {
-      orden: 4,
-      titulo: "Presupuesto estimado",
-      descripcion: "Valoración económica del contrato",
-      articulosLCSP: ["Art. 100 LCSP"],
+      order: 4,
+      title: "Presupuesto estimado",
+      description: "Valoración económica del contrato",
+      lcspArticles: ["Art. 100 LCSP"],
     },
     {
-      orden: 5,
-      titulo: "Conclusión y propuesta",
-      descripcion: "Conclusión y propuesta de actuación",
+      order: 5,
+      title: "Conclusión y propuesta",
+      description: "Conclusión y propuesta de actuación",
     },
   ],
   memoria: [
     {
-      orden: 1,
-      titulo: "Antecedentes y justificación",
-      descripcion: "Contexto y motivos de la contratación",
-      articulosLCSP: ["Art. 28 LCSP"],
+      order: 1,
+      title: "Antecedentes y justificación",
+      description: "Contexto y motivos de la contratación",
+      lcspArticles: ["Art. 28 LCSP"],
     },
     {
-      orden: 2,
-      titulo: "Objeto del contrato",
-      descripcion: "Descripción detallada del objeto",
-      articulosLCSP: ["Art. 99 LCSP"],
+      order: 2,
+      title: "Objeto del contrato",
+      description: "Descripción detallada del objeto",
+      lcspArticles: ["Art. 99 LCSP"],
     },
     {
-      orden: 3,
-      titulo: "Necesidades a satisfacer",
-      descripcion: "Necesidades administrativas a cubrir",
-      articulosLCSP: ["Art. 28.1 LCSP"],
+      order: 3,
+      title: "Necesidades a satisfacer",
+      description: "Necesidades administrativas a cubrir",
+      lcspArticles: ["Art. 28.1 LCSP"],
     },
     {
-      orden: 4,
-      titulo: "Idoneidad del contrato",
-      descripcion: "Justificación del tipo de contrato elegido",
-      articulosLCSP: ["Art. 28 LCSP"],
+      order: 4,
+      title: "Idoneidad del contrato",
+      description: "Justificación del tipo de contrato elegido",
+      lcspArticles: ["Art. 28 LCSP"],
     },
     {
-      orden: 5,
-      titulo: "Procedimiento de adjudicación",
-      descripcion: "Justificación del procedimiento elegido",
-      articulosLCSP: ["Art. 131 LCSP"],
+      order: 5,
+      title: "Procedimiento de adjudicación",
+      description: "Justificación del procedimiento elegido",
+      lcspArticles: ["Art. 131 LCSP"],
     },
     {
-      orden: 6,
-      titulo: "Presupuesto y valor estimado",
-      descripcion: "Análisis económico del contrato",
-      articulosLCSP: ["Art. 100 LCSP", "Art. 101 LCSP"],
+      order: 6,
+      title: "Presupuesto y valor estimado",
+      description: "Análisis económico del contrato",
+      lcspArticles: ["Art. 100 LCSP", "Art. 101 LCSP"],
     },
     {
-      orden: 7,
-      titulo: "Criterios de adjudicación",
-      descripcion: "Criterios para valorar las ofertas",
-      articulosLCSP: ["Art. 145 LCSP"],
+      order: 7,
+      title: "Criterios de adjudicación",
+      description: "Criterios para valorar las ofertas",
+      lcspArticles: ["Art. 145 LCSP"],
     },
     {
-      orden: 8,
-      titulo: "Conclusiones",
-      descripcion: "Resumen y propuesta final",
+      order: 8,
+      title: "Conclusiones",
+      description: "Resumen y propuesta final",
     },
   ],
   pcap: [
     {
-      orden: 1,
-      titulo: "Disposiciones generales",
-      descripcion: "Objeto, régimen jurídico y órgano de contratación",
-      articulosLCSP: ["Art. 99 LCSP", "Art. 61 LCSP"],
+      order: 1,
+      title: "Disposiciones generales",
+      description: "Objeto, régimen jurídico y órgano de contratación",
+      lcspArticles: ["Art. 99 LCSP", "Art. 61 LCSP"],
     },
     {
-      orden: 2,
-      titulo: "Requisitos de los licitadores",
-      descripcion: "Capacidad, solvencia y prohibiciones",
-      articulosLCSP: ["Art. 65-68 LCSP", "Art. 71 LCSP"],
+      order: 2,
+      title: "Requisitos de los licitadores",
+      description: "Capacidad, solvencia y prohibiciones",
+      lcspArticles: ["Art. 65-68 LCSP", "Art. 71 LCSP"],
     },
     {
-      orden: 3,
-      titulo: "Procedimiento de adjudicación",
-      descripcion: "Fases y trámites del procedimiento",
-      articulosLCSP: ["Art. 131-187 LCSP"],
+      order: 3,
+      title: "Procedimiento de adjudicación",
+      description: "Fases y trámites del procedimiento",
+      lcspArticles: ["Art. 131-187 LCSP"],
     },
     {
-      orden: 4,
-      titulo: "Criterios de adjudicación",
-      descripcion: "Criterios y su ponderación",
-      articulosLCSP: ["Art. 145-149 LCSP"],
+      order: 4,
+      title: "Criterios de adjudicación",
+      description: "Criterios y su ponderación",
+      lcspArticles: ["Art. 145-149 LCSP"],
     },
     {
-      orden: 5,
-      titulo: "Garantías",
-      descripcion: "Garantía provisional y definitiva",
-      articulosLCSP: ["Art. 106-112 LCSP"],
+      order: 5,
+      title: "Garantías",
+      description: "Garantía provisional y definitiva",
+      lcspArticles: ["Art. 106-112 LCSP"],
     },
     {
-      orden: 6,
-      titulo: "Formalización del contrato",
-      descripcion: "Documentación y firma del contrato",
-      articulosLCSP: ["Art. 153 LCSP"],
+      order: 6,
+      title: "Formalización del contrato",
+      description: "Documentación y firma del contrato",
+      lcspArticles: ["Art. 153 LCSP"],
     },
     {
-      orden: 7,
-      titulo: "Ejecución del contrato",
-      descripcion: "Condiciones de ejecución y modificaciones",
-      articulosLCSP: ["Art. 187-205 LCSP"],
+      order: 7,
+      title: "Ejecución del contrato",
+      description: "Condiciones de ejecución y modificaciones",
+      lcspArticles: ["Art. 187-205 LCSP"],
     },
     {
-      orden: 8,
-      titulo: "Extinción del contrato",
-      descripcion: "Cumplimiento, resolución y efectos",
-      articulosLCSP: ["Art. 209-213 LCSP"],
+      order: 8,
+      title: "Extinción del contrato",
+      description: "Cumplimiento, resolución y efectos",
+      lcspArticles: ["Art. 209-213 LCSP"],
     },
   ],
   ppt: [
     {
-      orden: 1,
-      titulo: "Objeto y alcance",
-      descripcion: "Descripción técnica del objeto",
-      articulosLCSP: ["Art. 99 LCSP"],
+      order: 1,
+      title: "Objeto y alcance",
+      description: "Descripción técnica del objeto",
+      lcspArticles: ["Art. 99 LCSP"],
     },
     {
-      orden: 2,
-      titulo: "Especificaciones técnicas",
-      descripcion: "Requisitos técnicos detallados",
-      articulosLCSP: ["Art. 126 LCSP"],
+      order: 2,
+      title: "Especificaciones técnicas",
+      description: "Requisitos técnicos detallados",
+      lcspArticles: ["Art. 126 LCSP"],
     },
     {
-      orden: 3,
-      titulo: "Entregables y resultados",
-      descripcion: "Productos y servicios a entregar",
+      order: 3,
+      title: "Entregables y resultados",
+      description: "Productos y servicios a entregar",
     },
     {
-      orden: 4,
-      titulo: "Plazo de ejecución",
-      descripcion: "Duración y fases del contrato",
-      articulosLCSP: ["Art. 29 LCSP"],
+      order: 4,
+      title: "Plazo de ejecución",
+      description: "Duración y fases del contrato",
+      lcspArticles: ["Art. 29 LCSP"],
     },
     {
-      orden: 5,
-      titulo: "Equipo de trabajo",
-      descripcion: "Personal y medios necesarios",
+      order: 5,
+      title: "Equipo de trabajo",
+      description: "Personal y medios necesarios",
     },
     {
-      orden: 6,
-      titulo: "Control de calidad",
-      descripcion: "Criterios de aceptación y control",
+      order: 6,
+      title: "Control de calidad",
+      description: "Criterios de aceptación y control",
     },
     {
-      orden: 7,
-      titulo: "Penalidades",
-      descripcion: "Penalidades por incumplimiento",
-      articulosLCSP: ["Art. 192 LCSP"],
+      order: 7,
+      title: "Penalidades",
+      description: "Penalidades por incumplimiento",
+      lcspArticles: ["Art. 192 LCSP"],
     },
   ],
   justificacion_procedimiento: [
     {
-      orden: 1,
-      titulo: "Identificación del contrato",
-      descripcion: "Datos básicos del contrato",
+      order: 1,
+      title: "Identificación del contrato",
+      description: "Datos básicos del contrato",
     },
     {
-      orden: 2,
-      titulo: "Análisis del valor estimado",
-      descripcion: "Cálculo y determinación del valor estimado",
-      articulosLCSP: ["Art. 101 LCSP"],
+      order: 2,
+      title: "Análisis del valor estimado",
+      description: "Cálculo y determinación del valor estimado",
+      lcspArticles: ["Art. 101 LCSP"],
     },
     {
-      orden: 3,
-      titulo: "Procedimientos aplicables",
-      descripcion: "Análisis de procedimientos posibles",
-      articulosLCSP: ["Art. 131 LCSP"],
+      order: 3,
+      title: "Procedimientos aplicables",
+      description: "Análisis de procedimientos posibles",
+      lcspArticles: ["Art. 131 LCSP"],
     },
     {
-      orden: 4,
-      titulo: "Justificación de la elección",
-      descripcion: "Motivos de la elección del procedimiento",
+      order: 4,
+      title: "Justificación de la elección",
+      description: "Motivos de la elección del procedimiento",
     },
     {
-      orden: 5,
-      titulo: "Conclusión",
-      descripcion: "Propuesta de procedimiento",
+      order: 5,
+      title: "Conclusión",
+      description: "Propuesta de procedimiento",
     },
   ],
   anexo_tecnico: [
     {
-      orden: 1,
-      titulo: "Especificaciones detalladas",
-      descripcion: "Detalles técnicos adicionales",
+      order: 1,
+      title: "Especificaciones detalladas",
+      description: "Detalles técnicos adicionales",
     },
     {
-      orden: 2,
-      titulo: "Requisitos funcionales",
-      descripcion: "Funcionalidades requeridas",
+      order: 2,
+      title: "Requisitos funcionales",
+      description: "Funcionalidades requeridas",
     },
     {
-      orden: 3,
-      titulo: "Requisitos no funcionales",
-      descripcion: "Rendimiento, seguridad, etc.",
+      order: 3,
+      title: "Requisitos no funcionales",
+      description: "Rendimiento, seguridad, etc.",
     },
     {
-      orden: 4,
-      titulo: "Anexos y documentación",
-      descripcion: "Documentación técnica adicional",
+      order: 4,
+      title: "Anexos y documentación",
+      description: "Documentación técnica adicional",
     },
   ],
   anexo_economico: [
     {
-      orden: 1,
-      titulo: "Modelo de oferta económica",
-      descripcion: "Formato de presentación de oferta",
+      order: 1,
+      title: "Modelo de oferta económica",
+      description: "Formato de presentación de oferta",
     },
     {
-      orden: 2,
-      titulo: "Desglose de precios",
-      descripcion: "Estructura de precios unitarios",
+      order: 2,
+      title: "Desglose de precios",
+      description: "Estructura de precios unitarios",
     },
     {
-      orden: 3,
-      titulo: "Criterios de valoración económica",
-      descripcion: "Fórmulas de puntuación",
+      order: 3,
+      title: "Criterios de valoración económica",
+      description: "Fórmulas de puntuación",
     },
   ],
 };
 
 const DEFAULT_SECTIONS: Section[] = [
   {
-    orden: 1,
-    titulo: "Introducción",
-    descripcion: "Contexto y objetivos del documento",
+    order: 1,
+    title: "Introducción",
+    description: "Contexto y objetivos del documento",
   },
   {
-    orden: 2,
-    titulo: "Contenido principal",
-    descripcion: "Desarrollo del contenido específico",
+    order: 2,
+    title: "Contenido principal",
+    description: "Desarrollo del contenido específico",
   },
-  { orden: 3, titulo: "Conclusión", descripcion: "Resumen y propuesta final" },
+  {
+    order: 3,
+    title: "Conclusión",
+    description: "Resumen y propuesta final",
+  },
 ];
 
 const GENERATION_PROMPT = `Eres un experto en contratación pública española (LCSP 9/2017).
@@ -334,41 +329,37 @@ IMPORTANTE: Responde SOLO con un JSON válido, sin texto adicional ni markdown c
 
 El JSON debe tener esta estructura exacta:
 {
-  "coherente": true,
-  "puntuacionGlobal": 85,
-  "evaluacionGeneral": "Evaluación general del documento",
-  "sugerenciasPorSeccion": [
+  "coherent": true,
+  "globalScore": 85,
+  "generalEvaluation": "Evaluación general del documento",
+  "sectionSuggestions": [
     {
-      "seccion": 1,
-      "tipo": "mejora",
-      "mensaje": "Descripción del hallazgo",
-      "sugerencia": "Sugerencia de mejora"
+      "section": 1,
+      "type": "improvement",
+      "message": "Descripción del hallazgo",
+      "suggestion": "Sugerencia de mejora"
     }
   ]
 }`;
 
 function buildSectionPrompt(
   section: Section,
-  expediente: ExpedienteData,
+  caseContext: CaseContext,
   previousSections: Array<{
-    titulo?: string;
-    contenido?: string;
     title?: string;
     content?: string;
   }>,
   comments?: string,
 ): string {
-  // Support both Spanish and English field names
-  const sectionOrder = section.order ?? section.orden ?? 0;
-  const sectionTitle = section.title ?? section.titulo ?? "";
-  const sectionDesc = section.description ?? section.descripcion ?? "";
+  const sectionOrder = section.order ?? 0;
+  const sectionTitle = section.title ?? "";
+  const sectionDesc = section.description ?? "";
 
   const previousContext =
     previousSections.length > 0
       ? `\n\nSecciones anteriores del documento:\n${previousSections
           .map(
-            (s) =>
-              `## ${s.title ?? s.titulo ?? ""}\n${s.content ?? s.contenido ?? ""}`,
+            (s) => `## ${s.title ?? ""}\n${s.content ?? ""}`,
           )
           .join("\n\n")}`
       : "";
@@ -377,17 +368,17 @@ function buildSectionPrompt(
 
 **Sección ${sectionOrder}: ${sectionTitle}**
 Descripción: ${sectionDesc}
-${section.articulosLCSP ? `Artículos LCSP relacionados: ${section.articulosLCSP.join(", ")}` : ""}
+${section.lcspArticles ? `Artículos LCSP relacionados: ${section.lcspArticles.join(", ")}` : ""}
 
 **Datos del expediente:**
-- Objeto: ${expediente.subject}
-- Tipo de contrato: ${expediente.contractType}
-- Procedimiento: ${expediente.procedure ?? "No especificado"}
-- Valor estimado: ${expediente.estimatedValue ?? "No especificado"} €
-- Presupuesto base: ${expediente.baseBudget ?? "No especificado"} €
-- Unidad contratante: ${expediente.unit}
-- Órgano de contratación: ${expediente.department}
-${expediente.selectedCpv !== undefined && expediente.selectedCpv !== "" ? `- Código CPV: ${expediente.selectedCpv}` : ""}
+- Objeto: ${caseContext.subject}
+- Tipo de contrato: ${caseContext.contractType}
+- Procedimiento: ${caseContext.procedure ?? "No especificado"}
+- Valor estimado: ${caseContext.estimatedValue ?? "No especificado"} €
+- Presupuesto base: ${caseContext.baseBudget ?? "No especificado"} €
+- Unidad contratante: ${caseContext.unit}
+- Órgano de contratación: ${caseContext.department}
+${caseContext.selectedCpv !== undefined && caseContext.selectedCpv !== "" ? `- Código CPV: ${caseContext.selectedCpv}` : ""}
 ${previousContext}
 ${comments !== undefined && comments !== "" ? `\n**Comentarios adicionales:** ${comments}` : ""}
 
@@ -406,13 +397,13 @@ function parseJsonSafely(response: string, fallback: unknown): unknown {
   }
 }
 
-export default async function aiGenerarDocumentoRoutes(
+export default async function aiGenerateDocumentRoutes(
   app: FastifyInstance,
 ): Promise<void> {
   app.addHook("preHandler", async (request, reply) => {
-    if (request.url.includes("ai-generar-documento")) {
+    if (request.url.includes("ai-generate-document")) {
       request.log.info({
-        msg: "ai-generar-documento preHandler",
+        msg: "ai-generate-document preHandler",
         url: request.url,
         method: request.method,
         bodyType: typeof request.body,
@@ -421,7 +412,7 @@ export default async function aiGenerarDocumentoRoutes(
     }
   });
 
-  app.post("/ai-generar-documento", {
+  app.post("/ai-generate-document", {
     preValidation: [app.authAccessToken],
     handler: async (
       request: FastifyRequest<{ Body: RequestBody }>,
@@ -431,7 +422,7 @@ export default async function aiGenerarDocumentoRoutes(
       const { phase } = request.body;
 
       request.log.info({
-        msg: "ai-generar-documento request",
+        msg: "ai-generate-document request",
         phase,
         bodyKeys: Object.keys(request.body || {}),
       });
@@ -448,21 +439,13 @@ export default async function aiGenerarDocumentoRoutes(
               });
             }
 
-            const rawSecciones =
+            const rawSections =
               (Object.hasOwn(DOCUMENT_SECTIONS, documentType)
                 ? // eslint-disable-next-line security/detect-object-injection
                   DOCUMENT_SECTIONS[documentType]
                 : DEFAULT_SECTIONS) || [];
 
-            // Normalize to English field names for frontend consistency
-            const secciones = rawSecciones.map((s) => ({
-              order: s.order ?? s.orden,
-              title: s.title ?? s.titulo,
-              description: s.description ?? s.descripcion,
-              articulosLCSP: s.articulosLCSP,
-            }));
-
-            return reply.send({ secciones });
+            return reply.send({ sections: rawSections });
           }
 
           case "generate_section": {
@@ -499,16 +482,13 @@ export default async function aiGenerarDocumentoRoutes(
               });
             }
 
-            // Support both Spanish (orden) and English (order) field names
-            const section = plan.find(
-              (s) => (s.order ?? s.orden) === currentSection,
-            );
+            const section = plan.find((s) => s.order === currentSection);
 
             if (!section) {
               request.log.warn({
                 msg: "Section not found in plan",
                 currentSection,
-                availableSections: plan.map((s) => s.order ?? s.orden),
+                availableSections: plan.map((s) => s.order),
               });
               return reply.status(400).send({
                 data: null,
@@ -518,8 +498,8 @@ export default async function aiGenerarDocumentoRoutes(
 
             request.log.info({
               msg: "Building prompt for section",
-              sectionTitle: section.title ?? section.titulo,
-              sectionOrder: section.order ?? section.orden,
+              sectionTitle: section.title,
+              sectionOrder: section.order,
             });
 
             const prompt = buildSectionPrompt(
@@ -565,15 +545,15 @@ export default async function aiGenerarDocumentoRoutes(
                 msg: "AI gateway error",
                 error: errorMessage,
                 stack: aiError instanceof Error ? aiError.stack : undefined,
-                sectionTitle: section.title ?? section.titulo,
-                sectionOrder: section.order ?? section.orden,
+                sectionTitle: section.title,
+                sectionOrder: section.order,
               });
               // Return structured error response instead of throwing
               return reply.status(500).send({
                 error: {
                   message: `AI generation failed: ${errorMessage}`,
-                  section: section.title ?? section.titulo,
-                  sectionOrder: section.order ?? section.orden,
+                  section: section.title,
+                  sectionOrder: section.order,
                 },
               });
             }
@@ -594,7 +574,7 @@ export default async function aiGenerarDocumentoRoutes(
 ${fullContent}
 
 El documento tiene ${sections.length} secciones:
-${sections.map((s, i) => `${i + 1}. ${s.titulo}`).join("\n")}
+${sections.map((s, i) => `${i + 1}. ${s.title ?? ""}`).join("\n")}
 
 Responde SOLO con JSON válido.`;
 
@@ -612,6 +592,7 @@ Responde SOLO con JSON válido.`;
                 section: i + 1,
                 type: "ok",
                 message: "Section generated correctly",
+                suggestion: "",
               })),
             };
 
@@ -627,7 +608,7 @@ Responde SOLO con JSON válido.`;
         }
       } catch (error) {
         request.log.error({
-          msg: "Error in ai-generar-documento",
+          msg: "Error in ai-generate-document",
           phase,
           error: error instanceof Error ? error.message : String(error),
           stack: error instanceof Error ? error.stack : undefined,
