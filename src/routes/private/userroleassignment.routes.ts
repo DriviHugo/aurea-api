@@ -3,6 +3,26 @@ import type { PrismaClient } from "@prisma/client";
 
 const routes: FastifyPluginAsync = async (fastify) => {
   const prisma: PrismaClient = fastify.prisma;
+  const allowedRoles = new Set(["admin", "processor"]);
+
+  const countActiveAdmins = async (excludeUserId?: string) => {
+    const adminAssignments = await prisma.userRoleAssignment.findMany({
+      where: {
+        role: "admin",
+        ...(excludeUserId ? { userId: { not: excludeUserId } } : {}),
+      },
+      select: { userId: true },
+    });
+
+    if (adminAssignments.length === 0) return 0;
+
+    return prisma.profile.count({
+      where: {
+        id: { in: adminAssignments.map((assignment) => assignment.userId) },
+        active: true,
+      },
+    });
+  };
 
   // List UserRoles with pagination
   fastify.get(
@@ -98,6 +118,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
           },
         },
         response: {
+          400: { type: "object", properties: { error: { type: "string" } } },
           500: { type: "object", properties: { error: { type: "string" } } },
           200: {
             type: "object",
@@ -180,6 +201,12 @@ const routes: FastifyPluginAsync = async (fastify) => {
           role: string;
         };
 
+        if (!allowedRoles.has(role)) {
+          return reply
+            .status(400)
+            .send({ error: "Solo se permiten roles administrador y tramitador" });
+        }
+
         const userRole = await prisma.userRoleAssignment.create({
           data: {
             userId,
@@ -222,6 +249,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
           },
         },
         response: {
+          400: { type: "object", properties: { error: { type: "string" } } },
           500: { type: "object", properties: { error: { type: "string" } } },
           200: {
             type: "object",
@@ -233,12 +261,6 @@ const routes: FastifyPluginAsync = async (fastify) => {
             },
           },
           404: {
-            type: "object",
-            properties: {
-              error: { type: "string" },
-            },
-          },
-          400: {
             type: "object",
             properties: {
               error: { type: "string" },
@@ -258,6 +280,35 @@ const routes: FastifyPluginAsync = async (fastify) => {
 
         if (!existingUserRole) {
           return reply.status(404).send({ error: "User role not found" });
+        }
+
+        if (updateData.role && !allowedRoles.has(updateData.role)) {
+          return reply
+            .status(400)
+            .send({ error: "Solo se permiten roles administrador y tramitador" });
+        }
+
+        const removingAdminRole =
+          existingUserRole.role === "admin" &&
+          ((updateData.role && updateData.role !== "admin") ||
+            (updateData.userId && updateData.userId !== existingUserRole.userId));
+
+        if (removingAdminRole) {
+          const profile = await prisma.profile.findUnique({
+            where: { id: existingUserRole.userId },
+            select: { active: true },
+          });
+
+          if (profile?.active) {
+            const remainingAdmins = await countActiveAdmins(
+              existingUserRole.userId,
+            );
+            if (remainingAdmins === 0) {
+              return reply.status(400).send({
+                error: "Debe existir al menos un administrador activo",
+              });
+            }
+          }
         }
 
         const data: any = {};
@@ -297,6 +348,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
           },
         },
         response: {
+          400: { type: "object", properties: { error: { type: "string" } } },
           500: { type: "object", properties: { error: { type: "string" } } },
           200: {
             type: "object",
@@ -323,6 +375,24 @@ const routes: FastifyPluginAsync = async (fastify) => {
 
         if (!existingUserRole) {
           return reply.status(404).send({ error: "User role not found" });
+        }
+
+        if (existingUserRole.role === "admin") {
+          const profile = await prisma.profile.findUnique({
+            where: { id: existingUserRole.userId },
+            select: { active: true },
+          });
+
+          if (profile?.active) {
+            const remainingAdmins = await countActiveAdmins(
+              existingUserRole.userId,
+            );
+            if (remainingAdmins === 0) {
+              return reply.status(400).send({
+                error: "Debe existir al menos un administrador activo",
+              });
+            }
+          }
         }
 
         await prisma.userRoleAssignment.delete({

@@ -42,6 +42,15 @@ const authRefreshTokenPlugin = fp(async (fastify: FastifyInstance) => {
         const { jti, sub } = verifyRefreshToken(refreshToken.value);
         request.refreshOpaqueToken = jti;
         request.refreshUserId = sub;
+
+        const profile = await fastify.prisma.profile.findUnique({
+          where: { id: sub },
+          select: { active: true },
+        });
+
+        if (!profile?.active) {
+          throw new Errors.unauthorizedToken();
+        }
       } catch {
         throw new Errors.unauthorizedToken();
       }

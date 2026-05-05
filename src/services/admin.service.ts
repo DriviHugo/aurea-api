@@ -21,12 +21,31 @@ export interface CreateUserResult {
 
 export interface DeleteUserResult {
   success: boolean;
-  code?: string;
-  expedientesCount?: number;
 }
+
+const ALLOWED_USER_ROLES = new Set<UserRole>(["admin", "processor"]);
 
 export class AdminService {
   constructor(private prisma: PrismaClient) {}
+
+  private async countActiveAdmins(excludeUserId?: string): Promise<number> {
+    const adminAssignments = await this.prisma.userRoleAssignment.findMany({
+      where: {
+        role: "admin",
+        ...(excludeUserId ? { userId: { not: excludeUserId } } : {}),
+      },
+      select: { userId: true },
+    });
+
+    if (adminAssignments.length === 0) return 0;
+
+    return this.prisma.profile.count({
+      where: {
+        id: { in: adminAssignments.map((assignment) => assignment.userId) },
+        active: true,
+      },
+    });
+  }
 
   async isAdmin(userId: string): Promise<boolean> {
     const adminRole = await this.prisma.userRoleAssignment.findFirst({
@@ -44,6 +63,10 @@ export class AdminService {
       unit,
       roles = ["processor" as UserRole],
     } = input;
+
+    if (roles.some((role) => !ALLOWED_USER_ROLES.has(role))) {
+      throw new Error("Solo se permiten los roles administrador y tramitador");
+    }
 
     // Check if email already exists
     const existingUser = await this.prisma.profile.findUnique({
@@ -112,39 +135,34 @@ export class AdminService {
       throw new Error("Cannot delete yourself");
     }
 
-    // Check if user has cases (using creatorId field)
-    const cases = await this.prisma.case.findMany({
-      where: { creatorId: userId },
-      select: { id: true },
+    const profile = await this.prisma.profile.findUnique({
+      where: { id: userId },
+      select: { active: true },
     });
 
-    if (cases.length > 0 && !reassignToUserId) {
-      return {
-        success: false,
-        code: "NEEDS_REASSIGN",
-        expedientesCount: cases.length,
-      };
+    if (!profile) {
+      throw new Error("User not found");
     }
 
-    await this.prisma.$transaction(async (tx) => {
-      // Reassign cases if needed
-      if (cases.length > 0 && reassignToUserId) {
-        await tx.case.updateMany({
-          where: { creatorId: userId },
-          data: { creatorId: reassignToUserId },
-        });
+    const isAdminRole =
+      (await this.prisma.userRoleAssignment.findFirst({
+        where: { userId, role: "admin" },
+        select: { id: true },
+      })) !== null;
+
+    if (isAdminRole && profile.active) {
+      const remainingAdmins = await this.countActiveAdmins(userId);
+      if (remainingAdmins === 0) {
+        throw new Error("Debe existir al menos un administrador activo");
       }
+    }
 
-      // Delete user roles
-      await tx.userRoleAssignment.deleteMany({
-        where: { userId },
-      });
-
-      // Delete profile
-      await tx.profile.delete({
-        where: { id: userId },
-      });
+    await this.prisma.profile.update({
+      where: { id: userId },
+      data: { active: false },
     });
+
+    void reassignToUserId;
 
     return { success: true };
   }
