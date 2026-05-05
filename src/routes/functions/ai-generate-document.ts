@@ -358,9 +358,7 @@ function buildSectionPrompt(
   const previousContext =
     previousSections.length > 0
       ? `\n\nSecciones anteriores del documento:\n${previousSections
-          .map(
-            (s) => `## ${s.title ?? ""}\n${s.content ?? ""}`,
-          )
+          .map((s) => `## ${s.title ?? ""}\n${s.content ?? ""}`)
           .join("\n\n")}`
       : "";
 

@@ -293,7 +293,9 @@ const routes: FastifyPluginAsync = async (fastify) => {
               ? await prisma.profile.count({
                   where: {
                     id: {
-                      in: adminAssignments.map((assignment) => assignment.userId),
+                      in: adminAssignments.map(
+                        (assignment) => assignment.userId,
+                      ),
                     },
                     active: true,
                   },
@@ -382,7 +384,9 @@ const routes: FastifyPluginAsync = async (fastify) => {
               ? await prisma.profile.count({
                   where: {
                     id: {
-                      in: adminAssignments.map((assignment) => assignment.userId),
+                      in: adminAssignments.map(
+                        (assignment) => assignment.userId,
+                      ),
                     },
                     active: true,
                   },

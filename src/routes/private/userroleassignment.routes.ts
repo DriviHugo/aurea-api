@@ -202,9 +202,9 @@ const routes: FastifyPluginAsync = async (fastify) => {
         };
 
         if (!allowedRoles.has(role)) {
-          return reply
-            .status(400)
-            .send({ error: "Solo se permiten roles administrador y tramitador" });
+          return reply.status(400).send({
+            error: "Solo se permiten roles administrador y tramitador",
+          });
         }
 
         const userRole = await prisma.userRoleAssignment.create({
@@ -283,15 +283,16 @@ const routes: FastifyPluginAsync = async (fastify) => {
         }
 
         if (updateData.role && !allowedRoles.has(updateData.role)) {
-          return reply
-            .status(400)
-            .send({ error: "Solo se permiten roles administrador y tramitador" });
+          return reply.status(400).send({
+            error: "Solo se permiten roles administrador y tramitador",
+          });
         }
 
         const removingAdminRole =
           existingUserRole.role === "admin" &&
           ((updateData.role && updateData.role !== "admin") ||
-            (updateData.userId && updateData.userId !== existingUserRole.userId));
+            (updateData.userId &&
+              updateData.userId !== existingUserRole.userId));
 
         if (removingAdminRole) {
           const profile = await prisma.profile.findUnique({
