@@ -115,6 +115,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
           },
         },
         response: {
+          400: { type: "object", properties: { error: { type: "string" } } },
           403: { type: "object", properties: { error: { type: "string" } } },
           500: { type: "object", properties: { error: { type: "string" } } },
           200: {
@@ -265,6 +266,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
           },
         },
         response: {
+          400: { type: "object", properties: { error: { type: "string" } } },
           403: { type: "object", properties: { error: { type: "string" } } },
           500: { type: "object", properties: { error: { type: "string" } } },
           200: {
@@ -310,6 +312,40 @@ const routes: FastifyPluginAsync = async (fastify) => {
           return reply.status(404).send({ error: "Profile not found" });
         }
 
+        if (updateData.active === false && existingProfile.active) {
+          const isAdminRole =
+            (await prisma.userRoleAssignment.findFirst({
+              where: { userId: id, role: "admin" },
+              select: { id: true },
+            })) !== null;
+
+          if (isAdminRole) {
+            const adminAssignments = await prisma.userRoleAssignment.findMany({
+              where: { role: "admin", userId: { not: id } },
+              select: { userId: true },
+            });
+
+            const remainingAdmins = adminAssignments.length
+              ? await prisma.profile.count({
+                  where: {
+                    id: {
+                      in: adminAssignments.map(
+                        (assignment) => assignment.userId,
+                      ),
+                    },
+                    active: true,
+                  },
+                })
+              : 0;
+
+            if (remainingAdmins === 0) {
+              return reply.status(400).send({
+                error: "Debe existir al menos un administrador activo",
+              });
+            }
+          }
+        }
+
         const profile = await prisma.profile.update({
           where: { id },
           data: updateData,
@@ -338,6 +374,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
           },
         },
         response: {
+          400: { type: "object", properties: { error: { type: "string" } } },
           403: { type: "object", properties: { error: { type: "string" } } },
           500: { type: "object", properties: { error: { type: "string" } } },
           200: {
@@ -374,12 +411,46 @@ const routes: FastifyPluginAsync = async (fastify) => {
           return reply.status(404).send({ error: "Profile not found" });
         }
 
-        await prisma.profile.delete({
+        if (existingProfile.active) {
+          const isAdminRole =
+            (await prisma.userRoleAssignment.findFirst({
+              where: { userId: id, role: "admin" },
+              select: { id: true },
+            })) !== null;
+
+          if (isAdminRole) {
+            const adminAssignments = await prisma.userRoleAssignment.findMany({
+              where: { role: "admin", userId: { not: id } },
+              select: { userId: true },
+            });
+
+            const remainingAdmins = adminAssignments.length
+              ? await prisma.profile.count({
+                  where: {
+                    id: {
+                      in: adminAssignments.map(
+                        (assignment) => assignment.userId,
+                      ),
+                    },
+                    active: true,
+                  },
+                })
+              : 0;
+
+            if (remainingAdmins === 0) {
+              return reply.status(400).send({
+                error: "Debe existir al menos un administrador activo",
+              });
+            }
+          }
+        }
+
+        await prisma.profile.update({
           where: { id },
+          data: { active: false },
         });
-        return reply
-          .status(200)
-          .send({ message: "Profile deleted successfully" });
+
+        return reply.status(200).send({ message: "Profile deactivated" });
       } catch (error) {
         return reply.status(500).send({ error: "Internal server error" });
       }

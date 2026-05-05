@@ -71,11 +71,11 @@ fastify.register(logRequest);
 fastify.register(authAccessToken);
 fastify.register(authRefreshToken);
 
-// Debug hook to log all ai-generar-documento requests
+// Debug hook to log all ai-generate-document requests
 fastify.addHook("onRequest", async (request) => {
-  if (request.url.includes("ai-generar-documento")) {
+  if (request.url.includes("ai-generate-document")) {
     request.log.info({
-      msg: "DEBUG: ai-generar-documento onRequest",
+      msg: "DEBUG: ai-generate-document onRequest",
       url: request.url,
       contentType: request.headers["content-type"],
     });
@@ -83,9 +83,9 @@ fastify.addHook("onRequest", async (request) => {
 });
 
 fastify.addHook("preParsing", async (request, _reply, payload) => {
-  if (request.url.includes("ai-generar-documento")) {
+  if (request.url.includes("ai-generate-document")) {
     request.log.info({
-      msg: "DEBUG: ai-generar-documento preParsing",
+      msg: "DEBUG: ai-generate-document preParsing",
       payloadType: typeof payload,
     });
   }

@@ -40,6 +40,15 @@ const authAccessTokenPlugin = fp(async (fastify: FastifyInstance) => {
         const { sub, jti } = verifyAccessToken(accessToken.value);
         request.userId = sub;
         request.sessionId = jti;
+
+        const profile = await fastify.prisma.profile.findUnique({
+          where: { id: sub },
+          select: { active: true },
+        });
+
+        if (!profile?.active) {
+          throw new Errors.unauthorizedToken();
+        }
       } catch {
         throw new Errors.unauthorizedToken();
       }

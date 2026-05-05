@@ -23,10 +23,10 @@ export class CpvController {
   ): Promise<void> {
     try {
       const { query, limit = 20 } = req.body;
-      const resultados = await this.cpvService.search(query, limit);
+      const results = await this.cpvService.search(query, limit);
 
       return reply.send({
-        data: { resultados },
+        data: { results },
         error: null,
       });
     } catch (error) {
