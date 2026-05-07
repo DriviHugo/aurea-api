@@ -416,6 +416,9 @@ const routes: FastifyPluginAsync = async (fastify) => {
 
         const isAdmin = Boolean(adminRole);
         const unit = profile?.unit?.trim() ?? "";
+        const unitScopeWhere: Prisma.CaseWhereInput = unit
+          ? { unit: { equals: unit, mode: "insensitive" } }
+          : { creatorId: userId };
 
         const viewWhere: Prisma.CaseWhereInput = (() => {
           if (viewMode === "mis") {
@@ -427,7 +430,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
           }
 
           if (isAdmin) return {};
-          return unit ? { unit } : { creatorId: userId };
+          return unitScopeWhere;
         })();
 
         const normalizedStatus = status ? STATUS_FILTER_MAP[status] : undefined;
@@ -486,11 +489,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
 
         const urgentLimitDate = new Date();
         urgentLimitDate.setDate(urgentLimitDate.getDate() + 7);
-        const scopeWhere: Prisma.CaseWhereInput = isAdmin
-          ? {}
-          : unit
-            ? { unit }
-            : { creatorId: userId };
+        const scopeWhere: Prisma.CaseWhereInput = isAdmin ? {} : unitScopeWhere;
 
         const [cases, total, myTotal, myPending, urgentCount, scopeTotal] =
           await Promise.all([
