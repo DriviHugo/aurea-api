@@ -537,6 +537,118 @@ const routes: FastifyPluginAsync = async (fastify) => {
     },
   );
 
+  // GET /cases/fractionation-check - Detect possible contract fractionation (Art. 118.3 LCSP)
+  fastify.get(
+    "/fractionation-check",
+    {
+      preValidation: [fastify.authAccessToken],
+      schema: {
+        tags: ["Cases"],
+        description: "Detect possible minor contract fractionation by CPV division",
+        querystring: {
+          type: "object",
+          required: ["cpv", "contractType"],
+          properties: {
+            cpv: { type: "string" },
+            contractType: { type: "string" },
+            excludeId: { type: "string" },
+            sinceDate: { type: "string" },
+          },
+        },
+        response: {
+          400: { type: "object", properties: { error: { type: "string" } } },
+          500: { type: "object", properties: { error: { type: "string" } } },
+          200: {
+            type: "object",
+            properties: {
+              contracts: {
+                type: "array",
+                items: {
+                  type: "object",
+                  properties: {
+                    id: { type: "string" },
+                    code: { type: "string" },
+                    subject: { type: "string" },
+                    selected_cpv: { type: ["string", "null"] },
+                    base_tender_budget: { type: ["number", "null"] },
+                    created_at: { type: "string" },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    async (request, reply) => {
+      try {
+        const { cpv, contractType, excludeId, sinceDate } = request.query as {
+          cpv: string;
+          contractType: string;
+          excludeId?: string;
+          sinceDate?: string;
+        };
+
+        const normalizedContract = CONTRACT_FILTER_MAP[contractType] as ContractType | undefined;
+        if (!normalizedContract) {
+          return reply.status(400).send({ error: `Invalid contractType: ${contractType}` });
+        }
+
+        // Extract CPV division (first 2 digits of numeric part)
+        const digits = cpv.replace(/\D/g, "");
+        const division = digits.length >= 2 ? digits.substring(0, 2) : null;
+        if (!division) {
+          return reply.status(400).send({ error: `Invalid CPV: ${cpv}` });
+        }
+
+        const since = sinceDate
+          ? new Date(sinceDate)
+          : (() => { const d = new Date(); d.setFullYear(d.getFullYear() - 1); return d; })();
+
+        // Step 1: query all minor contracts with same type in last year (DB filter)
+        const where: Prisma.CaseWhereInput = {
+          selectedProcedure: "minor" as ProcedureType,
+          contractType: normalizedContract,
+          createdAt: { gte: since },
+          ...(excludeId ? { id: { not: excludeId } } : {}),
+        };
+
+        const candidates = await prisma.case.findMany({
+          where,
+          select: {
+            id: true,
+            code: true,
+            subject: true,
+            selectedCpv: true,
+            baseTenderBudget: true,
+            createdAt: true,
+          },
+          orderBy: { createdAt: "desc" },
+        });
+
+        // Step 2: filter by CPV division (first 2 numeric digits) — matches the algorithm
+        const contracts = candidates.filter((c) => {
+          if (!c.selectedCpv) return false;
+          const d = c.selectedCpv.replace(/\D/g, "").substring(0, 2);
+          return d === division;
+        });
+
+        const result = contracts.map((c) => ({
+          id: c.id,
+          code: c.code,
+          subject: c.subject,
+          selected_cpv: c.selectedCpv,
+          base_tender_budget: c.baseTenderBudget ? Number(c.baseTenderBudget) : null,
+          created_at: c.createdAt.toISOString(),
+        }));
+
+        return reply.status(200).send({ contracts: result });
+      } catch (error) {
+        return reply.status(500).send({ error: "Internal server error" });
+      }
+    },
+  );
+
   // GET /cases/:id - Get by ID
   fastify.get(
     "/:id",
