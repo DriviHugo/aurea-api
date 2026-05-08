@@ -544,7 +544,8 @@ const routes: FastifyPluginAsync = async (fastify) => {
       preValidation: [fastify.authAccessToken],
       schema: {
         tags: ["Cases"],
-        description: "Detect possible minor contract fractionation by CPV division",
+        description:
+          "Detect possible minor contract fractionation by CPV division",
         querystring: {
           type: "object",
           required: ["cpv", "contractType"],
@@ -589,9 +590,11 @@ const routes: FastifyPluginAsync = async (fastify) => {
           sinceDate?: string;
         };
 
-        const normalizedContract = CONTRACT_FILTER_MAP[contractType] as ContractType | undefined;
+        const normalizedContract = CONTRACT_FILTER_MAP[contractType];
         if (!normalizedContract) {
-          return reply.status(400).send({ error: `Invalid contractType: ${contractType}` });
+          return reply
+            .status(400)
+            .send({ error: `Invalid contractType: ${contractType}` });
         }
 
         // Extract CPV division (first 2 digits of numeric part)
@@ -603,7 +606,11 @@ const routes: FastifyPluginAsync = async (fastify) => {
 
         const since = sinceDate
           ? new Date(sinceDate)
-          : (() => { const d = new Date(); d.setFullYear(d.getFullYear() - 1); return d; })();
+          : (() => {
+              const d = new Date();
+              d.setFullYear(d.getFullYear() - 1);
+              return d;
+            })();
 
         // Step 1: query all minor contracts with same type in last year (DB filter)
         const where: Prisma.CaseWhereInput = {
@@ -638,7 +645,9 @@ const routes: FastifyPluginAsync = async (fastify) => {
           code: c.code,
           subject: c.subject,
           selected_cpv: c.selectedCpv,
-          base_tender_budget: c.baseTenderBudget ? Number(c.baseTenderBudget) : null,
+          base_tender_budget: c.baseTenderBudget
+            ? Number(c.baseTenderBudget)
+            : null,
           created_at: c.createdAt.toISOString(),
         }));
 

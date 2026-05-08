@@ -4,7 +4,7 @@
 
 import type { PrismaClient } from "@prisma/client";
 import { FallbackAIGatewayService } from "./ai-gateway/fallback-gateway.service.js";
-import { AIProvider } from "./ai-gateway/types.js";
+import { getProductionGateway } from "./ai-gateway/production-gateway.js";
 
 export interface ReescribirSeccionInput {
   seccionId: string;
@@ -36,26 +36,7 @@ export class AIDocumentService {
   private aiGateway: FallbackAIGatewayService;
 
   constructor(private prisma: PrismaClient) {
-    // ALIA config (preferente)
-    const aliaConfig = {
-      provider: AIProvider.ALIA,
-      model: process.env["ALIA_MODEL"] ?? "alia-40b-instruct",
-      baseUrl:
-        process.env["ALIA_BASE_URL"] ??
-        "https://api.nextbit256.com/onemillion/llm/v1",
-      apiKey: process.env["ALIA_API_KEY"] ?? "",
-      temperature: parseFloat(process.env["AI_TEMPERATURE"] ?? "0.7"),
-      maxTokens: 4096,
-    };
-    // Fallback config (Claude Sonnet 4.5, luego Llama 3.3 70b on-prem)
-    const fallbackConfig = {
-      provider: AIProvider.ANTHROPIC,
-      model: "claude-3-5-sonnet-20241022",
-      apiKey: process.env["ANTHROPIC_API_KEY"] ?? "",
-      temperature: parseFloat(process.env["AI_TEMPERATURE"] ?? "0.7"),
-      maxTokens: 4096,
-    };
-    this.aiGateway = new FallbackAIGatewayService(aliaConfig, fallbackConfig);
+    this.aiGateway = getProductionGateway();
   }
 
   async reescribirSeccion(

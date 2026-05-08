@@ -34,16 +34,24 @@ export function getProductionGateway(): FallbackAIGatewayService {
     const primaryConfig = primaryUrl
       ? {
           provider: AIProvider.ALIA,
-          model: process.env["AI_PRIMARY_MODEL"] ?? process.env["ALIA_MODEL"] ?? "BSC-LT/ALIA-40b-instruct_Q8_0",
+          model:
+            process.env["AI_PRIMARY_MODEL"] ??
+            process.env["ALIA_MODEL"] ??
+            "BSC-LT/ALIA-40b-instruct_Q8_0",
           baseUrl: primaryUrl,
-          apiKey: process.env["AI_PRIMARY_API_KEY"] ?? process.env["ALIA_API_KEY"] ?? "",
+          apiKey:
+            process.env["AI_PRIMARY_API_KEY"] ??
+            process.env["ALIA_API_KEY"] ??
+            "",
           temperature,
           maxTokens: 4096,
         }
       : {
           provider: AIProvider.ALIA,
           model: process.env["ALIA_MODEL"] ?? "alia-40b-instruct",
-          baseUrl: process.env["ALIA_BASE_URL"] ?? "https://api.nextbit256.com/onemillion/llm/v1",
+          baseUrl:
+            process.env["ALIA_BASE_URL"] ??
+            "https://api.nextbit256.com/onemillion/llm/v1",
           apiKey: process.env["ALIA_API_KEY"] ?? "",
           temperature,
           maxTokens: 4096,
@@ -55,7 +63,8 @@ export function getProductionGateway(): FallbackAIGatewayService {
     const fallbackConfig = fallbackUrl
       ? {
           provider: AIProvider.ALIA,
-          model: process.env["AI_FALLBACK_MODEL"] ?? "BSC-LT/ALIA-40b-instruct_Q8_0",
+          model:
+            process.env["AI_FALLBACK_MODEL"] ?? "BSC-LT/ALIA-40b-instruct_Q8_0",
           baseUrl: fallbackUrl,
           apiKey: process.env["AI_FALLBACK_API_KEY"] ?? "",
           temperature,
@@ -72,7 +81,9 @@ export function getProductionGateway(): FallbackAIGatewayService {
     logger.info({
       msg: "[ProductionGateway] Initializing gateway",
       primaryMode: primaryUrl ? `on-prem (${primaryUrl})` : "cloud (ALIA)",
-      fallbackMode: fallbackUrl ? `on-prem (${fallbackUrl})` : "cloud (Anthropic)",
+      fallbackMode: fallbackUrl
+        ? `on-prem (${fallbackUrl})`
+        : "cloud (Anthropic)",
     });
 
     gateway = new FallbackAIGatewayService(primaryConfig, fallbackConfig);
