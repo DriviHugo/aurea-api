@@ -72,26 +72,6 @@ fastify.register(authAccessToken);
 fastify.register(authRefreshToken);
 
 // Debug hook to log all ai-generate-document requests
-fastify.addHook("onRequest", async (request) => {
-  if (request.url.includes("ai-generate-document")) {
-    request.log.info({
-      msg: "DEBUG: ai-generate-document onRequest",
-      url: request.url,
-      contentType: request.headers["content-type"],
-    });
-  }
-});
-
-fastify.addHook("preParsing", async (request, _reply, payload) => {
-  if (request.url.includes("ai-generate-document")) {
-    request.log.info({
-      msg: "DEBUG: ai-generate-document preParsing",
-      payloadType: typeof payload,
-    });
-  }
-  return payload;
-});
-
 // Routes
 fastify.register(privateRoutes, { prefix: `${regularRoutePath}/private` });
 fastify.register(publicRoutes, { prefix: `${regularRoutePath}/public` });
