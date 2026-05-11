@@ -1,13 +1,16 @@
 import type { FastifyInstance } from "fastify";
 import authRoutes from "./auth-simple.js";
 import ssoRoutes from "./sso.routes.js";
+import { FEATURE_FLAGS } from "../../env.js";
 
 export default async (fastify: FastifyInstance): Promise<void> => {
   // Rutas de autenticación local (email/password)
   await fastify.register(authRoutes, { prefix: "/auth" });
 
-  // Rutas SSO (OpenAM/OIDC)
-  await fastify.register(ssoRoutes, { prefix: "/sso" });
+  // Rutas SSO (OpenAM/OIDC) — only if OIDC_ISSUER_URL is configured
+  if (FEATURE_FLAGS.ssoEnabled) {
+    await fastify.register(ssoRoutes, { prefix: "/sso" });
+  }
 
   // OLD BOILERPLATE ROUTE (DISABLED - uses authApiKey which is disabled)
   /*

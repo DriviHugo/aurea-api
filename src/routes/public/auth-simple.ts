@@ -1,5 +1,6 @@
 import type { FastifyInstance } from "fastify";
 import * as authController from "../../controllers/auth-simple.js";
+import { FEATURE_FLAGS } from "../../env.js";
 
 export default async function authRoutes(app: FastifyInstance): Promise<void> {
   // Login - público
@@ -17,22 +18,24 @@ export default async function authRoutes(app: FastifyInstance): Promise<void> {
     handler: authController.login,
   });
 
-  // Register - público
-  app.post("/register", {
-    schema: {
-      body: {
-        type: "object",
-        required: ["email", "password", "name"],
-        properties: {
-          email: { type: "string", format: "email" },
-          password: { type: "string", minLength: 6 },
-          name: { type: "string", minLength: 1 },
-          lastName: { type: "string" },
+  // Register - public, but only enabled if LOCAL_AUTH_ENABLED=true
+  if (FEATURE_FLAGS.localAuthRegisterEnabled) {
+    app.post("/register", {
+      schema: {
+        body: {
+          type: "object",
+          required: ["email", "password", "name"],
+          properties: {
+            email: { type: "string", format: "email" },
+            password: { type: "string", minLength: 6 },
+            name: { type: "string", minLength: 1 },
+            lastName: { type: "string" },
+          },
         },
       },
-    },
-    handler: authController.register,
-  });
+      handler: authController.register,
+    });
+  }
 
   // Me - requiere autenticación
   app.get("/me", {

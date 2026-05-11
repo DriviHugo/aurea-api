@@ -22,15 +22,16 @@ import validacionevidenciaRoutes from "./validationevidence.routes.js";
 import revisionRoutes from "./review.routes.js";
 import comentarioRoutes from "./comment.routes.js";
 import auditlogRoutes from "./auditlog.routes.js";
-import aiproviderRoutes from "./aiprovider.routes.js";
+// DISABLED BOILERPLATE ROUTES (not used in AUREA production)
+// import aiproviderRoutes from "./aiprovider.routes.js";
 import aifunctionRoutes from "./aifunction.routes.js";
 import aifunctionversionRoutes from "./aifunctionversion.routes.js";
 import aifunctionlogRoutes from "./aifunctionlog.routes.js";
 import incidenciaRoutes from "./issue.routes.js";
-import testcaseRoutes from "./testcase.routes.js";
-import repairdocumentRoutes from "./repairdocument.routes.js";
-import repairextractionRoutes from "./repairextraction.routes.js";
-import repairruleRoutes from "./repairrule.routes.js";
+// import testcaseRoutes from "./testcase.routes.js";
+// import repairdocumentRoutes from "./repairdocument.routes.js";
+// import repairextractionRoutes from "./repairextraction.routes.js";
+// import repairruleRoutes from "./repairrule.routes.js";
 import ruleusageRoutes from "./ruleusage.routes.js";
 import sectionquestionRoutes from "./sectionquestion.routes.js";
 import unitRoutes from "./unit.routes.js";
@@ -76,15 +77,18 @@ export default async (fastify: FastifyInstance): Promise<void> => {
   fastify.register(revisionRoutes, { prefix: "/review" });
   fastify.register(comentarioRoutes, { prefix: "/comment" });
   fastify.register(auditlogRoutes, { prefix: "/audit-log" });
-  fastify.register(aiproviderRoutes, { prefix: "/ai-provider" });
+  // DISABLED: aiprovider routes (boilerplate, not used in production)
+  // fastify.register(aiproviderRoutes, { prefix: "/ai-provider" });
   fastify.register(aifunctionRoutes, { prefix: "/ai-function" });
   fastify.register(aifunctionversionRoutes, { prefix: "/ai-function-version" });
   fastify.register(aifunctionlogRoutes, { prefix: "/ai-function-log" });
   fastify.register(incidenciaRoutes, { prefix: "/issue" });
-  fastify.register(testcaseRoutes, { prefix: "/test-case" });
-  fastify.register(repairdocumentRoutes, { prefix: "/repair-document" });
-  fastify.register(repairextractionRoutes, { prefix: "/repair-extraction" });
-  fastify.register(repairruleRoutes, { prefix: "/repair-rule" });
+  // DISABLED: testcase routes (boilerplate test fixture, not used in production)
+  // fastify.register(testcaseRoutes, { prefix: "/test-case" });
+  // DISABLED: repair routes (debugging/utility, not used in production)
+  // fastify.register(repairdocumentRoutes, { prefix: "/repair-document" });
+  // fastify.register(repairextractionRoutes, { prefix: "/repair-extraction" });
+  // fastify.register(repairruleRoutes, { prefix: "/repair-rule" });
   fastify.register(ruleusageRoutes, { prefix: "/rule-usage" });
   fastify.register(sectionquestionRoutes, { prefix: "/section-question" });
   fastify.register(unitRoutes, { prefix: "/unit" });
