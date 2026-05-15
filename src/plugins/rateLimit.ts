@@ -7,8 +7,7 @@ import rateLimit, { type RateLimitOptions } from "@fastify/rate-limit";
 import type { FastifyInstance } from "fastify";
 
 export async function registerRateLimiting(fastify: FastifyInstance) {
-  const isRateLimitEnabled =
-    process.env["RATE_LIMIT_ENABLED"] !== "false"; // Enabled by default
+  const isRateLimitEnabled = process.env["RATE_LIMIT_ENABLED"] !== "false"; // Enabled by default
 
   if (!isRateLimitEnabled) {
     fastify.log.info("Rate limiting is disabled");
@@ -33,7 +32,11 @@ export async function registerRateLimiting(fastify: FastifyInstance) {
  * Usage in route handlers:
  *   fastify.post('/auth/login', { ... }, applyRateLimit('login', 5, '15 minutes'))
  */
-export function createRateLimitConfig(endpoint: string, max: number, timeWindow: string) {
+export function createRateLimitConfig(
+  endpoint: string,
+  max: number,
+  timeWindow: string,
+) {
   return {
     config: {
       rateLimit: {

@@ -5,13 +5,12 @@ const transporter: Transporter = nodemailer.createTransport({
   host: process.env["EMAIL_HOST"] ?? "localhost",
   port: Number(process.env["EMAIL_PORT"] ?? 1025),
   secure: process.env["EMAIL_SECURE"] === "true",
-  auth:
-    process.env["EMAIL_AUTH_USER"]
-      ? {
-          user: process.env["EMAIL_AUTH_USER"],
-          pass: process.env["EMAIL_AUTH_PASS"],
-        }
-      : undefined,
+  auth: process.env["EMAIL_AUTH_USER"]
+    ? {
+        user: process.env["EMAIL_AUTH_USER"],
+        pass: process.env["EMAIL_AUTH_PASS"],
+      }
+    : undefined,
 });
 
 export async function sendEmail(

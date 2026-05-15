@@ -85,8 +85,7 @@ export function getProductionGateway(): FallbackAIGatewayService {
       ? {
           provider: AIProvider.ALIA,
           model:
-            process.env["AI_FALLBACK_MODEL"] ??
-            "BSC-LT/ALIA-40b-instruct_Q8_0",
+            process.env["AI_FALLBACK_MODEL"] ?? "BSC-LT/ALIA-40b-instruct_Q8_0",
           baseUrl: fallbackUrl,
           apiKey: process.env["AI_FALLBACK_API_KEY"] ?? "",
           temperature,

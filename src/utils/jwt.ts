@@ -4,8 +4,9 @@ import { Errors } from "../errors/appErrorFactory.js";
 const ACCESS_TOKEN_SECRET = process.env["ACCESS_TOKEN_SECRET"]!;
 // Default: 30 minutes. Override with ACCESS_TOKEN_EXPIRATION env var (e.g. "15m", "1h").
 const ACCESS_TOKEN_EXPIRATION = process.env["ACCESS_TOKEN_EXPIRATION"] ?? "30m";
-export const ACCESS_TOKEN_EXPIRATION_IN_SECONDS =
-  parseDurationToSeconds(ACCESS_TOKEN_EXPIRATION);
+export const ACCESS_TOKEN_EXPIRATION_IN_SECONDS = parseDurationToSeconds(
+  ACCESS_TOKEN_EXPIRATION,
+);
 
 const REFRESH_TOKEN_SECRET = process.env["REFRESH_TOKEN_SECRET"]!;
 const REFRESH_TOKEN_EXPIRATION = "30d";

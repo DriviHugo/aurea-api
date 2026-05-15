@@ -74,7 +74,7 @@ function validateNoCloudEnvironmentVars(nodeEnv: string): ValidationResult {
     for (const [envKey, envValue] of Object.entries(process.env)) {
       // Check if this env var is a blocked cloud provider key
       for (const blocked of BLOCKED_CLOUD_ENV_VARS) {
-        if (blocked.pattern.test(envKey) && envValue && envValue.trim()) {
+        if (blocked.pattern.test(envKey) && envValue?.trim()) {
           result.isCompliant = false;
           result.errors.push(
             `[CLOUD ISOLATION VIOLATION] Environment variable '${envKey}' is set for ${blocked.provider}. ` +
@@ -133,7 +133,7 @@ function validateOnPremRequirements(nodeEnv: string): ValidationResult {
     const primaryUrl = process.env["AI_PRIMARY_GATEWAY_URL"];
     const fallbackUrl = process.env["AI_FALLBACK_GATEWAY_URL"];
 
-    if (!primaryUrl || !primaryUrl.trim()) {
+    if (!primaryUrl?.trim()) {
       result.isCompliant = false;
       result.errors.push(
         "[CLOUD ISOLATION ERROR] AI_PRIMARY_GATEWAY_URL is not set. " +
@@ -141,7 +141,7 @@ function validateOnPremRequirements(nodeEnv: string): ValidationResult {
       );
     }
 
-    if (!fallbackUrl || !fallbackUrl.trim()) {
+    if (!fallbackUrl?.trim()) {
       result.isCompliant = false;
       result.errors.push(
         "[CLOUD ISOLATION ERROR] AI_FALLBACK_GATEWAY_URL is not set. " +
@@ -204,9 +204,7 @@ export function validateCloudIsolation(): void {
   }
 
   // Success message
-  console.log(
-    `✅ Cloud Isolation Validation PASSED (NODE_ENV=${nodeEnv})`,
-  );
+  console.log(`✅ Cloud Isolation Validation PASSED (NODE_ENV=${nodeEnv})`);
   if (allWarnings.length === 0 && nodeEnv !== "development") {
     console.log(
       "✅ On-prem gateway is properly configured with zero cloud dependencies.",
