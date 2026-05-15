@@ -33,7 +33,7 @@ export class AIGatewayService {
   }
 
   async complete(request: AICompletionRequest): Promise<AICompletionResponse> {
-    const maxRetries = 2; // Reduced from 3 - fail faster to enable fallback
+    const maxRetries = this.config.retries ?? 2;
     let lastError: Error | null = null;
 
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
@@ -49,14 +49,6 @@ export class AIGatewayService {
         } else {
           lastError = new Error(String(error));
         }
-
-        console.error({
-          event: "ai_completion_error",
-          provider: this.config.provider,
-          model: this.config.model,
-          attempt,
-          error: lastError.message,
-        });
 
         // Don't retry on timeout or network errors - fail fast for fallback
         const isTimeoutOrNetworkError =
@@ -141,12 +133,16 @@ export function createAIGateway(): AIGatewayService {
   const provider = (process.env["AI_PROVIDER"] ?? "ollama") as AIProvider;
   const aiApiKey = process.env["AI_API_KEY"];
   const aiBaseUrl = process.env["AI_BASE_URL"];
+  const timeoutMs = parseInt(process.env["AI_TIMEOUT_MS"] ?? "120000", 10);
+  const retries = parseInt(process.env["AI_MAX_RETRIES"] ?? "2", 10);
 
   const config: AIConfig = {
     provider,
     model: process.env["AI_MODEL"] ?? getDefaultModel(provider),
     temperature: parseFloat(process.env["AI_TEMPERATURE"] ?? "0.7"),
     maxTokens: parseInt(process.env["AI_MAX_TOKENS"] ?? "4096", 10),
+    timeout: Number.isNaN(timeoutMs) ? 120000 : timeoutMs,
+    retries: Number.isNaN(retries) ? 2 : Math.max(retries, 1),
     ...(aiApiKey !== undefined && aiApiKey !== "" && { apiKey: aiApiKey }),
     ...(aiBaseUrl !== undefined && aiBaseUrl !== "" && { baseUrl: aiBaseUrl }),
   };

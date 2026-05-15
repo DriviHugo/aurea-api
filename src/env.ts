@@ -12,12 +12,16 @@ const REQUIRED_VARS = [
   "REFRESH_TOKEN_SECRET",
   "COOKIE_SECRET",
   "FRONTEND_BASE_URL",
+  "REDIS_HOST",
+  "MINIO_ENDPOINT",
+  "MINIO_ACCESS_KEY",
+  "MINIO_SECRET_KEY",
 ];
 
 const missing = REQUIRED_VARS.filter((key) => !process.env[key]?.trim());
 if (missing.length > 0) {
   console.error(
-    `[Startup] Missing required environment variables: ${missing.join(", ")}`
+    `[Startup] Missing required environment variables: ${missing.join(", ")}`,
   );
   process.exit(1);
 }

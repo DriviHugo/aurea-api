@@ -4,6 +4,7 @@
 
 import type { FastifyRequest, FastifyReply } from "fastify";
 import type { AIDocumentService } from "../services/ai-document.service.js";
+import logger from "../config/logger.js";
 
 interface ReescribirSeccionBody {
   seccionId: string;
@@ -32,7 +33,7 @@ export class AIDocumentController {
         error: null,
       });
     } catch (error) {
-      console.error("Error al reescribir sección:", error);
+      logger.error({ err: error, msg: "Error al reescribir sección" });
       return reply
         .status(
           error instanceof Error && error.message.includes("Faltan campos")

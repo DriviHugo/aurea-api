@@ -33,6 +33,7 @@ export default async (fastify: FastifyInstance): Promise<void> => {
   fastify.register(aiEvaluateSufficiencyRoutes);
 
   // POST /functions/cpv-search - CPV autocomplete
+  // Rate limited globally via @fastify/rate-limit plugin
   fastify.post("/cpv-search", {
     preValidation: [fastify.authAccessToken],
     schema: {
@@ -57,6 +58,7 @@ export default async (fastify: FastifyInstance): Promise<void> => {
   });
 
   // POST /functions/ai-provider-info - Get current provider order
+  // Rate limited globally via @fastify/rate-limit plugin
   fastify.post("/ai-provider-info", {
     preValidation: [fastify.authAccessToken],
     handler: async (_request, reply) => {
@@ -66,6 +68,7 @@ export default async (fastify: FastifyInstance): Promise<void> => {
   });
 
   // POST /functions/ai-swap-provider - Swap primary/fallback order
+  // Rate limited globally via @fastify/rate-limit plugin
   fastify.post("/ai-swap-provider", {
     preValidation: [fastify.authAccessToken],
     handler: async (_request, reply) => {

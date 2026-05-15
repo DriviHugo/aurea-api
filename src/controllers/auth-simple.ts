@@ -11,6 +11,8 @@ import {
   ACCESS_TOKEN_EXPIRATION_IN_SECONDS,
   REFRESH_TOKEN_EXPIRATION_IN_SECONDS,
 } from "../utils/jwt.js";
+import { blacklistJti } from "../services/tokenBlacklist.js";
+import logger from "../config/logger.js";
 
 interface LoginBody {
   email: string;
@@ -90,7 +92,7 @@ export const login = async (
         },
       });
   } catch (error) {
-    console.error("Login error:", error);
+    logger.error({ err: error, msg: "Login error" });
     return res.status(500).send({
       error: "Error interno del servidor",
     });
@@ -222,9 +224,17 @@ export const refreshAccessToken = async (
 };
 
 export const logout = async (
-  _req: FastifyRequest,
+  req: FastifyRequest,
   res: FastifyReply,
 ): Promise<void> => {
+  // Blacklist the session jti so access and refresh tokens are immediately revoked.
+  // req.refreshOpaqueToken is set by the authRefreshToken preHandler on this route.
+  const jti = (req as FastifyRequest & { refreshOpaqueToken?: string })
+    .refreshOpaqueToken;
+  if (jti) {
+    await blacklistJti(jti);
+  }
+
   return res
     .clearCookie(
       process.env["NODE_ENV"] === "production"

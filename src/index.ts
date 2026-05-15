@@ -1,6 +1,11 @@
 import blocked from "blocked";
 
 import "./env.js";
+import { validateCloudIsolation } from "./validators/cloudIsolation.js";
+
+// Validate cloud isolation before loading other services
+validateCloudIsolation();
+
 import prisma from "./config/prisma.js";
 import app from "./app.js";
 import logger from "./config/logger.js";

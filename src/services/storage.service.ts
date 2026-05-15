@@ -70,7 +70,6 @@ export class StorageService {
       const exists = await this.client.bucketExists(bucket);
       if (!exists) {
         await this.client.makeBucket(bucket);
-        console.log(`[Storage] Created bucket: ${bucket}`);
       }
     }
   }

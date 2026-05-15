@@ -171,29 +171,14 @@ Recuerda responder SOLO con JSON válido.`;
         );
         const generationTimeMs = Date.now() - startTime;
 
-        console.log("[AI-Contract] Raw AI response:", aiResponse.content);
-
         let result;
         try {
           const cleanResponse = aiResponse.content
             .replace(/```json\n?/g, "")
             .replace(/```\n?/g, "")
             .trim();
-          console.log("[AI-Contract] Cleaned response:", cleanResponse);
           result = JSON.parse(cleanResponse);
-          console.log(
-            "[AI-Contract] Parsed result:",
-            JSON.stringify(result, null, 2),
-          );
-          console.log(
-            "[AI-Contract] improvedSubject value:",
-            result.improvedSubject,
-          );
         } catch {
-          console.error(
-            "[AI-Contract] Failed to parse AI response:",
-            aiResponse.content,
-          );
           return reply.status(500).send({
             error: "Error processing AI response",
             details: "Response is not valid JSON",
@@ -210,7 +195,6 @@ Recuerda responder SOLO con JSON válido.`;
 
         return reply.send(result);
       } catch (error) {
-        console.error("[AI-Contract] Error:", error);
         return reply.status(500).send({
           error: "Error processing AI request",
           details: error instanceof Error ? error.message : "Unknown error",

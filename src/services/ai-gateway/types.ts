@@ -22,6 +22,7 @@ export interface AIConfig {
   maxTokens?: number;
   topP?: number;
   timeout?: number;
+  retries?: number;
 }
 
 export interface AIMessage {

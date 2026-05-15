@@ -3,7 +3,7 @@
  */
 
 import type { PrismaClient } from "@prisma/client";
-import { FallbackAIGatewayService } from "./ai-gateway/fallback-gateway.service.js";
+import type { FallbackAIGatewayService } from "./ai-gateway/fallback-gateway.service.js";
 import { getProductionGateway } from "./ai-gateway/production-gateway.js";
 
 export interface ReescribirSeccionInput {

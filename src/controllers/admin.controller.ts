@@ -5,6 +5,7 @@
 import type { FastifyRequest, FastifyReply } from "fastify";
 import type { UserRole } from "@prisma/client";
 import type { AdminService } from "../services/admin.service.js";
+import logger from "../config/logger.js";
 
 interface CreateUserBody {
   email: string;
@@ -60,7 +61,7 @@ export class AdminController {
         error: null,
       });
     } catch (error) {
-      console.error("Error creating user:", error);
+      logger.error({ err: error, msg: "Error creating user" });
       return reply
         .status(
           error instanceof Error && error.message.includes("Ya existe")
@@ -107,7 +108,7 @@ export class AdminController {
         error: null,
       });
     } catch (error) {
-      console.error("Error updating password:", error);
+      logger.error({ err: error, msg: "Error updating password" });
       return reply.status(500).send({
         data: null,
         error: {
@@ -147,7 +148,7 @@ export class AdminController {
         error: null,
       });
     } catch (error) {
-      console.error("Error deleting user:", error);
+      logger.error({ err: error, msg: "Error deleting user" });
       return reply
         .status(
           error instanceof Error && error.message.includes("ti mismo")

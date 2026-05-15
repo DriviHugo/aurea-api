@@ -4,6 +4,7 @@
 
 import type { FastifyRequest, FastifyReply } from "fastify";
 import type { CpvService, CpvImportItem } from "../services/cpv.service.js";
+import logger from "../config/logger.js";
 
 interface CpvSearchBody {
   query: string;
@@ -30,7 +31,7 @@ export class CpvController {
         error: null,
       });
     } catch (error) {
-      console.error("Error buscando CPV:", error);
+      logger.error({ err: error, msg: "Error buscando CPV" });
       return reply.status(500).send({
         data: null,
         error: {
@@ -55,7 +56,7 @@ export class CpvController {
         error: null,
       });
     } catch (error) {
-      console.error("Error importando CPV:", error);
+      logger.error({ err: error, msg: "Error importando CPV" });
       return reply
         .status(
           error instanceof Error && error.message.includes("No hay datos")

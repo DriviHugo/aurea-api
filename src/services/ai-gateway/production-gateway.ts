@@ -1,17 +1,11 @@
 /**
  * Production AI Gateway
  *
- * Each role (primary / fallback) is independently routed via its own URL variable:
- *
- *   AI_PRIMARY_GATEWAY_URL  — set → on-prem primary  | empty → ALIA cloud
- *   AI_FALLBACK_GATEWAY_URL — set → on-prem fallback | empty → Anthropic cloud
- *
- * Both URLs must expose an OpenAI-compatible /chat/completions endpoint.
- *
- * Typical setups:
- *   Local/staging:   both empty  → ALIA cloud primary + Anthropic cloud fallback
- *   Production:      both set    → on-prem primary + on-prem fallback (different models/ports)
- *   Mixed:           only one set → one on-prem, the other cloud
+ * On-prem is the default behavior.
+ * - AI_PRIMARY_GATEWAY_URL is required in non-development environments.
+ * - AI_FALLBACK_GATEWAY_URL is optional: if absent, a warning is logged and
+ *   the primary is used as both (single-node on-prem deployments).
+ * - In development, cloud providers are allowed as a convenience fallback.
  */
 
 import { FallbackAIGatewayService } from "./fallback-gateway.service.js";
@@ -25,12 +19,33 @@ let gateway: FallbackAIGatewayService | null = null;
  */
 export function getProductionGateway(): FallbackAIGatewayService {
   if (!gateway) {
+    const nodeEnv = process.env["NODE_ENV"] ?? "development";
+    const isDevelopment = nodeEnv === "development";
     const temperature = parseFloat(process.env["AI_TEMPERATURE"] ?? "0.7");
+    const timeoutMs = parseInt(process.env["AI_TIMEOUT_MS"] ?? "120000", 10);
+    const retries = parseInt(process.env["AI_MAX_RETRIES"] ?? "2", 10);
+    const timeout = Number.isNaN(timeoutMs) ? 120000 : timeoutMs;
+    const retryCount = Number.isNaN(retries) ? 2 : Math.max(retries, 1);
 
     const primaryUrl = process.env["AI_PRIMARY_GATEWAY_URL"]?.trim();
     const fallbackUrl = process.env["AI_FALLBACK_GATEWAY_URL"]?.trim();
 
-    // Primary: on-prem if URL is set, ALIA cloud otherwise
+    // In non-development, primary URL is mandatory.
+    if (!isDevelopment && !primaryUrl) {
+      throw new Error(
+        `[ProductionGateway] Missing required on-prem AI gateway var in ${nodeEnv}: AI_PRIMARY_GATEWAY_URL`,
+      );
+    }
+
+    // In non-development, warn (not throw) if fallback is absent.
+    if (!isDevelopment && !fallbackUrl) {
+      logger.warn({
+        msg: "[ProductionGateway] AI_FALLBACK_GATEWAY_URL not set — running single-node (no AI failover)",
+      });
+    }
+
+    // Resolve primary config.
+    // In development without a primary URL, fall back to cloud ALIA via env vars.
     const primaryConfig = primaryUrl
       ? {
           provider: AIProvider.ALIA,
@@ -45,45 +60,62 @@ export function getProductionGateway(): FallbackAIGatewayService {
             "",
           temperature,
           maxTokens: 4096,
+          timeout,
+          retries: retryCount,
         }
       : {
+          // Development only — requires ALIA_BASE_URL env var
           provider: AIProvider.ALIA,
           model: process.env["ALIA_MODEL"] ?? "alia-40b-instruct",
-          baseUrl:
-            process.env["ALIA_BASE_URL"] ??
-            "https://api.nextbit256.com/onemillion/llm/v1",
+          baseUrl: process.env["ALIA_BASE_URL"] ?? "",
           apiKey: process.env["ALIA_API_KEY"] ?? "",
           temperature,
           maxTokens: 4096,
+          timeout,
+          retries: retryCount,
         };
 
-    // Fallback: on-prem if URL is set, Anthropic cloud otherwise
+    // Resolve fallback config.
+    // If fallbackUrl is set → on-prem secondary.
+    // If not set in dev → cloud Anthropic (convenience).
+    // If not set in prod → mirror primary (single-node, no real failover).
     const anthropicKey = process.env["ANTHROPIC_API_KEY"] ?? "";
     const envModel = process.env["AI_MODEL"] ?? "";
     const fallbackConfig = fallbackUrl
       ? {
           provider: AIProvider.ALIA,
           model:
-            process.env["AI_FALLBACK_MODEL"] ?? "BSC-LT/ALIA-40b-instruct_Q8_0",
+            process.env["AI_FALLBACK_MODEL"] ??
+            "BSC-LT/ALIA-40b-instruct_Q8_0",
           baseUrl: fallbackUrl,
           apiKey: process.env["AI_FALLBACK_API_KEY"] ?? "",
           temperature,
           maxTokens: 4096,
+          timeout,
+          retries: retryCount,
         }
-      : {
-          provider: AIProvider.ANTHROPIC,
-          model: envModel.trim() !== "" ? envModel : "claude-sonnet-4-20250514",
-          apiKey: anthropicKey,
-          temperature,
-          maxTokens: 4096,
-        };
+      : isDevelopment
+        ? {
+            provider: AIProvider.ANTHROPIC,
+            model:
+              envModel.trim() !== "" ? envModel : "claude-sonnet-4-20250514",
+            apiKey: anthropicKey,
+            temperature,
+            maxTokens: 4096,
+            timeout,
+            retries: retryCount,
+          }
+        : primaryConfig; // single-node: fallback mirrors primary
 
     logger.info({
       msg: "[ProductionGateway] Initializing gateway",
-      primaryMode: primaryUrl ? `on-prem (${primaryUrl})` : "cloud (ALIA)",
+      environment: nodeEnv,
+      primaryMode: primaryUrl ? `on-prem (${primaryUrl})` : "cloud/dev (ALIA)",
       fallbackMode: fallbackUrl
         ? `on-prem (${fallbackUrl})`
-        : "cloud (Anthropic)",
+        : isDevelopment
+          ? "cloud/dev (Anthropic)"
+          : "none (single-node)",
     });
 
     gateway = new FallbackAIGatewayService(primaryConfig, fallbackConfig);

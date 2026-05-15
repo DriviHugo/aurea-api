@@ -2,15 +2,33 @@ import jwt from "jsonwebtoken";
 import { Errors } from "../errors/appErrorFactory.js";
 
 const ACCESS_TOKEN_SECRET = process.env["ACCESS_TOKEN_SECRET"]!;
-const ACCESS_TOKEN_EXPIRATION = "8h"; // 8 hours for development
-export const ACCESS_TOKEN_EXPIRATION_IN_SECONDS = 60 * 60 * 8; // 8 hours
+// Default: 30 minutes. Override with ACCESS_TOKEN_EXPIRATION env var (e.g. "15m", "1h").
+const ACCESS_TOKEN_EXPIRATION = process.env["ACCESS_TOKEN_EXPIRATION"] ?? "30m";
+export const ACCESS_TOKEN_EXPIRATION_IN_SECONDS =
+  parseDurationToSeconds(ACCESS_TOKEN_EXPIRATION);
 
 const REFRESH_TOKEN_SECRET = process.env["REFRESH_TOKEN_SECRET"]!;
-const REFRESH_TOKEN_EXPIRATION = "30d"; // 30 days
-export const REFRESH_TOKEN_EXPIRATION_IN_SECONDS = 60 * 60 * 24 * 30; // 30 days
+const REFRESH_TOKEN_EXPIRATION = "30d";
+export const REFRESH_TOKEN_EXPIRATION_IN_SECONDS = 60 * 60 * 24 * 30;
 
 const EMAIL_VALIDATION_SECRET = process.env["EMAIL_VALIDATION_SECRET"]!;
-const EMAIL_VALIDATION_EXPIRATION = "1h"; // 1 hour
+const EMAIL_VALIDATION_EXPIRATION = "1h";
+
+/**
+ * Parse a simple duration string (e.g. "30m", "8h", "1d") into seconds.
+ * Falls back to 1800 (30 minutes) for unrecognised formats.
+ */
+function parseDurationToSeconds(duration: string): number {
+  const match = /^(\d+)([smhd])$/.exec(duration);
+  if (!match) return 1800;
+  const value = parseInt(match[1]!, 10);
+  const unit = match[2] ?? "";
+  if (unit === "s") return value;
+  if (unit === "m") return value * 60;
+  if (unit === "h") return value * 3600;
+  if (unit === "d") return value * 86400;
+  return 1800;
+}
 
 export function signAccessToken({
   jti,
@@ -20,7 +38,7 @@ export function signAccessToken({
   sub: string;
 }): string {
   return jwt.sign({ jti, sub }, ACCESS_TOKEN_SECRET, {
-    expiresIn: ACCESS_TOKEN_EXPIRATION,
+    expiresIn: ACCESS_TOKEN_EXPIRATION_IN_SECONDS,
   });
 }
 

@@ -2,6 +2,7 @@ import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
 import fp from "fastify-plugin";
 import { verifyRefreshToken } from "../utils/jwt.js";
 import { Errors } from "../errors/appErrorFactory.js";
+import { isJtiBlacklisted } from "../services/tokenBlacklist.js";
 
 declare module "fastify" {
   interface FastifyRequest {
@@ -40,6 +41,11 @@ const authRefreshTokenPlugin = fp(async (fastify: FastifyInstance) => {
 
       try {
         const { jti, sub } = verifyRefreshToken(refreshToken.value);
+
+        if (await isJtiBlacklisted(jti)) {
+          throw new Errors.unauthorizedToken();
+        }
+
         request.refreshOpaqueToken = jti;
         request.refreshUserId = sub;
 

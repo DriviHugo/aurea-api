@@ -1,22 +1,18 @@
 import nodemailer, { type Transporter, type SendMailOptions } from "nodemailer";
 type Attachment = NonNullable<SendMailOptions["attachments"]>[number];
 
-let transporter: Transporter;
-if (process.env["NODE_ENV"] === "production") {
-  transporter = nodemailer.createTransport({
-    auth: {
-      pass: process.env["EMAIL_AUTH_PASS"],
-      user: process.env["EMAIL_AUTH_USER"],
-    },
-    service: "gmail",
-  });
-} else {
-  transporter = nodemailer.createTransport({
-    host: process.env["EMAIL_HOST"] ?? "localhost",
-    port: Number(process.env["EMAIL_PORT"] ?? 1025),
-    secure: false, // true for 465, false for other ports
-  });
-}
+const transporter: Transporter = nodemailer.createTransport({
+  host: process.env["EMAIL_HOST"] ?? "localhost",
+  port: Number(process.env["EMAIL_PORT"] ?? 1025),
+  secure: process.env["EMAIL_SECURE"] === "true",
+  auth:
+    process.env["EMAIL_AUTH_USER"]
+      ? {
+          user: process.env["EMAIL_AUTH_USER"],
+          pass: process.env["EMAIL_AUTH_PASS"],
+        }
+      : undefined,
+});
 
 export async function sendEmail(
   {

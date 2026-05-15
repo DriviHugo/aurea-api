@@ -3,7 +3,8 @@ import * as authController from "../../controllers/auth-simple.js";
 import { FEATURE_FLAGS } from "../../env.js";
 
 export default async function authRoutes(app: FastifyInstance): Promise<void> {
-  // Login - público
+  // Login - público, with strict rate limiting (5 attempts per 15 minutes)
+  // Rate limiting is configured globally in the app via @fastify/rate-limit plugin
   app.post("/login", {
     schema: {
       body: {
@@ -43,7 +44,8 @@ export default async function authRoutes(app: FastifyInstance): Promise<void> {
     handler: authController.me,
   });
 
-  // Refresh access token - requiere refresh cookie
+  // Refresh access token - requiere refresh cookie, with moderate rate limiting
+  // Rate limiting is configured globally in the app via @fastify/rate-limit plugin
   app.post("/refresh", {
     preValidation: [app.authRefreshToken],
     handler: authController.refreshAccessToken,

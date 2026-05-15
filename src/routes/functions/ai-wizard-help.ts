@@ -144,18 +144,13 @@ Proporciona ayuda contextual y práctica para este paso.`;
         try {
           const parsed = JSON.parse(jsonMatch[0]) as Record<string, unknown>;
           return reply.status(200).send(parsed);
-        } catch (parseError) {
-          console.error(
-            "[ai-wizard-help] JSON parse error after sanitization:",
-            parseError,
-          );
+        } catch {
           return reply.status(200).send({
             ayuda: response,
             section: sectionId ?? stepId,
           });
         }
-      } catch (error) {
-        console.error("[ai-wizard-help] Error:", error);
+      } catch {
         return reply.status(200).send({
           ayuda: getStaticHelp(stepId, sectionId),
           section: sectionId ?? stepId,
