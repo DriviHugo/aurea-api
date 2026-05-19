@@ -286,6 +286,186 @@ const routes: FastifyPluginAsync = async (fastify) => {
   );
 
   // DELETE /document-versions/:id - Delete
+  fastify.post(
+    "/:id/restore",
+    {
+      preValidation: [fastify.authAccessToken],
+      schema: {
+        tags: ["DocumentVersion"],
+        description:
+          "Restore document to a previous version and create backup/restore snapshots",
+        params: {
+          type: "object",
+          required: ["id"],
+          properties: {
+            id: { type: "string", format: "uuid" },
+          },
+        },
+        body: {
+          type: "object",
+          properties: {
+            documentId: { type: "string", format: "uuid" },
+            userId: { type: "string", format: "uuid" },
+          },
+        },
+        response: {
+          200: {
+            type: "object",
+            properties: {
+              restoredFrom: { type: "integer" },
+              newVersion: { type: "integer" },
+            },
+          },
+          400: { type: "object", properties: { error: { type: "string" } } },
+          404: { type: "object", properties: { error: { type: "string" } } },
+          500: { type: "object", properties: { error: { type: "string" } } },
+        },
+      },
+    },
+    async (request, reply) => {
+      try {
+        const { id } = request.params as { id: string };
+        const body = (request.body || {}) as { documentId?: string; userId?: string };
+
+        const targetVersion = await prisma.documentVersion.findUnique({
+          where: { id },
+        });
+
+        if (!targetVersion) {
+          return reply.status(404).send({ error: "Document version not found" });
+        }
+
+        const documentId = body.documentId || targetVersion.documentId;
+        const userId = (request as any).userId || body.userId;
+
+        if (!documentId || !userId) {
+          return reply
+            .status(400)
+            .send({ error: "Missing required fields: documentId and userId" });
+        }
+
+        const result = await prisma.$transaction(async (tx) => {
+          const currentDocument = await tx.document.findUnique({
+            where: { id: documentId },
+            select: { id: true, content: true, version: true },
+          });
+
+          if (!currentDocument) {
+            throw new Error("Document not found");
+          }
+
+          const currentSections = await tx.documentSection.findMany({
+            where: { documentId },
+            orderBy: { order: "asc" },
+          });
+
+          const backupVersionNumber = (currentDocument.version || 0) + 1;
+
+          await tx.documentVersion.create({
+            data: {
+              documentId,
+              version: backupVersionNumber,
+              contentSnapshot: ((currentDocument.content as unknown) || {}) as any,
+              sectionsSnapshot: {
+                secciones: currentSections,
+              } as any,
+              changeDescription: `Backup before restoring from version ${targetVersion.version}`,
+              userId,
+            },
+          });
+
+          const snapshot =
+            (targetVersion.sectionsSnapshot as Record<string, unknown> | null) ||
+            {};
+          const restoredSectionsRaw =
+            (snapshot["secciones"] as Array<Record<string, unknown>>) || [];
+
+          if (restoredSectionsRaw.length > 0) {
+            await tx.documentSection.deleteMany({ where: { documentId } });
+
+            await tx.documentSection.createMany({
+              data: restoredSectionsRaw.map((sectionRaw) => {
+                const section = sectionRaw as any;
+                return {
+                documentId,
+                order: Number(section["order"] ?? section["orden"] ?? 0),
+                title: String(section["title"] ?? section["titulo"] ?? "Untitled"),
+                description: (section["description"] ?? section["descripcion"] ?? null) as
+                  | string
+                  | null,
+                content: (section["content"] ?? section["contenido"] ?? null) as
+                  | string
+                  | null,
+                status: String(section["status"] ?? section["estado"] ?? "edited"),
+                tokensUsed:
+                  section["tokensUsed"] != null
+                    ? Number(section["tokensUsed"])
+                    : section["tokens_usados"] != null
+                      ? Number(section["tokens_usados"])
+                      : null,
+                generationTimeMs:
+                  section["generationTimeMs"] != null
+                    ? Number(section["generationTimeMs"])
+                    : section["tiempo_generacion_ms"] != null
+                      ? Number(section["tiempo_generacion_ms"])
+                      : null,
+                aiProvider: (section["aiProvider"] ?? section["ai_provider"] ?? null) as
+                  | string
+                  | null,
+                aiModel: (section["aiModel"] ?? section["ai_model"] ?? null) as
+                  | string
+                  | null,
+                lcspArticles: Array.isArray(
+                  section["lcspArticles"] ?? section["articulos_lcsp"],
+                )
+                  ? ((section["lcspArticles"] ??
+                      section["articulos_lcsp"]) as string[])
+                  : [],
+              };
+              }),
+            });
+          }
+
+          const restoredVersionNumber = backupVersionNumber + 1;
+
+          await tx.document.update({
+            where: { id: documentId },
+            data: {
+              content: ((targetVersion.contentSnapshot as unknown) || {}) as any,
+              version: restoredVersionNumber,
+            },
+          });
+
+          await tx.documentVersion.create({
+            data: {
+              documentId,
+              version: restoredVersionNumber,
+              contentSnapshot: ((targetVersion.contentSnapshot as unknown) || {}) as any,
+              sectionsSnapshot: ((targetVersion.sectionsSnapshot as unknown) ||
+                {}) as any,
+              changeDescription: `Restored from version ${targetVersion.version}`,
+              userId,
+            },
+          });
+
+          return {
+            restoredFrom: targetVersion.version,
+            newVersion: restoredVersionNumber,
+          };
+        });
+
+        return reply.status(200).send(result);
+      } catch (error: any) {
+        if (error instanceof Error && error.message === "Document not found") {
+          return reply.status(404).send({ error: error.message });
+        }
+        fastify.log.error({ error }, "Failed to restore document version");
+        return reply.status(500).send({ error: "Internal server error" });
+      }
+    },
+  );
+
+  // DELETE /document-versions/:id - Delete
   fastify.delete(
     "/:id",
     {
