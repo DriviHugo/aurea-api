@@ -4,7 +4,7 @@ const data = [
     email: "admin@example.com",
     name: "Admin",
     lastName: "Test",
-    password: "$2b$12$iW/gX4kWXoP8/3lEMuNXiumHmA068Z.MIH7ojA2KnIqqzx9m1yhB.", // password
+    password: "$2b$12$LIqtpSWxpiL1QeNs/Jcpr.vYcYSDAXqg4aKZP.MO0AlYWrn6U4YYu", // password
     active: true,
   },
   {
@@ -12,7 +12,7 @@ const data = [
     email: "user@example.com",
     name: "User",
     lastName: "Test",
-    password: "$2b$12$iW/gX4kWXoP8/3lEMuNXiumHmA068Z.MIH7ojA2KnIqqzx9m1yhB.", // password
+    password: "$2b$12$LIqtpSWxpiL1QeNs/Jcpr.vYcYSDAXqg4aKZP.MO0AlYWrn6U4YYu", // password
     active: true,
   },
 ];
