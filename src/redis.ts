@@ -1,24 +1,37 @@
 import * as Redis from "ioredis";
 const { Redis: RedisClient } = Redis;
 
-const redisHost = process.env["REDIS_HOST"] ?? "localhost";
-const redisPort = process.env["REDIS_PORT"] ?? "6379";
-const redisUrl = `redis://${redisHost}:${redisPort}`;
+type RedisInstance = InstanceType<typeof RedisClient>;
 
-const pubClient = new RedisClient(redisUrl);
-const subClient = new RedisClient(redisUrl);
+const redisConfigured = !!process.env["REDIS_HOST"]?.trim();
 
-pubClient.on("error", (error: Error) => {
-  throw error;
-});
-subClient.on("error", (error: Error) => {
-  throw error;
-});
+let pubClient: RedisInstance | null = null;
+let subClient: RedisInstance | null = null;
 
-pubClient.setMaxListeners(0);
-subClient.setMaxListeners(0);
+if (redisConfigured) {
+  const redisHost = process.env["REDIS_HOST"]!;
+  const redisPort = process.env["REDIS_PORT"] ?? "6379";
+  const redisUrl = `redis://${redisHost}:${redisPort}`;
 
-// Optionally configure keyspace notifications for subClient
-subClient.config("SET", "notify-keyspace-events", "KEA").catch(() => {});
+  pubClient = new RedisClient(redisUrl);
+  subClient = new RedisClient(redisUrl);
 
-export { pubClient, subClient };
+  pubClient.on("error", (error: Error) => {
+    throw error;
+  });
+  subClient.on("error", (error: Error) => {
+    throw error;
+  });
+
+  pubClient.setMaxListeners(0);
+  subClient.setMaxListeners(0);
+
+  // Optionally configure keyspace notifications for subClient
+  subClient.config("SET", "notify-keyspace-events", "KEA").catch(() => {});
+} else {
+  console.warn(
+    "[Redis] REDIS_HOST not set — Redis disabled. Token blacklisting will be skipped.",
+  );
+}
+
+export { pubClient, subClient, redisConfigured };

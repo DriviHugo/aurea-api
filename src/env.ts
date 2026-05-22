@@ -12,6 +12,9 @@ const REQUIRED_VARS = [
   "REFRESH_TOKEN_SECRET",
   "COOKIE_SECRET",
   "FRONTEND_BASE_URL",
+];
+
+const OPTIONAL_VARS_WARN = [
   "REDIS_HOST",
   "MINIO_ENDPOINT",
   "MINIO_ACCESS_KEY",
@@ -24,6 +27,15 @@ if (missing.length > 0) {
     `[Startup] Missing required environment variables: ${missing.join(", ")}`,
   );
   process.exit(1);
+}
+
+const missingOptional = OPTIONAL_VARS_WARN.filter(
+  (key) => !process.env[key]?.trim(),
+);
+if (missingOptional.length > 0) {
+  console.warn(
+    `[Startup] Optional environment variables not set (some features may be disabled): ${missingOptional.join(", ")}`,
+  );
 }
 
 /**

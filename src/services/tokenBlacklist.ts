@@ -21,6 +21,7 @@ export async function blacklistJti(
   jti: string,
   ttlSeconds = REFRESH_TOKEN_EXPIRATION_IN_SECONDS,
 ): Promise<void> {
+  if (!pubClient) return; // Redis not configured, skip blacklisting
   await pubClient.set(`${KEY_PREFIX}${jti}`, "1", "EX", ttlSeconds);
 }
 
@@ -28,6 +29,7 @@ export async function blacklistJti(
  * Check whether a jti has been blacklisted (i.e. the session was revoked).
  */
 export async function isJtiBlacklisted(jti: string): Promise<boolean> {
+  if (!pubClient) return false; // Redis not configured, treat all tokens as valid
   const value = await pubClient.get(`${KEY_PREFIX}${jti}`);
   return value !== null;
 }
