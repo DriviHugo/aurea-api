@@ -134,18 +134,17 @@ function validateOnPremRequirements(nodeEnv: string): ValidationResult {
     const fallbackUrl = process.env["AI_FALLBACK_GATEWAY_URL"];
 
     if (!primaryUrl?.trim()) {
-      result.isCompliant = false;
-      result.errors.push(
-        "[CLOUD ISOLATION ERROR] AI_PRIMARY_GATEWAY_URL is not set. " +
-          "In production, on-prem AI gateway URLs are required.",
+      result.warnings.push(
+        "[CLOUD ISOLATION WARNING] AI_PRIMARY_GATEWAY_URL is not set. " +
+          "AI document generation features will be unavailable. " +
+          "Set this to an on-prem gateway URL to enable AI features.",
       );
     }
 
     if (!fallbackUrl?.trim()) {
-      result.isCompliant = false;
-      result.errors.push(
-        "[CLOUD ISOLATION ERROR] AI_FALLBACK_GATEWAY_URL is not set. " +
-          "In production, on-prem fallback gateway URLs are required.",
+      result.warnings.push(
+        "[CLOUD ISOLATION WARNING] AI_FALLBACK_GATEWAY_URL is not set. " +
+          "Running without fallback gateway (single-node mode).",
       );
     }
   } else {
