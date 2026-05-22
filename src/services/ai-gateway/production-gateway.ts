@@ -30,11 +30,21 @@ export function getProductionGateway(): FallbackAIGatewayService {
     const primaryUrl = process.env["AI_PRIMARY_GATEWAY_URL"]?.trim();
     const fallbackUrl = process.env["AI_FALLBACK_GATEWAY_URL"]?.trim();
 
-    // In non-development, primary URL is mandatory.
+    // In non-development, primary URL is mandatory for on-prem deployments.
+    // Exception: if cloud API keys are present (staging/testing), warn and fall through to cloud config.
     if (!isDevelopment && !primaryUrl) {
-      throw new Error(
-        `[ProductionGateway] Missing required on-prem AI gateway var in ${nodeEnv}: AI_PRIMARY_GATEWAY_URL`,
-      );
+      const hasCloudKeys =
+        process.env["ALIA_API_KEY"]?.trim() !== "" ||
+        process.env["ANTHROPIC_API_KEY"]?.trim() !== "";
+      if (hasCloudKeys) {
+        logger.warn({
+          msg: "[ProductionGateway] AI_PRIMARY_GATEWAY_URL not set — falling back to cloud API keys (staging mode). Set AI_PRIMARY_GATEWAY_URL for on-prem.",
+        });
+      } else {
+        throw new Error(
+          `[ProductionGateway] Missing required on-prem AI gateway var in ${nodeEnv}: AI_PRIMARY_GATEWAY_URL`,
+        );
+      }
     }
 
     // In non-development, warn (not throw) if fallback is absent.
