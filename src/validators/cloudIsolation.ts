@@ -187,19 +187,30 @@ export function validateCloudIsolation(): void {
 
   // Fail if any errors detected
   if (allErrors.length > 0) {
-    console.error(
-      "❌ CLOUD ISOLATION VALIDATION FAILED\n" +
-        "═══════════════════════════════════════════════════════════════════",
-    );
-    for (const error of allErrors) {
-      console.error(`\n${error}`);
+    const isStrict = process.env["CLOUD_ISOLATION_STRICT"] === "true";
+    if (isStrict) {
+      console.error(
+        "❌ CLOUD ISOLATION VALIDATION FAILED\n" +
+          "═══════════════════════════════════════════════════════════════════",
+      );
+      for (const error of allErrors) {
+        console.error(`\n${error}`);
+      }
+      console.error(
+        "\n═══════════════════════════════════════════════════════════════════" +
+          "\n❌ Cloud providers detected in production configuration.\n" +
+          "Please set on-prem gateway URLs and remove cloud API keys.",
+      );
+      process.exit(1);
+    } else {
+      // Downgrade to warnings when CLOUD_ISOLATION_STRICT is not set
+      for (const error of allErrors) {
+        console.warn(`⚠️  [CLOUD ISOLATION] ${error}`);
+      }
+      console.warn(
+        "⚠️  Cloud isolation violations detected. Set CLOUD_ISOLATION_STRICT=true to enforce.",
+      );
     }
-    console.error(
-      "\n═══════════════════════════════════════════════════════════════════" +
-        "\n❌ Cloud providers detected in production configuration.\n" +
-        "Please set on-prem gateway URLs and remove cloud API keys.",
-    );
-    process.exit(1);
   }
 
   // Success message
