@@ -7,16 +7,12 @@ import { AIDocumentController } from "../../controllers/ai-document.controller.j
 import { createAIDocumentService } from "../../services/ai-document.service.js";
 
 export default async (fastify: FastifyInstance): Promise<void> => {
+  const aiDocumentService = createAIDocumentService(fastify.prisma);
+  const aiDocumentController = new AIDocumentController(aiDocumentService);
+
   // Rewrite document section with AI
   fastify.post("/ai-reescribir-seccion", {
     preValidation: [fastify.authAccessToken],
-    handler: async (request, reply) => {
-      const aiDocumentService = createAIDocumentService(fastify.prisma);
-      const aiDocumentController = new AIDocumentController(aiDocumentService);
-      return aiDocumentController.reescribirSeccion(
-        request as Parameters<typeof aiDocumentController.reescribirSeccion>[0],
-        reply,
-      );
-    },
+    handler: aiDocumentController.reescribirSeccion.bind(aiDocumentController),
   });
 };

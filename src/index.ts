@@ -99,6 +99,23 @@ async function start(): Promise<void> {
     return;
   }
 
+  // Initialize OIDC/SSO service (non-blocking if not configured)
+  try {
+    const oidcService = createOIDCService(prisma);
+    await oidcService.initialize();
+    if (oidcService.isConfigured()) {
+      logger.info("Startup: OIDC/SSO service initialized (OpenAM ready)");
+    } else {
+      logger.info("Startup: OIDC not configured - using local auth only");
+    }
+  } catch (error) {
+    // OIDC failure is non-fatal - local auth still works
+    logger.warn({
+      msg: "Startup: OIDC initialization failed - SSO disabled",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
+  }
+
   try {
     const address = await app.listen({ host: appHost, port: appPort });
     logger.info(`Startup: server listening at ${address}/api`);
@@ -110,24 +127,6 @@ async function start(): Promise<void> {
     });
     return;
   }
-
-  // Initialize OIDC/SSO service after server is up (non-blocking)
-  const oidcService = createOIDCService(prisma);
-  oidcService
-    .initialize()
-    .then(() => {
-      if (oidcService.isConfigured()) {
-        logger.info("Startup: OIDC/SSO service initialized (OpenAM ready)");
-      } else {
-        logger.info("Startup: OIDC not configured - using local auth only");
-      }
-    })
-    .catch((error: unknown) => {
-      logger.warn({
-        msg: "Startup: OIDC initialization failed - SSO disabled",
-        error: error instanceof Error ? error.message : "Unknown error",
-      });
-    });
 }
 
 if (eventLoopBlockLog) {
