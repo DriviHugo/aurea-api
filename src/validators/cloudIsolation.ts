@@ -168,8 +168,19 @@ function validateOnPremRequirements(nodeEnv: string): ValidationResult {
 /**
  * Perform comprehensive cloud isolation validation
  * Call this at application startup (in index.ts before starting server)
+ *
+ * Only active when ONPREM_MODE=true. Staging/cloud deployments skip all checks.
  */
 export function validateCloudIsolation(): void {
+  const onPremMode = process.env["ONPREM_MODE"] === "true";
+
+  if (!onPremMode) {
+    console.log(
+      "ℹ️  Cloud Isolation: ONPREM_MODE not set — running in cloud/staging mode, isolation checks skipped.",
+    );
+    return;
+  }
+
   const nodeEnv = process.env["NODE_ENV"] || "development";
 
   const results: ValidationResult[] = [
