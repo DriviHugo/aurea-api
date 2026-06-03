@@ -44,7 +44,10 @@ export default async (fastify: FastifyInstance): Promise<void> => {
               active: { type: "integer" },
               inactive: { type: "integer" },
               newThisMonth: { type: "integer" },
-              roleCount: { type: "object", additionalProperties: { type: "integer" } },
+              roleCount: {
+                type: "object",
+                additionalProperties: { type: "integer" },
+              },
             },
           },
           403: { type: "object", properties: { error: { type: "string" } } },
@@ -52,7 +55,7 @@ export default async (fastify: FastifyInstance): Promise<void> => {
       },
     },
     async (request, reply) => {
-      const userId = (request.user as { id: string }).id;
+      const userId = (request as unknown as { userId: string }).userId;
       if (!(await adminService.isAdmin(userId))) {
         return reply.status(403).send({ error: "Forbidden" });
       }
