@@ -11,6 +11,7 @@ export enum AIProvider {
   OLLAMA = "ollama",
   DEEPSEEK = "deepseek",
   ALIA = "alia", // BSC ALIA-40B - Spanish sovereign model (on-premise)
+  MISTRAL = "mistral", // Mistral AI - cloud fallback
 }
 
 export interface AIConfig {

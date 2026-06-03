@@ -16,6 +16,7 @@ import { AzureOpenAIAdapter } from "./adapters/azure-openai.adapter.js";
 import { GeminiAdapter } from "./adapters/gemini.adapter.js";
 import { AnthropicAdapter } from "./adapters/anthropic.adapter.js";
 import { ALIAAdapter } from "./adapters/alia.adapter.js";
+import { MistralAdapter } from "./adapters/mistral.adapter.js";
 
 export class AIGatewayService {
   private adapter: AIProviderAdapter;
@@ -120,6 +121,8 @@ export class AIGatewayService {
         return new OllamaAdapter(config);
       case AIProvider.ALIA:
         return new ALIAAdapter(config);
+      case AIProvider.MISTRAL:
+        return new MistralAdapter(config);
       default:
         throw new Error(`Unsupported AI provider: ${config.provider}`);
     }
@@ -166,6 +169,8 @@ function getDefaultModel(provider: AIProvider): string {
       return "deepseek-chat";
     case AIProvider.ALIA:
       return "alia-40b-instruct"; // NextBit256 hosted model
+    case AIProvider.MISTRAL:
+      return "mistral-large-latest";
   }
 }
 

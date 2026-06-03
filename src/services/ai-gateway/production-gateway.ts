@@ -35,7 +35,7 @@ export function getProductionGateway(): FallbackAIGatewayService {
     if (!isDevelopment && !primaryUrl) {
       const hasCloudKeys =
         process.env["ALIA_API_KEY"]?.trim() !== "" ||
-        process.env["ANTHROPIC_API_KEY"]?.trim() !== "";
+        process.env["AI_CLOUD_FALLBACK_KEY"]?.trim() !== "";
       if (hasCloudKeys) {
         logger.warn({
           msg: "[ProductionGateway] AI_PRIMARY_GATEWAY_URL not set — falling back to cloud API keys (staging mode). Set AI_PRIMARY_GATEWAY_URL for on-prem.",
@@ -86,10 +86,9 @@ export function getProductionGateway(): FallbackAIGatewayService {
         };
 
     // Resolve fallback config.
-    // If fallbackUrl is set → on-prem secondary.
-    // If not set in dev → cloud Anthropic (convenience).
+    // If fallbackUrl is set → on-prem secondary (uses AI_FALLBACK_API_KEY).
+    // If not set in dev → cloud Mistral (uses AI_CLOUD_FALLBACK_KEY).
     // If not set in prod → mirror primary (single-node, no real failover).
-    const anthropicKey = process.env["ANTHROPIC_API_KEY"] ?? "";
     const envModel = process.env["AI_MODEL"] ?? "";
     const fallbackConfig = fallbackUrl
       ? {
@@ -105,10 +104,9 @@ export function getProductionGateway(): FallbackAIGatewayService {
         }
       : isDevelopment
         ? {
-            provider: AIProvider.ANTHROPIC,
-            model:
-              envModel.trim() !== "" ? envModel : "claude-sonnet-4-20250514",
-            apiKey: anthropicKey,
+            provider: AIProvider.MISTRAL,
+            model: envModel.trim() !== "" ? envModel : "mistral-large-latest",
+            apiKey: process.env["AI_CLOUD_FALLBACK_KEY"] ?? "",
             temperature,
             maxTokens: 4096,
             timeout,
@@ -123,7 +121,7 @@ export function getProductionGateway(): FallbackAIGatewayService {
       fallbackMode: fallbackUrl
         ? `on-prem (${fallbackUrl})`
         : isDevelopment
-          ? "cloud/dev (Anthropic)"
+          ? "cloud/dev (Mistral)"
           : "none (single-node)",
     });
 

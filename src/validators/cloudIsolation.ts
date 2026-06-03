@@ -17,6 +17,7 @@ const BLOCKED_CLOUD_PATTERNS = {
   // Provider API URLs
   "api.openai.com": "OpenAI (BLOCKED IN PRODUCTION)",
   "api.anthropic.com": "Anthropic Claude (BLOCKED IN PRODUCTION)",
+  "api.mistral.ai": "Mistral AI (BLOCKED IN PRODUCTION)",
   "generativelanguage.googleapis.com": "Google Gemini (BLOCKED IN PRODUCTION)",
   "nextbit256.com": "ALIA Cloud (BLOCKED IN PRODUCTION)",
   "api.nextbit256.com": "ALIA Cloud (BLOCKED IN PRODUCTION)",
