@@ -166,6 +166,35 @@ export class AdminService {
 
     return { success: true };
   }
+
+  async getUserMetrics(): Promise<{
+    total: number;
+    active: number;
+    inactive: number;
+    newThisMonth: number;
+    roleCount: Record<string, number>;
+  }> {
+    const startOfMonth = new Date();
+    startOfMonth.setDate(1);
+    startOfMonth.setHours(0, 0, 0, 0);
+
+    const [total, active, newThisMonth, roleCounts] = await Promise.all([
+      this.prisma.profile.count(),
+      this.prisma.profile.count({ where: { active: true } }),
+      this.prisma.profile.count({ where: { createdAt: { gte: startOfMonth } } }),
+      this.prisma.userRoleAssignment.groupBy({
+        by: ["role"],
+        _count: { role: true },
+      }),
+    ]);
+
+    const roleCount: Record<string, number> = {};
+    for (const r of roleCounts) {
+      roleCount[r.role] = r._count.role;
+    }
+
+    return { total, active, inactive: total - active, newThisMonth, roleCount };
+  }
 }
 
 export function createAdminService(prisma: PrismaClient): AdminService {

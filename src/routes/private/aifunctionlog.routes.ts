@@ -4,23 +4,26 @@ import type { PrismaClient } from "@prisma/client";
 const routes: FastifyPluginAsync = async (fastify) => {
   const prisma: PrismaClient = fastify.prisma;
 
-  // List AiFunctionLogs with pagination
+  // List AiFunctionLogs with pagination and filters
   fastify.get(
     "/",
     {
       preValidation: [fastify.authAccessToken],
       schema: {
         tags: ["AiFunctionLog"],
-        description: "Get all AI function logs with pagination",
+        description: "Get all AI function logs with pagination and filters",
         querystring: {
           type: "object",
           properties: {
             page: { type: "integer", minimum: 1, default: 1 },
             limit: { type: "integer", minimum: 1, maximum: 100, default: 10 },
+            search: { type: "string" },
+            status: { type: "string" },
+            from: { type: "string" },
+            to: { type: "string" },
           },
         },
         response: {
-          404: { type: "object", properties: { error: { type: "string" } } },
           500: { type: "object", properties: { error: { type: "string" } } },
           200: {
             type: "object",
@@ -35,7 +38,17 @@ const routes: FastifyPluginAsync = async (fastify) => {
                     functionName: { type: "string", nullable: true },
                     providerName: { type: "string", nullable: true },
                     model: { type: "string" },
-                    inputVariables: { type: "object" },
+                    inputVariables: { type: "object", nullable: true },
+                    systemPrompt: { type: "string", nullable: true },
+                    userPrompt: { type: "string", nullable: true },
+                    response: { type: "object", nullable: true },
+                    tokensInput: { type: "integer", nullable: true },
+                    tokensOutput: { type: "integer", nullable: true },
+                    durationMs: { type: "integer", nullable: true },
+                    status: { type: "string" },
+                    errorMessage: { type: "string", nullable: true },
+                    userId: { type: "string", nullable: true },
+                    createdAt: { type: "string" },
                   },
                 },
               },
@@ -50,30 +63,51 @@ const routes: FastifyPluginAsync = async (fastify) => {
     },
     async (request, reply) => {
       try {
-        const { page = 1, limit = 10 } = request.query as {
-          page?: number;
-          limit?: number;
-        };
+        const { page = 1, limit = 10, search, status, from, to } =
+          request.query as {
+            page?: number;
+            limit?: number;
+            search?: string;
+            status?: string;
+            from?: string;
+            to?: string;
+          };
         const skip = (page - 1) * limit;
+
+        const where = {
+          ...(search
+            ? {
+                OR: [
+                  { functionCode: { contains: search, mode: "insensitive" as const } },
+                  { functionName: { contains: search, mode: "insensitive" as const } },
+                  { model: { contains: search, mode: "insensitive" as const } },
+                ],
+              }
+            : {}),
+          ...(status && status !== "all" ? { status } : {}),
+          ...((from ?? to)
+            ? {
+                createdAt: {
+                  ...(from ? { gte: new Date(from) } : {}),
+                  ...(to ? { lte: new Date(to) } : {}),
+                },
+              }
+            : {}),
+        };
 
         const [data, total] = await Promise.all([
           prisma.aiFunctionLog.findMany({
+            where,
             skip,
             take: limit,
-            orderBy: { id: "desc" },
+            orderBy: { createdAt: "desc" },
           }),
-          prisma.aiFunctionLog.count(),
+          prisma.aiFunctionLog.count({ where }),
         ]);
 
         const totalPages = Math.ceil(total / limit);
 
-        return reply.status(200).send({
-          data,
-          total,
-          page,
-          limit,
-          totalPages,
-        });
+        return reply.status(200).send({ data, total, page, limit, totalPages });
       } catch (error) {
         return reply.status(500).send({ error: "Internal server error" });
       }

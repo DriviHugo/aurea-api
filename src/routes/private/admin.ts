@@ -27,4 +27,37 @@ export default async (fastify: FastifyInstance): Promise<void> => {
     preValidation: [fastify.authAccessToken],
     handler: adminController.deleteUser.bind(adminController),
   });
+
+  // User metrics (admin only)
+  fastify.get(
+    "/admin/metrics",
+    {
+      preValidation: [fastify.authAccessToken],
+      schema: {
+        tags: ["Admin"],
+        description: "Get user metrics aggregated in the backend",
+        response: {
+          200: {
+            type: "object",
+            properties: {
+              total: { type: "integer" },
+              active: { type: "integer" },
+              inactive: { type: "integer" },
+              newThisMonth: { type: "integer" },
+              roleCount: { type: "object", additionalProperties: { type: "integer" } },
+            },
+          },
+          403: { type: "object", properties: { error: { type: "string" } } },
+        },
+      },
+    },
+    async (request, reply) => {
+      const userId = (request.user as { id: string }).id;
+      if (!(await adminService.isAdmin(userId))) {
+        return reply.status(403).send({ error: "Forbidden" });
+      }
+      const metrics = await adminService.getUserMetrics();
+      return reply.status(200).send(metrics);
+    },
+  );
 };
