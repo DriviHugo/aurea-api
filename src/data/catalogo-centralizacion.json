@@ -1,0 +1,3375 @@
+{
+  "meta": {
+    "version": "v22",
+    "last_updated": "2026-03-04T08:48:53Z",
+    "source": "contratacioncentralizada.gob.es/web/dgrcc/catalogo",
+    "last_reviewed": "2026-03-04",
+    "notes_quality": "Revisión incremental item a item contra ficha oficial + documentos asociados (AUNA/PLACSP). + Compleción de items_flat para AM faltantes (Electricidad, Audiovisuales, Impresoras, MONI, Muebles, Muebles compra directa, Ordenadores, Papel) con status según ficha DGRCC.",
+    "generated_at": "2026-03-04"
+  },
+  "groups": {
+    "Acuerdos marco": [
+      "AM_COMBUSTIBLES",
+      "AM_ELECTRICIDAD",
+      "AM_EQUIPOS_AUDIOVISUALES",
+      "AM_IMPRESORAS",
+      "AM_MATERIAL_OFICINA",
+      "AM_MOTOCICLETAS",
+      "AM_MUEBLES",
+      "AM_MUEBLES_COMPRA_DIRECTA",
+      "AM_ORDENADORES_PUESTO_TRABAJO",
+      "AM_PAPEL",
+      "AM_PUBLICIDAD_INSTITUCIONAL",
+      "AM_SISTEMAS_SEGURIDAD",
+      "AM_TURISMOS",
+      "AM_VEHICULOS_COMERCIALES_LIGEROS"
+    ],
+    "Sistemas dinámicos de adquisición": [
+      "SDA_COMUNICACIONES_SERVIDORES_ALMACENAMIENTO",
+      "SDA_SERVICIOS_DESARROLLO",
+      "SDA_SUMINISTRO_SOFTWARE"
+    ],
+    "Contratos centralizados": [
+      "CC_AGENCIA_VIAJES",
+      "CC_CONTROL_PUBLICIDAD",
+      "CC_LIMPIEZA_EDIFICIOS",
+      "CC_POSTALES_CERTIFICADAS",
+      "CC_POSTALES_NOTIFICACION",
+      "CC_POSTALES_PAQUETERIA_VALIJA",
+      "CC_SEGURIDAD_EDIFICIOS",
+      "CC_TELECOM_FASE_2"
+    ],
+    "Encargos a medios propios": ["ENCARGO_SERVICIOS_ELECTRONICOS_CONFIANZA"]
+  },
+  "items_flat": [
+    {
+      "nombre": "Combustibles en estaciones de servicio",
+      "expediente": "AM 21/2023",
+      "expediente_placsp": "2023/136",
+      "tipo": "Suministro",
+      "descripcion": "Suministro de combustibles en estaciones de servicio para vehículos, maquinaria agrícola, grupos electrógenos y otros motores. Combustibles incluidos: gasolina, gasóleo A, gasóleo B, bioetanol, biodiésel y GLP/Autogás. Incluye aditivos tipo AdBlue. Quedan fuera del objeto: gasóleo de calefacción (C), GNC, suministro por camión cisterna o postes marítimos, lavado, peajes, recarga eléctrica y productos de tienda distintos de AdBlue.",
+      "lotes": [
+        "Lote 1: Península",
+        "Lote 2: Islas Canarias (excepto La Gomera y El Hierro)",
+        "Lote 3: Islas de La Gomera y El Hierro (DESIERTO)",
+        "Lote 4: Ciudad Autónoma de Ceuta",
+        "Lote 5: Ciudad Autónoma de Melilla",
+        "Lote 6: Islas Baleares"
+      ],
+      "lotes_detail": [
+        {
+          "lote": "1",
+          "ambito": "Península",
+          "status": "adjudicado",
+          "adjudicatarios": [
+            {
+              "orden": 1,
+              "empresa": "MOEVE",
+              "descuento_sobre_pai_pct": 11.75
+            },
+            {
+              "orden": 2,
+              "empresa": "SOLRED",
+              "descuento_sobre_pai_pct": 10
+            }
+          ]
+        },
+        {
+          "lote": "2",
+          "ambito": "Islas Canarias (excepto La Gomera y El Hierro)",
+          "status": "adjudicado",
+          "adjudicatarios": [
+            {
+              "orden": 1,
+              "empresa": "MOEVE",
+              "descuento_sobre_pai_pct": 10.35
+            },
+            {
+              "orden": 2,
+              "empresa": "DISA RED",
+              "descuento_sobre_pai_pct": 8.01
+            }
+          ]
+        },
+        {
+          "lote": "3",
+          "ambito": "Islas de La Gomera y El Hierro",
+          "status": "desierto",
+          "adjudicatarios": [],
+          "notes": "Lote declarado desierto. Existe informe general que autoriza la contratación al margen del sistema estatal de contratación centralizada para este ámbito territorial mientras no exista un nuevo acuerdo marco."
+        },
+        {
+          "lote": "4",
+          "ambito": "Ciudad Autónoma de Ceuta",
+          "status": "adjudicado",
+          "adjudicatarios": [
+            {
+              "orden": 1,
+              "empresa": "MOEVE",
+              "descuento_sobre_pai_pct": 5
+            },
+            {
+              "orden": 2,
+              "empresa": "ON 365 ENERGIA",
+              "descuento_sobre_pai_pct": 3.6
+            }
+          ]
+        },
+        {
+          "lote": "5",
+          "ambito": "Ciudad Autónoma de Melilla",
+          "status": "adjudicado",
+          "adjudicatarios": [
+            {
+              "orden": 1,
+              "empresa": "MOEVE",
+              "descuento_sobre_pai_pct": 6.5,
+              "unique_awardee": true
+            }
+          ]
+        },
+        {
+          "lote": "6",
+          "ambito": "Islas Baleares",
+          "status": "adjudicado",
+          "adjudicatarios": [
+            {
+              "orden": 1,
+              "empresa": "MOEVE",
+              "descuento_sobre_pai_pct": 10.35
+            },
+            {
+              "orden": 2,
+              "empresa": "SOLRED",
+              "descuento_sobre_pai_pct": 9
+            }
+          ]
+        }
+      ],
+      "duracion": "Vigencia inicial del AM: 01/06/2024 a 31/05/2026. Posible prórroga hasta un máximo de 2 años. Duración máxima de contratos basados (incluidas prórrogas): hasta 30/11/2026.",
+      "enlace": "https://contratacioncentralizada.gob.es/web/dgrcc/-/ficha-ami-combustibles",
+      "pricing_reference": {
+        "pai_definition": "Se aplica un porcentaje de descuento sobre el PAI (Precio Antes de Impuestos). Para Gasolina 95, Gasóleo A y GLP, el PAI* es el precio medio nacional del último Weekly Oil Bulletin de la UE (último día del mes). Para el resto de combustibles, se usa el PAI de la estación en el momento del repostaje.",
+        "weekly_oil_bulletin_url": "https://energy.ec.europa.eu/data-and-analysis/weekly-oil-bulletin"
+      },
+      "procurement_modes": {
+        "H": true,
+        "B": true,
+        "default": "B",
+        "notes": "Compra directa (H) solo en supuestos tasados del PCAP (cláusula 27.2.1). En el resto de casos, o por decisión del organismo, se tramita segunda licitación (B)."
+      },
+      "mode_constraints": {
+        "H": {
+          "conditions": [
+            "Existe una única empresa adjudicataria en el lote (caso típico: lote 5)",
+            "El valor estimado del contrato basado del lote (referencia 12 meses) no supera 60.000 € (art. 101 LCSP, incluyendo prórrogas y modificaciones previstas)",
+            "La tramitación del contrato basado se efectúa como consecuencia de la resolución del anterior contrato (puede asignarse a la siguiente empresa mejor clasificada que garantice el suministro)",
+            "Una única empresa adjudicataria dispone de un punto de suministro a < 10 km (por carretera sin peajes) desde la sede del organismo o emplazamiento habitual"
+          ],
+          "selection_rule": "Si aplica el supuesto de VE ≤ 60.000 €, la adjudicación recae en la empresa mejor clasificada del lote (mayor descuento) que disponga de un punto de suministro a < 10 km. Si la primera no cumple proximidad, se pasa a la siguiente por orden de clasificación.",
+          "notes": "Aunque concurran supuestos de compra directa, el organismo interesado (o la DGRCC) puede optar por nueva licitación.",
+          "thresholds": {
+            "mentioned_eur": [60000],
+            "distance_km": 10
+          },
+          "contract_duration": {
+            "min_months": 12,
+            "max_months": 30,
+            "exceptional_min_months": "Inferior a 12 meses solo con autorización expresa de la DGRCC.",
+            "absolute_max_end_date": "2026-11-30"
+          },
+          "decision_rules": [
+            "if lote == 3 then out_of_scope (lote desierto: contratación fuera del sistema autorizada)",
+            "if unique_awardee_in_lote then mode 'H' allowed",
+            "if estimated_value_eur_12m <= 60000 then mode 'H' allowed (apply proximity<10km + best_discount order)",
+            "if only_one_awardee_has_station_within_10km then mode 'H' allowed",
+            "if based_on_previous_contract_resolution then mode 'H' allowed (assign next ranked guaranteeing supply)",
+            "else mode 'B'"
+          ],
+          "documents_required": [
+            "Documento acreditativo de crédito suficiente",
+            "Memoria justificativa de elección de empresa (modelo publicado)",
+            "En su caso, autorización DGRCC para duración < 12 meses",
+            "Pedido/contrato basado y propuesta de adjudicación en AUNA"
+          ],
+          "source_ids": [
+            "CATALOG_PAGE",
+            "DOC_INSTRUCCIONES",
+            "DOC_MEMORIA_CD",
+            "DOC_MEDIDAS_229_6",
+            "DOC_INFORME_LOTE3"
+          ]
+        },
+        "B": {
+          "conditions": [
+            "No concurre ninguno de los supuestos de compra directa (PCAP 27.2.1)",
+            "El organismo interesado decide acudir a nueva licitación"
+          ],
+          "prerequisites": [
+            "Informe favorable previo de la DGRCC al Documento de Licitación (a través de AUNA)",
+            "Aportar en AUNA: acreditación de crédito + Documento de Licitación conforme a modelo"
+          ],
+          "process_notes": [
+            "Invitar a todas las empresas adjudicatarias del lote (comprobar en AUNA que no estén excluidas temporalmente)",
+            "Plazo mínimo de presentación de ofertas: 5 días hábiles",
+            "En PLACSP indicar procedimiento 'Basado en Acuerdo Marco' y buscar el acuerdo por expediente 2023/136",
+            "Conservar el fichero de direcciones obtenido para invitaciones (si se usa carga automática)"
+          ],
+          "contract_duration": {
+            "max_months": 30,
+            "absolute_max_end_date": "2026-11-30"
+          },
+          "documents_required": [
+            "Documento acreditativo de crédito suficiente",
+            "Documento de Licitación (modelo oficial)",
+            "Invitaciones a adjudicatarios del lote",
+            "Certificado 'Estado adjudicatarios' (AUNA)",
+            "Informe/Acta de valoración (publicable)",
+            "Propuesta de adjudicación y adjudicación"
+          ],
+          "source_ids": [
+            "CATALOG_PAGE",
+            "DOC_INSTRUCCIONES",
+            "DOC_DL_MODELO",
+            "DOC_MEDIDAS_229_6"
+          ]
+        }
+      },
+      "special_cases": [
+        {
+          "case": "Lote 3 desierto",
+          "rule": "Autorizada la contratación al margen del sistema estatal de contratación centralizada para La Gomera y El Hierro mientras no exista un nuevo acuerdo marco.",
+          "doc_id": "DOC_INFORME_LOTE3"
+        }
+      ],
+      "instrumento": "AM",
+      "categoria_catalogo": "Acuerdos marco",
+      "id": "AM_COMBUSTIBLES",
+      "status": "vigente",
+      "validity": {
+        "raw": "Entrada en vigor de lotes 1,2,4,5,6 el 01/06/2024. Vigencia inicial hasta 31/05/2026."
+      },
+      "sources": [],
+      "integrity_notes": "Se reparó un cierre de objeto que había quedado truncado en una edición previa."
+    },
+    {
+      "nombre": "Publicidad institucional",
+      "titulo_oficial": "Compra de espacios en medios de comunicación y demás soportes publicitarios para campañas de publicidad institucional",
+      "expediente": "AM 50/2023",
+      "expediente_placsp": "2023/01",
+      "tipo": "Servicios",
+      "descripcion": "Servicios de mediación/agencia para la compra de espacios en medios de comunicación y otros soportes publicitarios para campañas de publicidad institucional. Incluye la planificación del plan de medios y la compra de espacios conforme a la Ley 29/2005 y la normativa de publicidad institucional. Quedan fuera del ámbito: creatividad/diseño de campañas, publicidad comercial, evaluación expost de eficacia (se cubre por contrato específico), publicidad internacional, patrocinios, relaciones públicas y campañas contratadas como contrato menor.",
+      "lotes": [
+        "Lote 1: Campañas con publicidad emitida en televisión (incluye también el resto de soportes)",
+        "Lote 2: Campañas sin publicidad emitida en televisión"
+      ],
+      "duracion": "Entrada en vigor: 19/12/2023. Vigencia inicial hasta 18/12/2025. Prórroga: hasta 18/12/2026 o fecha anterior de entrada en vigor de un nuevo acuerdo marco.",
+      "enlace": "https://contratacioncentralizada.gob.es/gl/web/dgrcc/-/ficha-ami-publicidad-institucional",
+      "procurement_modes": {
+        "H": false,
+        "B": true,
+        "default": "B",
+        "notes": "El acuerdo marco no tiene todos los términos fijados: los contratos basados siempre se adjudican mediante segunda licitación (mini‑concurso) entre adjudicatarios del lote."
+      },
+      "mode_constraints": {
+        "B": {
+          "name": "Segunda licitación (mini‑concurso)",
+          "conditions": [
+            "Segunda licitación obligatoria para cualquier contrato basado",
+            "Seleccionar lote según el plan de medios: si incluye TV → Lote 1; si no incluye TV → Lote 2",
+            "Invitar a todas las empresas adjudicatarias del lote (a través del listado de licitadores de AUNA)",
+            "El plan de medios debe contar con la conformidad de la Secretaría de Estado de Comunicación (SEC) antes de licitar"
+          ],
+          "prerequisites": [
+            "Para entidades adheridas: informe previo favorable de la DGRCC al Documento de Licitación (preceptivo y vinculante) vía AUNA",
+            "Documento de Licitación conforme al modelo oficial del AM",
+            "Crédito suficiente y tramitación de expediente interno del organismo"
+          ],
+          "process_notes": [
+            "La SEC valida el plan de medios (conformidad) y se recomienda iniciar el procedimiento con ~3 meses de antelación a la fecha de difusión de la campaña.",
+            "Cronograma orientativo publicado en instrucciones (total ~74 días hábiles): (1) solicitud a SEC y preparación DL: 20 d.h.; (2) informe DGRCC (adheridos): 10 d.h.; (3) plazo ofertas: 5 d.h.; (4) evaluación: 5 d.h.; (5) propuesta de adjudicación: 20 d.h.; (6) informe DGRCC/validación final (si aplica): 10 d.h.; (7) formalización: 4 d.h.",
+            "Gestión de invitaciones: obtener el listado de licitadores del lote en AUNA, conservar evidencias y utilizar el fichero de direcciones para invitaciones en PLACSP.",
+            "Las penalidades por incomparecencia (no presentar oferta) se tramitan conforme al procedimiento específico publicado por DGRCC (AUNA)."
+          ],
+          "deadlines": {
+            "sec_conformidad_plan_medios_min_business_days_before_diffusion": 7,
+            "offers_min_business_days": 5,
+            "timeline_total_business_days_reference": 74
+          },
+          "systems": ["AUNA", "PLACSP"],
+          "documents_required": [
+            "Plan de medios con conformidad SEC",
+            "Documento de Licitación (modelo AM 50/2023)",
+            "Acreditación de crédito suficiente",
+            "Invitaciones a adjudicatarios del lote",
+            "Acta/informe de valoración y propuesta de adjudicación",
+            "Adjudicación y formalización"
+          ],
+          "source_ids": [
+            "CATALOG_PAGE",
+            "DOC_INSTRUCCIONES",
+            "DOC_MEDIDAS_229_6",
+            "DOC_DL_MODELO",
+            "DOC_PROCEDIMIENTO_PENALIDADES_NO_PRESENTACION"
+          ]
+        }
+      },
+      "instrumento": "AM",
+      "categoria_catalogo": "Acuerdos marco",
+      "id": "AM_PUBLICIDAD_INSTITUCIONAL",
+      "status": "vigente",
+      "validity": {
+        "raw": "Entrada en vigor 19/12/2023. Vigencia inicial hasta 18/12/2025. Prórroga posible hasta 18/12/2026 (o antes si entra en vigor un nuevo AM)."
+      },
+      "sources": [
+        {
+          "id": "CATALOG_PAGE",
+          "type": "html",
+          "title": "Ficha en catálogo DGRCC — AM 50/2023",
+          "url": "https://contratacioncentralizada.gob.es/gl/web/dgrcc/-/ficha-ami-publicidad-institucional"
+        },
+        {
+          "id": "DOC_INSTRUCCIONES",
+          "type": "pdf",
+          "title": "Instrucciones para la tramitación de contratos basados (v3, 20/05/2024)",
+          "url": "https://contratacioncentralizada.gob.es/documents/32143/47726/Instrucciones%2Btramitaci%C3%B3n%2Bcontratos%2Bbasados%2BAM%2B50-23.pdf/7eb06ff7-30ae-a1ef-d084-7015a70a3ec6"
+        },
+        {
+          "id": "DOC_DL_MODELO",
+          "type": "docx",
+          "title": "Modelo de Documento de Licitación (julio 2025)",
+          "url": "https://contratacioncentralizada.gob.es/documents/32143/47726/Modelo%2Bdocumento%2Blicitacion%2BAM%2B50-2023-julio%2B2025.docx"
+        },
+        {
+          "id": "DOC_MEDIDAS_229_6",
+          "type": "pdf",
+          "title": "Resolución de medidas para entidades adheridas (art. 229.6 LCSP) (22/01/2024)",
+          "url": "https://contratacioncentralizada.gob.es/documents/32143/47726/MEDIDAS%2Badheridos%2Bart%2B229-6%2BAM%2B50-2023.pdf/c48c2e37-0e5f-8c0e-3dc5-047294a6b7f3"
+        },
+        {
+          "id": "DOC_PROCEDIMIENTO_PENALIDADES_NO_PRESENTACION",
+          "type": "pdf",
+          "title": "Procedimiento gestión de penalidades por no presentar oferta",
+          "url": "https://contratacioncentralizada.gob.es/documents/32143/47726/Procedimiento%2Bobtencion%2Blicitadores%2BAM%2B50-2023.pdf/d2a72014-519e-591b-bf22-2b217ef4c3ba"
+        },
+        {
+          "id": "PLACSP_DETAIL",
+          "type": "html",
+          "title": "PLACSP — detalle de licitación (Expte. 2023/01)",
+          "url": "https://contrataciondelestado.es/wps/poc?idEvl=4S8j%2FkK4nCoL1mbaoFPDuw%3D%3D&uri=deeplink%3Adetalle_licitacion"
+        }
+      ],
+      "semantic_match": {
+        "include_any": [
+          "campaña",
+          "campana",
+          "publicidad institucional",
+          "plan de medios",
+          "difusión",
+          "difusion",
+          "inserciones",
+          "medios",
+          "agencia creativa",
+          "creatividad",
+          "comunicación",
+          "comunicacion"
+        ],
+        "include_all": [],
+        "exclude_any": [
+          "ordenador",
+          "ordenadores",
+          "impresora",
+          "impresoras",
+          "papel a4",
+          "mobiliario",
+          "vehículo",
+          "vehiculo",
+          "combustible",
+          "electricidad",
+          "licencia",
+          "software"
+        ],
+        "type_primary": "Servicios",
+        "notes": "Solo seleccionar si el objeto trata de campañas de publicidad institucional, difusión o gestión de medios."
+      }
+    },
+    {
+      "nombre": "Sistemas de seguridad",
+      "titulo_oficial": "Suministro de elementos y sistemas de seguridad",
+      "expediente": "AM 08/2021",
+      "expediente_placsp": "2021/43",
+      "tipo": "Suministro",
+      "descripcion": "Acuerdo marco para el suministro de sistemas y elementos de seguridad declarados de contratación centralizada. Incluye la determinación de productos adjudicados o empresas seleccionadas por lote, así como las condiciones generales del suministro para los contratos basados.",
+      "lotes": [
+        "Lote 1: Sistemas de control de accesos y presencia, CCTV y contra intrusión/anti hurto (no todos los términos establecidos)",
+        "Lote 2: Sistemas automáticos de detección y extinción de incendios (no todos los términos establecidos)",
+        "Lote 3: Sistemas de alimentación eléctrica ininterrumpida (no todos los términos establecidos)",
+        "Lote 4: Equipos de inspección por rayos X (todos los términos establecidos)",
+        "Lote 5: Arcos detectores de metales y detectores portátiles (todos los términos establecidos)",
+        "Lote 6: Cajas fuertes, armarios de seguridad/ignífugos y armeros (todos los términos establecidos)",
+        "Lote 7: Equipos de extinción de incendios (todos los términos establecidos)",
+        "Lote 8: Destructoras de documentos en papel (todos los términos establecidos)"
+      ],
+      "lotes_detail": [
+        {
+          "lote": "1",
+          "terms_established": "not_all_terms_established",
+          "notes": "Adjudicación siempre mediante segunda licitación (mini‑concurso), salvo excepción de contratos < 15.000 € si pueden tramitarse como contrato menor art. 118 LCSP."
+        },
+        {
+          "lote": "2",
+          "terms_established": "not_all_terms_established",
+          "notes": "Adjudicación siempre mediante segunda licitación (mini‑concurso), salvo excepción de contratos < 15.000 € si pueden tramitarse como contrato menor art. 118 LCSP."
+        },
+        {
+          "lote": "3",
+          "terms_established": "not_all_terms_established",
+          "notes": "Adjudicación siempre mediante segunda licitación (mini‑concurso), salvo excepción de contratos < 15.000 € si pueden tramitarse como contrato menor art. 118 LCSP."
+        },
+        {
+          "lote": "4",
+          "terms_established": "all_terms_established",
+          "buying_options": [
+            "H (sin segunda licitación)",
+            "B (con segunda licitación)"
+          ]
+        },
+        {
+          "lote": "5",
+          "terms_established": "all_terms_established",
+          "buying_options": [
+            "H (sin segunda licitación)",
+            "B (con segunda licitación)"
+          ]
+        },
+        {
+          "lote": "6",
+          "terms_established": "all_terms_established",
+          "buying_options": [
+            "H (sin segunda licitación)",
+            "B (con segunda licitación)"
+          ]
+        },
+        {
+          "lote": "7",
+          "terms_established": "all_terms_established",
+          "buying_options": [
+            "H (sin segunda licitación)",
+            "B (con segunda licitación)"
+          ]
+        },
+        {
+          "lote": "8",
+          "terms_established": "all_terms_established",
+          "buying_options": [
+            "H (sin segunda licitación)",
+            "B (con segunda licitación)"
+          ]
+        }
+      ],
+      "duracion": "Vigencia inicial: 2 años desde 28/11/2022. Prórroga acordada el 10/09/2025: del 28/11/2025 al 27/11/2026 para los lotes 1 a 8. Duración total máxima (incluidas prórrogas): 4 años.",
+      "enlace": "https://contratacioncentralizada.gob.es/web/dgrcc/-/ficha-ami-sistemas-seguridad",
+      "procurement_modes": {
+        "H": true,
+        "B": true,
+        "default": "B",
+        "notes": "H (sin segunda licitación) solo aplica a lotes 4 a 8 y en condiciones tasadas. Lotes 1 a 3 siempre requieren B (segunda licitación), salvo excepción < 15.000 € (contrato menor art. 118 LCSP) indicada en nota informativa."
+      },
+      "mode_constraints": {
+        "H": {
+          "name": "Adjudicación sin segunda licitación (contratación directa en AUNA)",
+          "scope": "Lotes 4 a 8 (términos establecidos)",
+          "conditions": [
+            "Presupuesto del contrato basado ≤ 80.000 € (IVA excluido)",
+            "El objeto corresponde a elementos principales del catálogo del lote/categoría",
+            "No se solicita conjuntamente el suministro de accesorios del apartado 3.8 del PPT (si se solicitan, debe usarse B)"
+          ],
+          "selection_rule": "Regla general: adjudicar al producto/oferta de menor precio dentro del lote y categoría. Alternativamente, puede adjudicarse conforme a criterios objetivos previstos en PCAP (Anexo I) si el menor precio no cubre la necesidad (debe justificarse en el expediente).",
+          "process_notes": [
+            "El justificante del catálogo debe obtenerse desde AUNA → pestaña Catálogo → ‘Contratación directa’ → seleccionar AM 08/2021 → lote/categoría → comparar artículos y exportar informe.",
+            "La propuesta de adjudicación debe acompañarse del Anexo de adjudicación sin segunda licitación + justificante AUNA (informe comparativo)."
+          ],
+          "thresholds": {
+            "budget_no_second_licitation_max_eur": 80000
+          },
+          "documents_required": [
+            "Anexo a la propuesta de adjudicación (lotes 4 a 8) — modalidad sin segunda licitación",
+            "Justificante del catálogo AUNA (informe comparativo lote/categoría)",
+            "Documento acreditativo de crédito suficiente",
+            "Memoria justificativa (si procede, para elección por criterio objetivo distinto del menor precio)",
+            "En contratos PRTR: solicitud DACI (modelo publicado)"
+          ],
+          "systems": ["AUNA"],
+          "decision_rules": [
+            "if lote in {1,2,3} then mode 'B' (no H)",
+            "if lote in {4,5,6,7,8} and presupuesto_eur <= 80000 and accesorios_PPT_3_8 == false then mode 'H' allowed",
+            "if lote in {4,5,6,7,8} and (presupuesto_eur > 80000 or accesorios_PPT_3_8 == true) then mode 'B'"
+          ],
+          "source_ids": [
+            "CATALOG_PAGE",
+            "DOC_INSTRUCCIONES",
+            "DOC_ANEXO_PROPUESTA_ADJUDICACION",
+            "DOC_EJEMPLO_JUSTIFICANTE_AUNA"
+          ]
+        },
+        "B": {
+          "name": "Adjudicación con segunda licitación (mini‑concurso)",
+          "scope": "Obligatoria en lotes 1 a 3. También en lotes 4 a 8 cuando no aplica H o se decide licitar.",
+          "conditions": [
+            "Lotes 1 a 3: siempre",
+            "Lotes 4 a 8: presupuesto > 80.000 €, o se solicitan accesorios PPT 3.8, o se decide licitar"
+          ],
+          "prerequisites": [
+            "Invitar a todas las empresas adjudicatarias del lote (en no SARA, puede invitarse a menos justificándolo, siempre ≥ 5)",
+            "Plazo mínimo ofertas: 10 días naturales desde la notificación. En lotes 4 a 8 y por importe ≤ 15.000 €, plazo mínimo: 5 días hábiles",
+            "El precio ofertado en la segunda licitación no puede ser superior al precio del acuerdo marco (pueden ofertar descuentos)"
+          ],
+          "dgrcc_prior_report": {
+            "lotes_1_3": [
+              "Obligatorio si el contrato basado supera el umbral SARA",
+              "También cuando se pretende reducir plazos máximos de entrega (cláusula 9 PCAP)"
+            ],
+            "lotes_4_8": [
+              "Obligatorio cuando, en una segunda licitación, se soliciten características técnicas superiores a los mínimos del PPT",
+              "También cuando se pretende reducir plazos máximos de entrega (cláusula 9 PCAP)"
+            ],
+            "submission": "A través de AUNA, adjuntando al menos Documento de Licitación + memoria justificativa."
+          },
+          "documents_required": [
+            "Documento de Licitación (modelo oficial según lote)",
+            "Acreditación de crédito suficiente",
+            "Invitaciones a adjudicatarios",
+            "Acta/informe de valoración + propuesta de adjudicación",
+            "En entidades adheridas: declaración responsable y carga en Conecta‑Centralización/AUNA según medidas art. 229.6",
+            "En contratos PRTR: solicitud DACI (modelo publicado)"
+          ],
+          "systems": ["PLACSP", "AUNA"],
+          "thresholds": {
+            "budget_no_second_licitation_max_eur": 80000,
+            "minor_contract_exception_eur": 15000,
+            "min_invited_when_not_sara": 5,
+            "min_offer_days_natural": 10,
+            "min_offer_days_business_for_small_4_8": 5
+          },
+          "source_ids": [
+            "CATALOG_PAGE",
+            "DOC_INSTRUCCIONES",
+            "DOC_DL_LOTES_1_3",
+            "DOC_DL_LOTES_4_8",
+            "DOC_MEDIDAS_229_6",
+            "DOC_NOTA_IMPORTES_MENORES_15000"
+          ]
+        }
+      },
+      "special_cases": [
+        {
+          "case": "Contratos < 15.000 € (lotes 1 a 3)",
+          "rule": "El acuerdo marco no incluye los contratos basados por importe inferior a 15.000 € (IVA excluido) cuando pueda tramitarse como contrato menor (art. 118 LCSP). En ese supuesto no aplica el AM 08/2021.",
+          "doc_id": "DOC_NOTA_IMPORTES_MENORES_15000"
+        }
+      ],
+      "instrumento": "AM",
+      "categoria_catalogo": "Acuerdos marco",
+      "id": "AM_SISTEMAS_SEGURIDAD",
+      "status": "vigente",
+      "validity": {
+        "raw": "Desde 28/11/2022. Prórroga acordada el 10/09/2025: 28/11/2025–27/11/2026 (lotes 1–8)."
+      },
+      "sources": [
+        {
+          "id": "CATALOG_PAGE",
+          "type": "html",
+          "title": "Ficha en catálogo DGRCC — AM 08/2021",
+          "url": "https://contratacioncentralizada.gob.es/web/dgrcc/-/ficha-ami-sistemas-seguridad"
+        },
+        {
+          "id": "DOC_INSTRUCCIONES",
+          "type": "pdf",
+          "title": "Instrucciones AM 08/2021 (actualizado 05/11/2025)",
+          "url": "https://contratacioncentralizada.gob.es/documents/32143/41449/2-1-AUNA-Instrucciones-AM08_actualizadas-a-05-11-2025.pdf.xsig.pdf/f0458a10-902e-b1af-271c-bf5ebc781e08"
+        },
+        {
+          "id": "DOC_ANEXO_PROPUESTA_ADJUDICACION",
+          "type": "docx",
+          "title": "Anexo a propuesta de adjudicación (sin segunda licitación) — Lotes 4 a 8",
+          "url": "https://contratacioncentralizada.gob.es/documents/32143/41449/2.Anexo_adjudicacion_sin_segunda_licitacion.docx/ca08ed54-31ad-40b9-bb31-d25ea1f82c9f"
+        },
+        {
+          "id": "DOC_DL_LOTES_1_3",
+          "type": "docx",
+          "title": "Documento de licitación — Lotes 1 a 3 (actualizado enero 2026)",
+          "url": "https://contratacioncentralizada.gob.es/documents/32143/41449/3.Documento_licitacion_lotes_1-3.docx/5c462ed0-be25-6f9e-d5ac-592cfc1a0d1c"
+        },
+        {
+          "id": "DOC_DL_LOTES_4_8",
+          "type": "docx",
+          "title": "Documento de licitación — Lotes 4 a 8 (actualizado enero 2026)",
+          "url": "https://contratacioncentralizada.gob.es/documents/32143/41449/4.Documento_licitacion_lotes_4-8.docx/54502432-4f48-d050-45b6-3038336d69b7"
+        },
+        {
+          "id": "DOC_MODELOS_OFERTA",
+          "type": "zip",
+          "title": "Modelos de oferta",
+          "url": "https://contratacioncentralizada.gob.es/documents/32143/41449/5.Modelos_oferta.zip/1b04f2b8-ae49-f1a6-81d6-c1a71aa31086"
+        },
+        {
+          "id": "DOC_EJEMPLO_JUSTIFICANTE_AUNA",
+          "type": "pdf",
+          "title": "Ejemplo para expedir justificante del catálogo de AUNA",
+          "url": "https://contratacioncentralizada.gob.es/documents/32143/41449/6-Ejemplo-expedici%C3%B3n-justificante-cat%C3%A1logo-AUNA-2025%2B.pdf/c4976bc8-ca09-6d1a-dd6f-f42574efd8f7"
+        },
+        {
+          "id": "DOC_MEDIDAS_229_6",
+          "type": "pdf",
+          "title": "Medidas art. 229.6 LCSP para entidades adheridas (AM 08/2021)",
+          "url": "https://contratacioncentralizada.gob.es/documents/32143/41449/AM%2B08_2021%2BResolucion%2Bmedidas%2B229_6%2BFIRMADA.pdf/85b0d68d-c610-edbd-a7e2-d2e89a3440ca"
+        },
+        {
+          "id": "DOC_NOTA_IMPORTES_MENORES_15000",
+          "type": "pdf",
+          "title": "Nota informativa importes menores de 15.000 €",
+          "url": "https://contratacioncentralizada.gob.es/documents/32143/41449/NOTA_IMPORTES_MENORES_15.000.pdf/efadf7dc-c4f9-4a5b-2137-00cb8dd789a0"
+        },
+        {
+          "id": "DOC_DACI_PRTR",
+          "type": "pdf",
+          "title": "Modelo solicitud DACI (PRTR)",
+          "url": "https://contratacioncentralizada.gob.es/documents/32143/41449/Solicitud%2BDACI_DGRCC.pdf/734bec57-b75d-f57b-67a6-4869540f916a"
+        }
+      ]
+    },
+    {
+      "nombre": "Vehículos Turismos",
+      "titulo_oficial": "Suministro de Vehículos Turismos",
+      "expediente": "AM 14/2022",
+      "expediente_placsp": "2022/01",
+      "tipo": "Suministro",
+      "descripcion": "El objeto del acuerdo marco es el suministro de vehículos turismo y vehículos pick-up, así como los elementos de equipamiento adicional y kits de adaptación, cuando así resulte necesario, para el cumplimiento de los fines que tengan encomendados los diferentes Ministerios, Organismos y Entidades destinatarios.",
+      "lotes": [
+        "Lote 1: Vehículo compacto L1 (longitud exterior ≥ 3.400 mm y < 4.200 mm)",
+        "Lote 2: Vehículo compacto L2 (longitud exterior ≥ 4.200 mm y < 4.550 mm)",
+        "Lote 3: Vehículo compacto L3 (longitud exterior ≥ 4.550 mm)",
+        "Lote 4: Vehículo berlina",
+        "Lote 5: Vehículo todocamino 4x4",
+        "Lote 6: Vehículo todoterreno",
+        "Lote 7: Vehículo tipo pick-up"
+      ],
+      "lotes_detail": [
+        {
+          "lote": "1",
+          "terms_established": "all_terms_established"
+        },
+        {
+          "lote": "2",
+          "terms_established": "all_terms_established"
+        },
+        {
+          "lote": "3",
+          "terms_established": "all_terms_established"
+        },
+        {
+          "lote": "4",
+          "terms_established": "all_terms_established"
+        },
+        {
+          "lote": "5",
+          "terms_established": "all_terms_established"
+        },
+        {
+          "lote": "6",
+          "terms_established": "all_terms_established"
+        },
+        {
+          "lote": "7",
+          "terms_established": "all_terms_established"
+        }
+      ],
+      "duracion": "Duración inicial: 2 años desde el 07/09/2022 para todos los lotes. Prórroga: hasta un máximo de 2 años. Prorrogado hasta el 06/09/2026 o hasta la entrada en vigor (anterior) de un nuevo acuerdo marco de suministro de vehículos turismos.",
+      "enlace": "https://contratacioncentralizada.gob.es/web/dgrcc/-/ficha-ami-vehiculos-turismos",
+      "catalog_search": {
+        "url": "https://contratacioncentralizada.gob.es/web/dgrcc/consulta-de-productos-y-servicios?acuerdo=22",
+        "notas": "El catálogo permite filtrar por empresa proveedora y por lote (Tipo de artículo 01xxxx..07xxxx)."
+      },
+      "proveedores_catalogo": [
+        "AUTOMAX ESPAÑA S.L.",
+        "B&M AUTOMÓVILES ESPAÑA S.A.",
+        "BMW Ibérica S.A.",
+        "FIAT CHRYSLER AUTOMOBILES SPAIN S.A.",
+        "FORD ESPAÑA SL",
+        "KGM AUTO SPAIN, S.A.",
+        "NISSAN MOTOR ESPAÑA, S.A.",
+        "Renault España Comercial, S.A.",
+        "SEAT S.A.",
+        "STELLANTIS ESPAÑA, S.L",
+        "SUBARU ESPAÑA, S.A.",
+        "TOYOTA ESPAÑA S.L.U.",
+        "VOLKSWAGEN GROUP ESPAÑA DISTRIBUCION SA"
+      ],
+      "procurement_modes": {
+        "H": true,
+        "B": true,
+        "default": "H",
+        "notes": "Acuerdo marco con todos los términos definidos: los contratos basados se adjudican con o sin nueva licitación según cláusula 31 (PCAP) y las instrucciones publicadas."
+      },
+      "mode_constraints": {
+        "H": {
+          "name": "Adquisición sin nueva licitación (compra directa)",
+          "conditions": [
+            "El objeto se encuentra definido en catálogo (vehículo del lote/grupo que se ajusta a la necesidad)",
+            "El importe del suministro NO supera 180.000 € (impuestos excluidos)",
+            "No se incluye kit de adaptación NO definido (no incluido en Anexo IV del PCAP)",
+            "No se incluye equipamiento adicional NO incluido en Anexo III del PCAP",
+            "No se prevé entrega de bienes como parte del pago",
+            "Excepcionalmente, previa solicitud del organismo, puede autorizarse por falta de concurrencia o por requisitos técnicos específicos"
+          ],
+          "selection_rule": {
+            "objective_conditions": [
+              "Precio del conjunto de bienes (peso orientativo 70%–100%)",
+              "Solo si es necesario, puede combinarse con hasta 3 criterios de valoración de la segunda licitación"
+            ],
+            "vehicles_to_compare": [
+              "Comparar todos los vehículos disponibles en el catálogo dentro del lote y grupo que cumplan los requisitos técnicos justificadamente",
+              "Si se exige equipamiento opcional o kits definidos, comparar solo vehículos con precio definido para dichos elementos (incluido 0 €)"
+            ]
+          },
+          "thresholds": {
+            "max_amount_without_new_tender_eur": 180000
+          },
+          "documents_required": [
+            "Memoria justificativa (modelo general) para compra directa",
+            "En PRTR: Memoria justificativa específica PRTR + documentación DACI/Minerva según aplique",
+            "Documento acreditativo de crédito suficiente",
+            "Propuesta de adjudicación (según instrucciones)"
+          ],
+          "decision_rules": [
+            "if estimated_value_eur > 180000 then mode 'B'",
+            "if kit_no_definido == true then mode 'B'",
+            "if equipamiento_no_incluido_anexo_III == true then mode 'B'",
+            "if trade_in_or_delivery_as_payment == true then mode 'B'",
+            "else mode 'H'"
+          ],
+          "systems": ["Catálogo DGRCC", "AUNA (si aplica en el organismo)"],
+          "source_ids": [
+            "CATALOG_PAGE",
+            "DOC_INSTRUCCIONES",
+            "DOC_MEMORIA_COMPRA_DIRECTA_GENERAL",
+            "DOC_MEMORIA_COMPRA_DIRECTA_PRTR",
+            "DOC_DACI_SOLICITUD"
+          ]
+        },
+        "B": {
+          "name": "Adquisición con nueva licitación (segunda licitación)",
+          "conditions": [
+            "Cualquiera que sea su importe, si así lo dispone el organismo destinatario",
+            "El objeto del suministro es de importe superior a 180.000 € (impuestos excluidos)",
+            "Se requiere kit de adaptación NO definido (fuera del Anexo IV)",
+            "Se requiere equipamiento adicional NO incluido en Anexo III",
+            "Se prevé entrega de bienes como parte del pago"
+          ],
+          "prerequisites": [
+            "Informe previo favorable de la DGRCC antes de licitar",
+            "Invitar a todas las empresas adjudicatarias del lote y grupo correspondiente (con claves activas en el catálogo)",
+            "Licitación electrónica vía PLACSP u otro sistema electrónico del organismo"
+          ],
+          "deadlines": {
+            "offers_min_business_days_if_simple": 5,
+            "offers_min_business_days_if_complex": 10,
+            "simple_definition": "Sin kits NO definidos y con menos de 3 criterios adicionales al precio",
+            "complex_definition": "Con kits NO definidos o con 3+ criterios adicionales al precio"
+          },
+          "evaluation": {
+            "max_total_points": 100,
+            "price_is_mandatory": true,
+            "price_min_weight_pct": 30,
+            "allowed_criteria_examples": [
+              "Mayor potencia de motor desarrollada",
+              "Mayor autonomía eléctrica (solo 100% eléctricos)",
+              "Mayor número de asientos (excepto lote 7)",
+              "Mayor capacidad de carga (lote 7)",
+              "Características constructivas: altura/longitud/puertas",
+              "Criterios técnicos vinculados al kit",
+              "Menor consumo de combustible o energía",
+              "Menor nivel de emisiones de CO2",
+              "Mejoras respecto a EURO vigente",
+              "Mayor número de ecoinnovaciones"
+            ]
+          },
+          "documents_required": [
+            "Documento de licitación (modelo general / modelo cascada / modelo unidades mínimas)",
+            "En su caso, Documento de prescripciones técnicas para kits NO definidos",
+            "Documento acreditativo de crédito suficiente",
+            "Invitaciones a adjudicatarios del lote/grupo",
+            "Acta/informe de valoración + propuesta de adjudicación"
+          ],
+          "thresholds": {
+            "new_tender_mandatory_over_eur": 180000
+          },
+          "systems": ["PLACSP", "Catálogo DGRCC"],
+          "source_ids": [
+            "CATALOG_PAGE",
+            "DOC_INSTRUCCIONES",
+            "DOC_DL_MODELO_GENERAL",
+            "DOC_DL_MODELO_CASCADA",
+            "DOC_DL_MODELO_UNIDADES_MINIMAS",
+            "DOC_PPT_KITS_NO_DEFINIDOS",
+            "DOC_DACI_SOLICITUD"
+          ]
+        }
+      },
+      "organos_y_competencias": {
+        "organo_contratacion_cb": [
+          "DGRCC cuando el organismo pertenece al ámbito obligatorio (art. 3.1 LCSP: letras a), b), c), d) y g)",
+          "Órgano de contratación propio del organismo cuando pertenece al ámbito voluntario"
+        ],
+        "responsabilidades_organismo_destinatario": [
+          "Determinar necesidades (lote/grupo) y justificar idoneidad",
+          "En segunda licitación: elaborar el Documento de licitación y ejecutar la licitación",
+          "Elevar propuesta de adjudicación a DGRCC",
+          "Recepción y pago; custodia del expediente"
+        ]
+      },
+      "responsable_am": "Subdirección General de Contratación Centralizada de Servicios y Suministros de carácter Operativo",
+      "contacto": {
+        "email": "amautomocion@hacienda.gob.es"
+      },
+      "instrumento": "AM",
+      "categoria_catalogo": "Acuerdos marco",
+      "id": "AM_TURISMOS",
+      "status": "vigente",
+      "validity": {
+        "raw": "Entrada en vigor 07/09/2022. Prórroga publicada: hasta 06/09/2026 o nuevo AM (lo que ocurra antes)."
+      },
+      "sources": [
+        {
+          "id": "CATALOG_PAGE",
+          "type": "html",
+          "title": "Ficha en catálogo DGRCC — AM 14/2022",
+          "url": "https://contratacioncentralizada.gob.es/web/dgrcc/-/ficha-ami-vehiculos-turismos"
+        },
+        {
+          "id": "DOC_INSTRUCCIONES",
+          "type": "pdf",
+          "title": "Instrucciones para la tramitación de contratos basados (AM 14/2022, v2)",
+          "url": "https://contratacioncentralizada.gob.es/documents/32143/42159/AM%2B142022%2B1.%2BInstrucciones.pdf/131f7bf3-d104-a6e9-5dd5-26b297d4c53c"
+        },
+        {
+          "id": "DOC_MEMORIA_COMPRA_DIRECTA_GENERAL",
+          "type": "docx",
+          "title": "Modelo general de Memoria justificativa (compra directa)",
+          "url": "https://contratacioncentralizada.gob.es/documents/32143/42159/AM%2B142022%2B2.1.%2BMemoria%2Bcompra%2Bdirecta%2Bgeneral.docx/e3861b29-d9db-8fd6-1b7d-9c649b86cf4d"
+        },
+        {
+          "id": "DOC_MEMORIA_COMPRA_DIRECTA_PRTR",
+          "type": "docx",
+          "title": "Modelo específico de Memoria justificativa (financiación PRTR)",
+          "url": "https://contratacioncentralizada.gob.es/documents/32143/42159/AM%2B142022%2B2.2.%2BMemoria%2Bcompra%2Bdirecta%2BPRTR.docx/4505ff71-ab0e-5436-f201-814c3a941cff"
+        },
+        {
+          "id": "DOC_DL_MODELO_GENERAL",
+          "type": "docx",
+          "title": "Documento de licitación — modelo general (v6)",
+          "url": "https://contratacioncentralizada.gob.es/documents/32143/42159/AM%2B142022%2B3.1.%2BDocumento%2Bde%2Blicitaci%C3%B3n%2Bmodelo%2Bgeneral%2BV6.docx/b063b265-f89f-eee3-73af-e4d5c0e9994d"
+        },
+        {
+          "id": "DOC_DL_MODELO_CASCADA",
+          "type": "docx",
+          "title": "Documento de licitación — modelo cascada (v6)",
+          "url": "https://contratacioncentralizada.gob.es/documents/32143/42159/AM%2B142022%2B3.2.%2BDocumento%2Bde%2Blicitaci%C3%B3n%2Bmodelo%2Bcascada%2BV6.docx/5618d983-ba65-8819-c1cb-02a06547568a"
+        },
+        {
+          "id": "DOC_DL_MODELO_UNIDADES_MINIMAS",
+          "type": "docx",
+          "title": "Documento de licitación — modelo unidades mínimas (v6)",
+          "url": "https://contratacioncentralizada.gob.es/documents/32143/42159/AM%2B142022%2B3.3.%2BDocumento%2Bde%2Blicitaci%C3%B3n%2Bmodelo%2Bunidades%2Bm%C3%ADnimas%2BV6.docx/aac12b15-1ba8-adb0-94c3-568baea3dcb7"
+        },
+        {
+          "id": "DOC_PPT_KITS_NO_DEFINIDOS",
+          "type": "docx",
+          "title": "Modelo de Documento de prescripciones técnicas para kits NO definidos",
+          "url": "https://contratacioncentralizada.gob.es/documents/32143/42159/AM%2B142022%2BModelo%2BPPT%2Bkits%2BNO%2Bdefinidos.docx/8085ae2f-67c4-a95c-d809-ea87d3e4aa1f"
+        },
+        {
+          "id": "DOC_DACI_ORDEN_1030_2021",
+          "type": "docx",
+          "title": "Modelo DACI — Orden HFP/1030/2021",
+          "url": "https://contratacioncentralizada.gob.es/documents/32143/42159/DACI%2BModelo%2BOrden%2BHFP-1030-2021..docx/b4193bac-4132-fcc7-f512-c179c2aa5af4"
+        },
+        {
+          "id": "DOC_DACI_ORDEN_55_2023",
+          "type": "docx",
+          "title": "Modelo DACI — Orden HFP/55/2023",
+          "url": "https://contratacioncentralizada.gob.es/documents/32143/42159/DACI%2BModelo%2BOrden%2BHFP-55-2023.docx/931b1514-8304-e3b0-79de-48943b252e2b"
+        },
+        {
+          "id": "DOC_DACI_SOLICITUD",
+          "type": "pdf",
+          "title": "Modelo para solicitar la DACI al órgano de contratación",
+          "url": "https://contratacioncentralizada.gob.es/documents/32143/42159/Solicitud%2BDACI_DGRCC.pdf/f511caaa-b6f2-6bfa-bd1d-ac218d70a66c"
+        },
+        {
+          "id": "CATALOG_SEARCH_PAGE",
+          "type": "html",
+          "title": "Consulta de productos y servicios — AM 14/2022",
+          "url": "https://contratacioncentralizada.gob.es/web/dgrcc/consulta-de-productos-y-servicios?acuerdo=22"
+        },
+        {
+          "id": "PLACSP_DETAIL",
+          "type": "html",
+          "title": "PLACSP — detalle de licitación (Expte. 2022/01)",
+          "url": "https://contrataciondelestado.es/wps/poc?idEvl=jfiAaXiVrY8SugstABGr5A%3D%3D&uri=deeplink%3Adetalle_licitacion"
+        }
+      ]
+    },
+    {
+      "nombre": "Vehículos comerciales ligeros",
+      "titulo_oficial": "Suministro de vehículos comerciales ligeros",
+      "expediente": "AM 18/2024",
+      "expediente_placsp": "2024/29",
+      "tipo": "Suministro",
+      "descripcion": "Suministro de vehículos comerciales ligeros (categorías M1 y N1) con masa máxima técnicamente admisible ≤ 3.500 kg, incluyendo (cuando proceda) equipamiento opcional y kits de adaptación. Quedan excluidos: (1) turismos y pick-up del AM 14/2022; (2) vehículos > 3.500 kg; (3) vehículos usados o previamente matriculados; (4) cualquier modalidad de arrendamiento.",
+      "lotes": [
+        "Lote 1: Combi compacto",
+        "Lote 2: Combi medio y largo",
+        "Lote 3: Furgón compacto",
+        "Lote 4: Furgón medio y largo",
+        "Lote 5: Chasis cabina simple"
+      ],
+      "estructura_lotes_grupos": {
+        "grupo_I": {
+          "codigo": "01",
+          "tipo": "Combustión (CO2 > 50 g/km)",
+          "niveles": {
+            "potencia_01": "según lote (ver clases)",
+            "potencia_02": "según lote (ver clases)"
+          }
+        },
+        "grupo_II": {
+          "codigo": "02",
+          "tipo": "Eléctrico e híbrido (CO2 ≤ 50 g/km)",
+          "niveles": {
+            "autonomia_01": "según lote (ver clases)",
+            "autonomia_02": "según lote (ver clases)"
+          }
+        },
+        "clases_catalogo": [
+          {
+            "lote": 1,
+            "grupo": "01",
+            "nivel": "01",
+            "clase": "010101"
+          },
+          {
+            "lote": 1,
+            "grupo": "01",
+            "nivel": "02",
+            "clase": "010102"
+          },
+          {
+            "lote": 1,
+            "grupo": "02",
+            "nivel": "01",
+            "clase": "010201"
+          },
+          {
+            "lote": 1,
+            "grupo": "02",
+            "nivel": "02",
+            "clase": "010202"
+          },
+          {
+            "lote": 2,
+            "grupo": "01",
+            "nivel": "01",
+            "clase": "020101"
+          },
+          {
+            "lote": 2,
+            "grupo": "01",
+            "nivel": "02",
+            "clase": "020102"
+          },
+          {
+            "lote": 2,
+            "grupo": "02",
+            "nivel": "01",
+            "clase": "020201"
+          },
+          {
+            "lote": 2,
+            "grupo": "02",
+            "nivel": "02",
+            "clase": "020202"
+          },
+          {
+            "lote": 3,
+            "grupo": "01",
+            "nivel": "01",
+            "clase": "030101"
+          },
+          {
+            "lote": 3,
+            "grupo": "01",
+            "nivel": "02",
+            "clase": "030102"
+          },
+          {
+            "lote": 3,
+            "grupo": "02",
+            "nivel": "01",
+            "clase": "030201"
+          },
+          {
+            "lote": 3,
+            "grupo": "02",
+            "nivel": "02",
+            "clase": "030202"
+          },
+          {
+            "lote": 4,
+            "grupo": "01",
+            "nivel": "01",
+            "clase": "040101"
+          },
+          {
+            "lote": 4,
+            "grupo": "01",
+            "nivel": "02",
+            "clase": "040102"
+          },
+          {
+            "lote": 4,
+            "grupo": "02",
+            "nivel": "01",
+            "clase": "040201"
+          },
+          {
+            "lote": 4,
+            "grupo": "02",
+            "nivel": "02",
+            "clase": "040202"
+          },
+          {
+            "lote": 5,
+            "grupo": "01",
+            "nivel": "01",
+            "clase": "050101"
+          },
+          {
+            "lote": 5,
+            "grupo": "01",
+            "nivel": "02",
+            "clase": "050102"
+          },
+          {
+            "lote": 5,
+            "grupo": "02",
+            "nivel": "01",
+            "clase": "050201"
+          }
+        ]
+      },
+      "duracion": "Duración inicial: 2 años a partir del 01/02/2025 (fin previsto 31/01/2027). Prórroga: una o varias hasta un máximo de 2 años adicionales (duración máxima total 4 años).",
+      "enlace": "https://contratacioncentralizada.gob.es/web/dgrcc/-/ficha-ami-vehiculos-comerciales-ligeros",
+      "catalog_search": {
+        "url": "https://contratacioncentralizada.gob.es/web/dgrcc/consulta-de-productos-y-servicios?acuerdo=17",
+        "notas": "El catálogo permite filtrar por lote (01..05), grupo (01/02) y clase (LLGGNN)."
+      },
+      "procurement_modes": {
+        "H": true,
+        "B": true,
+        "default": "H",
+        "notes": "Acuerdo marco con todos los términos definidos: los contratos basados pueden adjudicarse sin nueva licitación (compra directa) o con nueva licitación, según cláusula 32 del PCAP y las instrucciones publicadas."
+      },
+      "mode_constraints": {
+        "H": {
+          "name": "Adjudicación sin nueva licitación (compra directa)",
+          "conditions": [
+            "El objeto (vehículo) está definido en catálogo dentro del lote/grupo/clase correspondiente",
+            "El importe del suministro no supera 180.000 € (impuestos excluidos)",
+            "No se incluye kit de adaptación NO definido (fuera del Anexo IV del PCAP)",
+            "No se incluye equipamiento opcional NO definido (fuera del Anexo III del PCAP)",
+            "No se prevé entrega de bienes como parte del pago (trueque/entrega como pago)",
+            "Se aplica descuento mínimo obligatorio según nº de vehículos del contrato basado"
+          ],
+          "discount_rules": [
+            {
+              "min_vehicles": 6,
+              "min_discount_pct": 1
+            },
+            {
+              "min_vehicles": 21,
+              "min_discount_pct": 2
+            },
+            {
+              "min_vehicles": 51,
+              "min_discount_pct": 3
+            }
+          ],
+          "selection_rule": {
+            "vehicles_to_compare": [
+              "Comparar todos los vehículos del catálogo dentro del lote/clase que cumplan los requisitos técnicos del organismo (justificados)",
+              "Si se exige equipamiento opcional definido o kits definidos, comparar solo vehículos que tengan precio definido para dichos elementos (incluido 0 €)"
+            ],
+            "objective_conditions": [
+              "Precio del conjunto de bienes (debe estar siempre)",
+              "Hasta 5 condiciones objetivas (de las previstas para nueva licitación) si se necesita (y se justifican)"
+            ]
+          },
+          "thresholds": {
+            "max_amount_without_new_tender_eur": 180000
+          },
+          "documents_required": [
+            "Modelo general de Memoria justificativa (compra directa)",
+            "Si financiación PRTR: modelo específico PRTR + DACI/Minerva según aplique",
+            "Documento acreditativo de crédito suficiente",
+            "Propuesta de adjudicación (según instrucciones)"
+          ],
+          "decision_rules": [
+            "if estimated_value_eur > 180000 then mode 'B'",
+            "if kit_no_definido == true then mode 'B'",
+            "if equipamiento_opcional_no_definido == true then mode 'B'",
+            "if trade_in_or_delivery_as_payment == true then mode 'B'",
+            "else mode 'H'"
+          ],
+          "systems": ["Catálogo DGRCC", "AUNA (si aplica en el organismo)"],
+          "source_ids": [
+            "CATALOG_PAGE",
+            "DOC_INSTRUCCIONES",
+            "DOC_MEMORIA_COMPRA_DIRECTA_GENERAL",
+            "DOC_MEMORIA_COMPRA_DIRECTA_PRTR",
+            "DOC_DACI_SOLICITUD"
+          ]
+        },
+        "B": {
+          "name": "Adjudicación con nueva licitación (segunda licitación)",
+          "conditions": [
+            "Cualquiera que sea su importe, si así lo dispone el organismo destinatario",
+            "El objeto del suministro es de importe superior a 180.000 € (impuestos excluidos)",
+            "Se requiere kit de adaptación NO definido (fuera del Anexo IV)",
+            "Se requiere equipamiento opcional NO definido (fuera del Anexo III)",
+            "Se prevé entrega de bienes como parte del pago"
+          ],
+          "prerequisites": [
+            "Solicitar conformidad/informe previo de la DGRCC cuando proceda (vía AUNA)",
+            "Invitar a todas las empresas adjudicatarias del lote/grupo/clase correspondiente",
+            "Licitación electrónica vía PLACSP u otro sistema electrónico del organismo"
+          ],
+          "deadlines": {
+            "offers_min_business_days_if_simple": 5,
+            "offers_min_business_days_if_complex": 10,
+            "simple_definition": "Sin kits NO definidos y con menos de 3 criterios adicionales al precio",
+            "complex_definition": "Con kits NO definidos o con 3+ criterios adicionales al precio"
+          },
+          "evaluation": {
+            "max_total_points": 100,
+            "price_is_mandatory": true,
+            "price_min_weight_pct": 30,
+            "discount_min_mandatory": "Debe respetar el descuento mínimo obligatorio según nº de vehículos (si se oferta inferior, se aplica el mínimo).",
+            "environmental_criteria": "Se establecen criterios ambientales vinculados al objeto (p.ej., eficiencia/CO2), excepto cuando no sean aplicables (p.ej., todo eléctrico).",
+            "allowed_criteria_examples": [
+              "Mayor potencia",
+              "Mayor autonomía eléctrica (vehículos 100% eléctricos)",
+              "Mayor número de asientos",
+              "Mayor capacidad de carga",
+              "Menor consumo",
+              "Menor nivel de emisiones de CO2",
+              "Mejoras respecto normativa EURO vigente"
+            ]
+          },
+          "delivery_rules": {
+            "min_delivery_days": 20,
+            "min_delivery_days_with_kit_no_definido": 60,
+            "notes": "La reducción de plazos máximos de entrega exige conformidad previa del adjudicatario (y puede exigir informe previo DGRCC)."
+          },
+          "documents_required": [
+            "Documento de licitación (modelo general o modelo unidades mínimas)",
+            "En su caso: PPT para kits NO definidos",
+            "Documento acreditativo de crédito suficiente",
+            "Invitaciones a adjudicatarios",
+            "Acta/informe de valoración + propuesta de adjudicación",
+            "En entidades adheridas: medidas art. 229.6 y uso de Conecta‑Centralización/AUNA",
+            "En contratos PRTR: solicitud DACI (modelo publicado)"
+          ],
+          "thresholds": {
+            "new_tender_mandatory_over_eur": 180000
+          },
+          "systems": ["PLACSP", "AUNA"],
+          "source_ids": [
+            "CATALOG_PAGE",
+            "DOC_INSTRUCCIONES",
+            "DOC_DL_MODELO_GENERAL",
+            "DOC_DL_MODELO_UNIDADES_MINIMAS",
+            "DOC_PPT_KITS_NO_DEFINIDOS",
+            "DOC_MEDIDAS_229_6",
+            "DOC_DACI_SOLICITUD"
+          ]
+        }
+      },
+      "responsable_am": "Subdirección General de Contratación Centralizada de Servicios y Suministros de carácter Operativo",
+      "contacto": {
+        "email": "amautomocion@hacienda.gob.es"
+      },
+      "instrumento": "AM",
+      "categoria_catalogo": "Acuerdos marco",
+      "id": "AM_VEHICULOS_COMERCIALES_LIGEROS",
+      "status": "vigente",
+      "validity": {
+        "raw": "Duración inicial 2 años desde 01/02/2025. Prórroga hasta 2 años adicionales."
+      },
+      "sources": [
+        {
+          "id": "CATALOG_PAGE",
+          "type": "html",
+          "title": "Ficha en catálogo DGRCC — AM 18/2024",
+          "url": "https://contratacioncentralizada.gob.es/web/dgrcc/-/ficha-ami-vehiculos-comerciales-ligeros"
+        },
+        {
+          "id": "DOC_INSTRUCCIONES",
+          "type": "pdf",
+          "title": "Instrucciones para la tramitación de contratos basados (AM 18/2024)",
+          "url": "https://contratacioncentralizada.gob.es/documents/32143/42671/Instrucciones%2Btramitaci%C3%B3n%2BCB%2B18-2024.pdf/4bd5f420-cc0f-c362-2768-b6c70d112db0"
+        },
+        {
+          "id": "DOC_MEDIDAS_229_6",
+          "type": "pdf",
+          "title": "Medidas art. 229.6 LCSP para entidades adheridas (AM 18/2024)",
+          "url": "https://contratacioncentralizada.gob.es/documents/32143/42671/Resoluci%C3%B3n%2B%C3%BAnica%2Bpara%2Bentidades%2Badheridas%2Ba%2BAM%2B18-2024.pdf/c57a7348-4d05-8dec-4193-e59711aaafb5"
+        },
+        {
+          "id": "DOC_MEMORIA_COMPRA_DIRECTA_GENERAL",
+          "type": "docx",
+          "title": "Modelo general de Memoria justificativa (compra directa)",
+          "url": "https://contratacioncentralizada.gob.es/documents/32143/42671/3_1-AM182024-Memoria-compra-directa-general.docx/a582ed6b-b288-c6af-723b-4a5f8bdd6eba"
+        },
+        {
+          "id": "DOC_MEMORIA_COMPRA_DIRECTA_PRTR",
+          "type": "docx",
+          "title": "Modelo específico de Memoria justificativa (financiación PRTR)",
+          "url": "https://contratacioncentralizada.gob.es/documents/32143/42671/3_2-AM182024-Memoria-compra-directa-general-PRTR.docx/625db42a-002f-4e87-a130-cfbcc0b5b9e1"
+        },
+        {
+          "id": "DOC_DL_MODELO_GENERAL",
+          "type": "docx",
+          "title": "Documento de licitación — modelo general",
+          "url": "https://contratacioncentralizada.gob.es/documents/32143/42671/4.1-AM-182024-Documento-de-licitaci%C3%B3n-modelo-general.docx/230c9f40-382c-5075-a6bc-9b1549001c84"
+        },
+        {
+          "id": "DOC_DL_MODELO_UNIDADES_MINIMAS",
+          "type": "docx",
+          "title": "Documento de licitación — modelo unidades mínimas",
+          "url": "https://contratacioncentralizada.gob.es/documents/32143/42671/4_2-AM-182024-Documento-de-licitacion-modelo-unidades-minimas.docx/ba82bfeb-6526-1473-0e53-c459fec601bc"
+        },
+        {
+          "id": "DOC_PPT_KITS_NO_DEFINIDOS",
+          "type": "docx",
+          "title": "Modelo PPT para kits NO definidos",
+          "url": "https://contratacioncentralizada.gob.es/documents/32143/42671/5-AM182024-Modelo-documento-PT-kits-NO-definidos.docx/3cd88ca6-d7ef-0fbe-bb3b-4613526c625b"
+        },
+        {
+          "id": "DOC_DACI_SOLICITUD",
+          "type": "pdf",
+          "title": "Modelo para solicitar la DACI al órgano de contratación",
+          "url": "https://contratacioncentralizada.gob.es/documents/32143/42671/Solicitud%2BDACI_DGRCC.pdf/908c2096-6605-984e-e7cf-2b0b9af68d20"
+        },
+        {
+          "id": "DOC_AUTORIZACION_AUNA",
+          "type": "pdf",
+          "title": "Resolución por la que se autoriza la utilización de AUNA (AM 18/2024)",
+          "url": "https://contratacioncentralizada.gob.es/documents/32143/42671/Resoluci%C3%B3n%2Bpara%2Bla%2Bautorizaci%C3%B3n%2Bde%2Bla%2Butilizaci%C3%B3n%2Bde%2B%2BAUNA.pdf/f1490cbc-2f2e-4622-7485-bcfaef03c78c"
+        },
+        {
+          "id": "CATALOG_SEARCH_PAGE",
+          "type": "html",
+          "title": "Consulta de productos y servicios — AM 18/2024",
+          "url": "https://contratacioncentralizada.gob.es/web/dgrcc/consulta-de-productos-y-servicios?acuerdo=17"
+        },
+        {
+          "id": "PLACSP_INFO",
+          "type": "html",
+          "title": "PLACSP — acceso a ficha (requiere búsqueda por expediente 2024/29)",
+          "url": "https://contrataciondelestado.es/wps/portal/plataforma/buscadores/detalle/!ut/p/z0/04_Sj9CPykssy0xPLMnMz0vMAfIjo8ziTVz9nZ3dPIwMLIKNXQyMfFxCQ808QFwj_YJsR0UA-dFl7Q!!/"
+        }
+      ]
+    },
+    {
+      "nombre": "Motocicletas y ATV/QUADS",
+      "titulo_oficial": "Suministro de motocicletas y ATV/QUADS",
+      "expediente": "AM 19/2022",
+      "expediente_placsp": "2022/46",
+      "expediente_placsp_variants": ["2022/46-L1"],
+      "tipo": "Suministro",
+      "descripcion": "Suministro de motocicletas y ATV/QUAD, comprendiendo únicamente vehículos a motor de categoría L, de dos, tres y cuatro ruedas. Se incluyen motocicletas de carretera, motocicletas todoterreno y triciclos/cuatriciclos, con equipamiento opcional y kits de adaptación cuando proceda.",
+      "lotes": [
+        "Lote 1: Motocicleta de carretera",
+        "Lote 2: Motocicleta todoterreno",
+        "Lote 3: Triciclos y cuatriciclos"
+      ],
+      "lotes_detail": [
+        {
+          "lote": "1",
+          "terms_established": "all_terms_established"
+        },
+        {
+          "lote": "2",
+          "terms_established": "all_terms_established"
+        },
+        {
+          "lote": "3",
+          "terms_established": "all_terms_established"
+        }
+      ],
+      "duracion": "Entrada en vigor: Lotes 2 y 3 el 25/04/2023; Lote 1 el 01/11/2023. Prórroga publicada: Lotes 2 y 3 hasta 24/04/2026; Lote 1 hasta 31/10/2026 (o antes si entra en vigor un nuevo acuerdo marco).",
+      "enlace": "https://contratacioncentralizada.gob.es/es-ES/web/dgrcc/-/ficha-ami-vehiculos-motocicletas",
+      "catalog_search": {
+        "url": "https://contratacioncentralizada.gob.es/web/dgrcc/consulta-de-productos-y-servicios?acuerdo=3",
+        "notas": "Filtrado por tipo de artículo: 010000 (Lote 1), 020000 (Lote 2), 030000 (Lote 3)."
+      },
+      "proveedores_catalogo": [
+        "BMW Ibérica S.A.",
+        "COOLTRA MOTOS, S.L.",
+        "EL MOTORISTA S.L",
+        "HONDA MOTOR EUROPE LIMITED, SUCURSAL EN ESPAÑA",
+        "MB MOTOR IBERICA",
+        "MOTOS BORDOY S.A.",
+        "NEXT MOTORBIKE SL",
+        "PIAGGIO ESPAÑA, S.L.U.",
+        "RIDE ON SCOOTER RENTAL S.L"
+      ],
+      "procurement_modes": {
+        "H": true,
+        "B": true,
+        "default": "H",
+        "notes": "Acuerdo marco de producto definido. Contratos basados con o sin nueva licitación conforme a cláusula 31 del PCAP e instrucciones de la DGRCC."
+      },
+      "mode_constraints": {
+        "H": {
+          "name": "Adquisición sin nueva licitación (compra directa)",
+          "conditions": [
+            "El suministro se limita a vehículos y equipamiento definido con precio en catálogo dentro del lote/tipo de artículo",
+            "El número de vehículos a adquirir es ≤ 10",
+            "No se requiere kit NO definido (fuera del Anexo IV del PCAP)",
+            "No se requiere equipamiento adicional NO incluido en Anexo III del PCAP",
+            "No se prevé entrega de bienes como parte del pago"
+          ],
+          "selection_rule": {
+            "objective_conditions": [
+              "Precio del conjunto de bienes (peso orientativo 70%–100%)",
+              "Si es necesario, puede añadirse hasta 3 criterios del procedimiento con nueva licitación, justificándolo"
+            ],
+            "vehicles_to_compare": [
+              "Comparar todos los vehículos disponibles en catálogo dentro del lote/tipo que cumplan los requisitos técnicos justificadamente",
+              "Si se exige equipamiento opcional o kits definidos, considerar únicamente vehículos con precio definido (incluido 0 €)"
+            ]
+          },
+          "documents_required": [
+            "Memoria justificativa (compra directa)",
+            "Documento acreditativo de crédito suficiente",
+            "Propuesta de adjudicación"
+          ],
+          "decision_rules": [
+            "if unidades > 10 then mode 'B'",
+            "if kit_no_definido == true then mode 'B'",
+            "if equipamiento_no_incluido_anexo_III == true then mode 'B'",
+            "if trade_in_or_delivery_as_payment == true then mode 'B'",
+            "else mode 'H'"
+          ],
+          "systems": ["Catálogo DGRCC", "AUNA (direcciones adjudicatarios)"],
+          "source_ids": [
+            "CATALOG_PAGE",
+            "DOC_INSTRUCCIONES",
+            "DOC_MEMORIA_CD_GENERAL",
+            "DOC_MEMORIA_CD_PRTR"
+          ]
+        },
+        "B": {
+          "name": "Adquisición con nueva licitación (segunda licitación)",
+          "conditions": [
+            "Cualquiera que sea el número de unidades, si así lo dispone el organismo",
+            "El número de vehículos a adquirir es > 10",
+            "Se requiere kit NO definido (fuera del Anexo IV del PCAP)",
+            "Se requiere equipamiento adicional NO incluido en Anexo III del PCAP",
+            "Se prevé entrega de bienes como parte del pago"
+          ],
+          "prerequisites": [
+            "Informe previo favorable de la DGRCC antes de licitar",
+            "Invitar a todas las empresas adjudicatarias del lote (con claves activas en catálogo)",
+            "Invitaciones a través de direcciones vigentes en AUNA (recomendado: carga automática en PLACSP)"
+          ],
+          "deadlines": {
+            "offers_min_business_days_if_simple": 5,
+            "offers_min_business_days_if_complex": 10,
+            "simple_definition": "Sin kits NO definidos y con menos de 3 criterios además del precio",
+            "complex_definition": "Con kits NO definidos o con 3+ criterios además del precio"
+          },
+          "evaluation": {
+            "max_total_points": 100,
+            "price_is_mandatory": true,
+            "price_min_weight_pct": 30,
+            "allowed_criteria_examples": [
+              "Mayor potencia y cilindrada",
+              "Mayor autonomía eléctrica ponderada",
+              "Mejoras de seguridad en conducción",
+              "Características constructivas más adecuadas (altura/longitud/masa)",
+              "Menor consumo",
+              "Menor nivel de emisiones de CO2",
+              "Mejoras respecto norma EURO en vigor"
+            ]
+          },
+          "documents_required": [
+            "Documento de licitación (modelo oficial)",
+            "En su caso: PPT para kit NO definido",
+            "Documento acreditativo de crédito suficiente",
+            "Invitaciones a adjudicatarios",
+            "Acta/informe de valoración + propuesta de adjudicación"
+          ],
+          "systems": ["PLACSP", "AUNA"],
+          "source_ids": [
+            "CATALOG_PAGE",
+            "DOC_INSTRUCCIONES",
+            "DOC_DL_MODELO_GENERAL",
+            "DOC_DL_MODELO_CASCADA",
+            "DOC_DL_MODELO_UNIDADES_MINIMAS",
+            "DOC_PPT_KITS_NO_DEFINIDOS",
+            "DOC_AUTORIZACION_AUNA",
+            "DOC_MEDIDAS_229_6",
+            "DOC_DACI_SOLICITUD"
+          ]
+        }
+      },
+      "responsable_am": "Subdirección General de Suministros y Servicios de Carácter Operativo",
+      "contacto": {
+        "email": "amautomocion@hacienda.gob.es"
+      },
+      "instrumento": "AM",
+      "categoria_catalogo": "Acuerdos marco",
+      "id": "AM_MOTOCICLETAS",
+      "status": "vigente",
+      "validity": {
+        "raw": "Lotes 2–3: desde 25/04/2023 (prórroga hasta 24/04/2026). Lote 1: desde 01/11/2023 (prórroga hasta 31/10/2026)."
+      },
+      "sources": [
+        {
+          "id": "CATALOG_PAGE",
+          "type": "html",
+          "title": "Ficha en catálogo DGRCC — AM 19/2022",
+          "url": "https://contratacioncentralizada.gob.es/es-ES/web/dgrcc/-/ficha-ami-vehiculos-motocicletas"
+        },
+        {
+          "id": "CATALOG_SEARCH_PAGE",
+          "type": "html",
+          "title": "Consulta de productos y servicios — AM 19/2022",
+          "url": "https://contratacioncentralizada.gob.es/web/dgrcc/consulta-de-productos-y-servicios?acuerdo=3"
+        },
+        {
+          "id": "DOC_INSTRUCCIONES",
+          "type": "pdf",
+          "title": "Instrucciones para la tramitación de contratos basados (AM 19/2022, v2)",
+          "url": "https://contratacioncentralizada.gob.es/documents/32143/42977/AM192022%2B1.%2BInstruccionesTramitacionContratosBasados%2BV2.pdf/8ad8c21f-ec2c-ca31-6fac-76c3bc6297f1"
+        },
+        {
+          "id": "DOC_MEMORIA_CD_GENERAL",
+          "type": "docx",
+          "title": "Modelo Memoria compra directa — general (v1)",
+          "url": "https://contratacioncentralizada.gob.es/documents/32143/42977/AM192022%2B2.1.%2BMemoria%2Bcompra%2Bdirecta%2Bgeneral%2BV1.docx/a90598aa-3d2b-4007-295e-24fb1f41fc2d"
+        },
+        {
+          "id": "DOC_MEMORIA_CD_PRTR",
+          "type": "docx",
+          "title": "Modelo Memoria compra directa — PRTR (v1)",
+          "url": "https://contratacioncentralizada.gob.es/documents/32143/42977/AM192022%2B2.2.%2BMemoria%2Bcompra%2Bdirecta%2BPRTR%2BV1.docx/172fabdd-7b74-d513-a176-ba4c46da7788"
+        },
+        {
+          "id": "DOC_DL_MODELO_GENERAL",
+          "type": "docx",
+          "title": "Documento de licitación — modelo general (v4)",
+          "url": "https://contratacioncentralizada.gob.es/documents/32143/42977/AM192022%2B3.1.%2BDocumento%2Bde%2Blicitaci%C3%B3n%2Bgeneral%2BV4.docx/41d96b6e-660f-17d3-fab5-3dbc69f8ef0b"
+        },
+        {
+          "id": "DOC_DL_MODELO_CASCADA",
+          "type": "docx",
+          "title": "Documento de licitación — modelo cascada (v4)",
+          "url": "https://contratacioncentralizada.gob.es/documents/32143/42977/AM192022%2B3.2.%2BDocumento%2Blicitaci%C3%B3n%2Bmodelo%2Bcascada%2BV4.docx/af421043-374d-b885-d3c3-425754af4377"
+        },
+        {
+          "id": "DOC_DL_MODELO_UNIDADES_MINIMAS",
+          "type": "docx",
+          "title": "Documento de licitación — modelo unidades mínimas (v4)",
+          "url": "https://contratacioncentralizada.gob.es/documents/32143/42977/AM192022%2B3.3.%2BDocumento%2Bde%2Blicitaci%C3%B3n%2Bmodelo%2Bunidades%2Bm%C3%ADnimas%2BV4.docx/22ca7b09-40a2-52a8-0a7b-61c172dbb343"
+        },
+        {
+          "id": "DOC_PPT_KITS_NO_DEFINIDOS",
+          "type": "docx",
+          "title": "Modelo PPT kits NO definidos",
+          "url": "https://contratacioncentralizada.gob.es/documents/32143/42977/AM192022%2B3.4.%2BModelo%2BPPT%2Bkits%2BNO%2Bdefinidos.docx/87d1abf1-effc-c4ce-6a7d-7c179c7e637b"
+        },
+        {
+          "id": "DOC_AUTORIZACION_AUNA",
+          "type": "pdf",
+          "title": "Resolución autorización uso AUNA (AM 19/2022)",
+          "url": "https://contratacioncentralizada.gob.es/documents/32143/42977/RESOLUCI%C3%93N%2BDE%2BLA%2BDIRECCI%C3%93N%2BGENERAL%2BDE%2BRACIONALIZACI%C3%93N%2BY%2BCENTRALIZACI%C3%93N%2BDE%2BLA%2BCONTRATACI%C3%93N%2BPOR%2BLA%2BQUE%2BSE%2BAUTORIZA%2BLA%2BUTILIZACI%C3%93N%2BDE%2BLA%2BAP.pdf/8380c06a-e181-4cb4-2966-3cac8d631ca4"
+        },
+        {
+          "id": "DOC_MEDIDAS_229_6",
+          "type": "pdf",
+          "title": "Medidas para entidades adheridas (art. 229.6 LCSP) — AM 19/2022",
+          "url": "https://contratacioncentralizada.gob.es/documents/32143/42977/Medidas%2BAdheridos%2BAM%2B19-22%2Bpara%2Bgarantizar%2Bcumplimiento%2Bart%2B229.6%2BLCSP.pdf/60365978-0aee-1551-efea-dd615782ce0a"
+        },
+        {
+          "id": "DOC_DACI_SOLICITUD",
+          "type": "pdf",
+          "title": "Modelo para solicitar DACI (PRTR)",
+          "url": "https://contratacioncentralizada.gob.es/documents/32143/42977/Solicitud%2BDACI_DGRCC.pdf/fc05f62a-03f7-eb48-e2a8-56371e9b4668"
+        },
+        {
+          "id": "PLACSP_DETAIL",
+          "type": "html",
+          "title": "PLACSP — detalle de licitación (Expte. 2022/46)",
+          "url": "https://contrataciondelestado.es/wps/poc?idEvl=MNMS8ssNfAcSugstABGr5A%3D%3D&uri=deeplink%3Adetalle_licitacion"
+        }
+      ]
+    },
+    {
+      "nombre": "Servicios de desarrollo",
+      "titulo_oficial": "Servicios de desarrollo de sistemas de administración electrónica",
+      "expediente": "SDA 26/2021",
+      "expediente_placsp": "2021/16",
+      "tipo": "Servicios",
+      "descripcion": "Sistema Dinámico de Adquisición (SDA) para la contratación de servicios de desarrollo de sistemas de administración electrónica (análisis, diseño, construcción, implantación, evolución y mantenimiento).",
+      "lotes": ["Lote único"],
+      "duracion": "Entrada en vigor: 20/06/2022. 1ª prórroga: 20/06/2024–19/06/2025. 2ª prórroga: 20/06/2025–19/06/2026. Plazo máximo del SDA (incluidas prórrogas): 01/02/2027.",
+      "enlace": "https://contratacioncentralizada.gob.es/web/dgrcc/-/ficha-sda-servicios-de-desarrollo",
+      "procurement_modes": {
+        "H": false,
+        "B": true,
+        "default": "B",
+        "notes": "En SDA siempre se tramita como contrato específico mediante invitación/mini‑concurso a las empresas admitidas."
+      },
+      "mode_constraints": {
+        "B": {
+          "name": "Contrato específico en SDA (invitación/mini‑concurso)",
+          "conditions": [
+            "Contrato específico siempre mediante invitación a empresas admitidas en el SDA",
+            "Invitación obligatoria a todas las empresas admitidas (y activas) a la fecha de invitación",
+            "Plazo mínimo de presentación de ofertas: 10 días naturales",
+            "Presupuesto base de licitación (sin impuestos) del contrato específico ≤ 862.000 € (no incluye prórrogas ni modificaciones; importe actualizable por orden ministerial, verificar en instrucciones vigentes)",
+            "Si el contrato incluye prestaciones de carácter intelectual, los criterios de calidad deben ponderar al menos el 51% y de ese total, al menos un 11% debe ser automático"
+          ],
+          "exclusions": [
+            "Quedan fuera del SDA los contratos con valor estimado < 15.000 € si pueden tramitarse como contrato menor (art. 118 LCSP)"
+          ],
+          "pricing_and_eval": {
+            "price_min_weight_pct": 40,
+            "notes": "Si hay criterios de juicio de valor, se recomienda utilizar una fórmula que optimice el criterio precio. En contratos por precio unitario (art. 308.3 LCSP), deben definirse unidades homogéneas y metodología de medición/estimación en el DI."
+          },
+          "dgrcc_prior_report": {
+            "when": [
+              "Preceptivo y vinculante cuando el valor estimado del contrato específico supere el umbral SARA vigente"
+            ],
+            "how": "Solicitud del informe previo por el canal del sistema estatal (AUNA/Conecta‑Centralización según aplique), adjuntando el Documento de Invitación (DI) y documentación preparatoria.",
+            "notes": "En contratos no SARA el informe no es obligatorio, pero puede solicitarse para validar lote/alcance y reducir riesgos de tramitación."
+          },
+          "aedigital_report": {
+            "when": [
+              "Cuando resulte aplicable conforme a la normativa TIC/administración digital (según instrucciones del SDA)"
+            ],
+            "notes": "Debe contarse con informe favorable de la Agencia Estatal de Administración Digital (AEAD) antes de elevar propuestas de adjudicación que se incorporen en AUNA."
+          },
+          "invitation_rules": {
+            "companies_to_invite": "Todas las empresas admitidas en el SDA a la fecha de invitación.",
+            "addresses_source": "Direcciones/licitadores obtenidos desde AUNA (se recomienda carga automática en la plataforma de licitación).",
+            "evidence": "Conservar fichero de direcciones/licitadores y evidencias de invitación en el expediente."
+          },
+          "pre_fiscalization_rule": {
+            "rule": "Para la fiscalización e intervención previa de propuestas de adjudicación (Circular IGAE 1/2023), el expediente debe incorporar certificados (Anexo I) expedidos por la Junta de Contratación Centralizada y la Subdirección responsable del SDA.",
+            "how": "Tras registrar la propuesta de adjudicación en CONECTA, solicitar certificados por correo a circular_1_2023.sgcctecnologias@hacienda.gob.es aportando el documento 'Propuesta de adjudicación' de CONECTA + declaración responsable (modelo nota) + certificados AEAT y TGSS.",
+            "date": "2024-11-11"
+          },
+          "deadlines": {
+            "offers_min_days_natural": 10
+          },
+          "thresholds": {
+            "max_pbl_no_tax_eur": 862000,
+            "minor_contract_exclusion_eur": 15000
+          },
+          "documents_required": [
+            "Documento de Invitación (modelo oficial SDA 26/2021)",
+            "Lista de comprobación (checklist) para contratos específicos",
+            "Prescripciones técnicas / alcance del servicio",
+            "Criterios de adjudicación y ponderación",
+            "Acreditación de crédito suficiente",
+            "Evidencias de invitación a empresas admitidas",
+            "Acta/informe de valoración + propuesta de adjudicación",
+            "Certificados Circular IGAE 1/2023 + declaración responsable + AEAT/TGSS (si fiscalización previa)",
+            "En contratos PRTR: solicitud DACI (modelo publicado)"
+          ],
+          "systems": ["AUNA", "PLACSP", "CONECTA"],
+          "decision_rules": [
+            "if estimated_value_eur < 15000 and minor_contract_art_118_possible == true then out_of_scope_for_SDA",
+            "if pbl_no_tax_eur > 862000 then not_allowed_by_SDA_rules",
+            "else mode 'B' (contrato específico con invitación a admitidos)"
+          ],
+          "source_ids": [
+            "CATALOG_PAGE",
+            "DOC_INSTRUCCIONES",
+            "DOC_DI_MODELO",
+            "DOC_CHECKLIST",
+            "DOC_NOTA_FISCALIZACION_IGAE_1_2023",
+            "DOC_DACI_PRTR",
+            "DOC_PREAVISO_PRORROGAS",
+            "DOC_PROTEO_SETUP",
+            "DOC_PROTEO_FORMULARIO"
+          ]
+        }
+      },
+      "instrumento": "SDA",
+      "categoria_catalogo": "Sistemas dinámicos de adquisición",
+      "id": "SDA_SERVICIOS_DESARROLLO",
+      "status": "vigente",
+      "validity": {
+        "raw": "Entrada en vigor 20/06/2022. Prórrogas publicadas hasta 19/06/2026. Plazo máximo del SDA hasta 01/02/2027."
+      },
+      "sources": [
+        {
+          "id": "CATALOG_PAGE",
+          "type": "html",
+          "title": "Ficha en catálogo DGRCC — SDA 26/2021",
+          "url": "https://contratacioncentralizada.gob.es/web/dgrcc/-/ficha-sda-servicios-de-desarrollo"
+        },
+        {
+          "id": "DOC_INSTRUCCIONES",
+          "type": "pdf",
+          "title": "Instrucciones para contratos específicos (SDA 26/2021) — Sep 2025",
+          "url": "https://contratacioncentralizada.gob.es/documents/32143/49098/1_InstruccionesCESDA26_Sep2025_F.pdf/5c712ce2-b020-d840-0f78-11c819811ad4"
+        },
+        {
+          "id": "DOC_DI_MODELO",
+          "type": "docx",
+          "title": "Modelo de Documento de Invitación (DI) — v07 (08/01/2026)",
+          "url": "https://contratacioncentralizada.gob.es/documents/32143/49098/2_ModeloDI_CESDA26_V07_08012026.docx/cdaec042-3ce7-9f93-1aaf-fba12c8f0c3f"
+        },
+        {
+          "id": "DOC_CHECKLIST",
+          "type": "docx",
+          "title": "Lista de comprobación (contratos específicos) — v3",
+          "url": "https://contratacioncentralizada.gob.es/documents/32143/49098/3_Listacomprobacion_CESDA26_V3.docx/c55cf26a-5bd8-899b-4a11-f98a9c7de57c"
+        },
+        {
+          "id": "DOC_NOTA_FISCALIZACION_IGAE_1_2023",
+          "type": "pdf",
+          "title": "Nota informativa — aplicación Circular IGAE 1/2023 (fiscalización previa de propuestas de adjudicación)",
+          "url": "https://contratacioncentralizada.gob.es/documents/32143/49098/NotaFiscalizacionPropuestaAdjCESDA26.pdf/0579a6df-dc38-ecc2-eedc-47c7885915bd"
+        },
+        {
+          "id": "DOC_DACI_PRTR",
+          "type": "pdf",
+          "title": "Modelo solicitud DACI (PRTR)",
+          "url": "https://contratacioncentralizada.gob.es/documents/32143/49098/ModeloSolicitudDACI_DGRCC_PRTR.pdf/ab5fba6a-1132-049f-4d8e-a4f1328b95f0"
+        },
+        {
+          "id": "DOC_PREAVISO_PRORROGAS",
+          "type": "pdf",
+          "title": "Modelo de comunicación de preaviso de prórrogas",
+          "url": "https://contratacioncentralizada.gob.es/documents/32143/49098/PreavisoProrrogasSDA262021_21122023.pdf/46182d38-f5c7-660e-01c0-1b1ed8f1f875"
+        },
+        {
+          "id": "DOC_PROTEO_SETUP",
+          "type": "zip",
+          "title": "SETUP PROTEO (SDA 26/2021)",
+          "url": "https://contratacioncentralizada.gob.es/documents/32143/49098/SETUP%20PROTEO%20SDA262021v2.zip/3fdefe06-9c7b-7e19-ec4e-e1ef4b81d55b"
+        },
+        {
+          "id": "DOC_PROTEO_FORMULARIO",
+          "type": "doc",
+          "title": "Formulario PROTEO",
+          "url": "https://contratacioncentralizada.gob.es/documents/32143/49098/FormularioPROTEO.doc/72c7c23e-1c45-08cc-fd2b-9e5f6d7f6c32"
+        },
+        {
+          "id": "PLACSP_SEARCH",
+          "type": "html",
+          "title": "PLACSP — búsqueda por expediente 2021/16",
+          "url": "https://contrataciondelestado.es/wps/portal/plataforma/buscadores/busquedaRapida"
+        }
+      ]
+    },
+    {
+      "nombre": "Suministro de equipos de comunicaciones, servidores y sistemas de almacenamiento",
+      "titulo_oficial": "Suministro de equipos de comunicaciones, servidores y sistemas de almacenamiento",
+      "expediente": "SDA 24/2022",
+      "expediente_placsp": "2022/68",
+      "tipo": "Suministro",
+      "descripcion": "Sistema Dinámico de Adquisición (SDA) para el suministro de equipos de comunicaciones, servidores y sistemas de almacenamiento (de uso común). Puede incluir de forma accesoria elementos complementarios inseparables, soporte/mantenimiento, garantía extendida y trabajos de instalación necesarios para completar la funcionalidad. Quedan excluidos: (1) contratos con VE < 15.000 € que puedan tramitarse como contrato menor (art. 118 LCSP); (2) bienes específicos directamente vinculados a proyectos de I+D+i; (3) equipamientos específicos para Defensa, Seguridad Nacional o FFCCSE que no sean de uso común; (4) otros suministros no calificables como de uso común por sus características particulares.",
+      "lotes": [
+        "Lote 1: Equipos de comunicaciones",
+        "Lote 2: Servidores y sistemas de almacenamiento"
+      ],
+      "lotes_detail": [
+        {
+          "lote": "1",
+          "ambito": "Equipos de comunicaciones",
+          "scope_summary": "Conmutadores, routers, seguridad/red, electrónica de red y componentes asociados, según PPT del SDA.",
+          "procurement_mode": "B"
+        },
+        {
+          "lote": "2",
+          "ambito": "Servidores y sistemas de almacenamiento",
+          "scope_summary": "Servidores, cabinas/almacenamiento y componentes asociados, según PPT del SDA.",
+          "procurement_mode": "B"
+        }
+      ],
+      "duracion": "Contrato/SDA formalizado: 06/03/2023–05/03/2025. Acuerdo de prórroga: 03/02/2025, con vigencia hasta 05/09/2026. Nota informativa (27/07/2023): vigencia del SDA hasta 16/11/2024, prorrogable por un máximo de 3 años.",
+      "enlace": "https://contratacioncentralizada.gob.es/web/dgrcc/-/ficha-sda-suministro-equipos-comunicaciones-servidores-almacenamiento",
+      "procurement_modes": {
+        "H": false,
+        "B": true,
+        "default": "B",
+        "notes": "En un SDA, cada contrato específico debe licitarse invitando a todas las empresas previamente admitidas en el lote correspondiente."
+      },
+      "mode_constraints": {
+        "B": {
+          "name": "Contrato específico en SDA (invitación/mini-concurso)",
+          "conditions": [
+            "Contrato específico siempre mediante invitación a empresas admitidas en el lote",
+            "VE < 15.000 € y contrato menor (art. 118 LCSP) excluido del SDA",
+            "Invitación obligatoria a todas las empresas admitidas en el lote",
+            "Plazo mínimo de presentación de ofertas: 10 días naturales",
+            "Presentación por PLACSP u otra plataforma que cumpla LCSP"
+          ],
+          "dgrcc_prior_report": {
+            "when": [
+              "Preceptivo y vinculante cuando el VE del contrato específico supere el umbral SARA vigente"
+            ],
+            "how": "Solicitud del informe previo a través de AUNA, adjuntando el Documento de Invitación (DI) y la documentación preparatoria.",
+            "source": "Instrucciones SDA 24/2022 (Sep 2025), apartado 4.1"
+          },
+          "sgad_report": {
+            "when": [
+              "Obligatorio para organismos incluidos en el ámbito del RD 806/2014 (TIC)"
+            ],
+            "how": "Con carácter previo, conforme a las reglas del propio organismo y a las instrucciones SDA.",
+            "source": "Instrucciones SDA 24/2022 (Sep 2025), apartado 4.2"
+          },
+          "invitation_rules": {
+            "companies_to_invite": "Todas las empresas admitidas (y con adhesión vigente) en el lote a la fecha de invitación.",
+            "addresses_source": "Direcciones de invitación obtenidas desde AUNA (se recomienda carga automática).",
+            "evidence": "Conservar fichero de direcciones/licitadores y certificado de situación de empresas invitadas (AUNA) en el expediente."
+          },
+          "pricing_and_eval": {
+            "general": "No puede adjudicarse por encima de los precios/condiciones máximas del SDA. Las empresas pueden mejorar precios/condiciones en su oferta.",
+            "criteria": "Definir criterios objetivos y su ponderación en el DI, respetando los pliegos del SDA."
+          },
+          "pre_fiscalization_rule": {
+            "rule": "Trámite obligatorio previo a fiscalizar propuestas de adjudicación: certificado de requisitos previos y subsistencia de solvencia acreditada en fase de admisión (Circular IGAE 1/2023, según nota informativa).",
+            "tooling": "AUNA → Administración estado de adjudicatarios → generar certificado (PDF)."
+          },
+          "documents_required": [
+            "Documento de Invitación (modelo oficial)",
+            "Prescripciones técnicas / entregables (si aplica)",
+            "Criterios de adjudicación y ponderación",
+            "Acreditación de crédito suficiente",
+            "Invitaciones a empresas admitidas (evidencias)",
+            "Acta/informe de valoración y propuesta de adjudicación",
+            "Certificado situación de empresas invitadas (AUNA)",
+            "En contratos PRTR: solicitud DACI (modelo publicado)"
+          ],
+          "systems": ["AUNA", "PLACSP"],
+          "thresholds": {
+            "minor_contract_exclusion_eur": 15000,
+            "offers_min_days_natural": 10,
+            "sara_threshold": "umbral SARA vigente (según normativa aplicable)"
+          },
+          "decision_rules": [
+            "if estimated_value_eur < 15000 and minor_contract_art_118_possible == true then out_of_scope_for_SDA",
+            "else mode 'B' (contrato específico con invitación a admitidos)"
+          ],
+          "source_ids": [
+            "CATALOG_PAGE",
+            "DOC_PRORROGA",
+            "DOC_INSTRUCCIONES",
+            "DOC_DI_MODELO",
+            "DOC_MODELOS_OFERTA",
+            "DOC_NOTA_IMPORTES_MENORES_15000",
+            "DOC_NOTA_FISCALIZACION_IGAE_1_2023",
+            "DOC_OBTENCION_LICITADORES_AUNA",
+            "DOC_DACI_PRTR",
+            "DOC_MEDIDAS_229_6"
+          ]
+        }
+      },
+      "organos_y_competencias": {
+        "organo_contratacion_cb": [
+          "DGRCC para entidades del ámbito obligatorio (art. 3.1 LCSP: letras a), b), c), d) y g)",
+          "Órgano de contratación propio para entidades adheridas"
+        ],
+        "responsabilidades_organismo_destinatario": [
+          "Determinar necesidad y justificar uso común/adecuación del lote",
+          "Elaborar DI y documentación preparatoria",
+          "Lanzar invitaciones y gestionar licitación",
+          "Valorar ofertas y elevar propuesta de adjudicación",
+          "Custodiar expediente, recepcionar y pagar"
+        ]
+      },
+      "responsable_sda": "Subdirección General de Contratación Centralizada de Tecnologías (DGRCC)",
+      "contacto": {
+        "email": "entradasgcctecnologias@hacienda.gob.es"
+      },
+      "instrumento": "SDA",
+      "categoria_catalogo": "Sistemas dinámicos de adquisición",
+      "id": "SDA_COMUNICACIONES_SERVIDORES_ALMACENAMIENTO",
+      "status": "vigente",
+      "validity": {
+        "raw": "Formalizado 06/03/2023. Prórroga acordada 03/02/2025 hasta 05/09/2026 (ver ficha oficial)."
+      },
+      "sources": [
+        {
+          "id": "CATALOG_PAGE",
+          "type": "html",
+          "title": "Ficha en catálogo DGRCC — SDA 24/2022",
+          "url": "https://contratacioncentralizada.gob.es/web/dgrcc/-/ficha-sda-suministro-equipos-comunicaciones-servidores-almacenamiento"
+        },
+        {
+          "id": "DOC_PRORROGA",
+          "type": "pdf",
+          "title": "Acuerdo de prórroga SDA 24/2022 (03/02/2025)",
+          "url": "https://contratacioncentralizada.gob.es/documents/32143/48244/Acuerdo%2Bde%2Bpr%C3%B3rroga%2BSDA%2B24-2022.pdf/46917044-a22e-96d4-21db-1d4b51c9e4bf"
+        },
+        {
+          "id": "DOC_INSTRUCCIONES",
+          "type": "pdf",
+          "title": "Instrucciones para contratos específicos SDA 24/2022 (Sep 2025)",
+          "url": "https://contratacioncentralizada.gob.es/documents/32143/48244/01.%2B%2BInstrucciones%2BSDA%2B24_2022%2B-%2BSep%2B2025_F.pdf/2448c0e3-fc68-8cb7-f1d3-d14613b37b58"
+        },
+        {
+          "id": "DOC_DI_MODELO",
+          "type": "docx",
+          "title": "Modelo de Documento de Invitación (SDA 24/2022)",
+          "url": "https://contratacioncentralizada.gob.es/documents/32143/48244/02.Modelo%2Bdocumento%2Binvitaci%C3%B3n_SDA24_2022.docx/0d475c9c-7c2b-ae71-658f-d95a5003cb2c"
+        },
+        {
+          "id": "DOC_MODELOS_OFERTA",
+          "type": "zip",
+          "title": "Modelos de oferta (SDA 24/2022)",
+          "url": "https://contratacioncentralizada.gob.es/documents/32143/48244/03Modelos_oferta.zip/10ffb80e-b455-0dfd-2db2-4520ce6d0d27"
+        },
+        {
+          "id": "DOC_PROTEO",
+          "type": "exe",
+          "title": "Descarga del Proteo para empresas (SDA 24/2022)",
+          "url": "https://contratacioncentralizada.gob.es/documents/32143/48244/04Descarga_del_Proteo_para_empresas_SDA24_2022.exe/4ee40d5e-6f4b-24c0-c7ec-f565e69bc6fe"
+        },
+        {
+          "id": "DOC_MEDIDAS_229_6",
+          "type": "pdf",
+          "title": "Medidas para entidades adheridas (art. 229.6 LCSP) — SDA 24/2022",
+          "url": "https://contratacioncentralizada.gob.es/documents/32143/48244/03-Resolucion%2Bmedidas_%2BSDA_24.pdf/22f75695-7695-8118-1152-f3054708756b"
+        },
+        {
+          "id": "DOC_NOTA_IMPORTES_MENORES_15000",
+          "type": "pdf",
+          "title": "Nota informativa — importes menores de 15.000 € (SDA 24/2022)",
+          "url": "https://contratacioncentralizada.gob.es/documents/32143/48244/04%2BSDA%2B24%2B-%2B2022%2B-Nota%2Binformativa%2Bimportes%2Bmenores%2B15000%2Beuros.pdf/9674e656-d4e5-8d7e-7c9d-fa89f2ead54f"
+        },
+        {
+          "id": "DOC_NOTA_FISCALIZACION_IGAE_1_2023",
+          "type": "pdf",
+          "title": "Nota — Fiscalización propuestas adjudicación contratos específicos (Circular IGAE 1/2023)",
+          "url": "https://contratacioncentralizada.gob.es/documents/32143/48244/05NotaFiscalizaci%C3%B3nPropuestasAdjudicaci%C3%B3nContratosEspec%C3%ADficosSDA24.pdf/a5a88998-b4af-c668-29bc-22fb2b66cba8"
+        },
+        {
+          "id": "DOC_OBTENCION_LICITADORES_AUNA",
+          "type": "pdf",
+          "title": "Instrucciones — obtención de licitadores en AUNA (SDA 24/2022)",
+          "url": "https://contratacioncentralizada.gob.es/documents/32143/48244/OBTENCION%2BLICITADORES%2BDE%2BAUNA%2BSDA%2B24.pdf/fbd604dd-ce9e-bdc7-335e-a9be995c0b98"
+        },
+        {
+          "id": "DOC_DACI_PRTR",
+          "type": "pdf",
+          "title": "Modelo solicitud DACI (PRTR)",
+          "url": "https://contratacioncentralizada.gob.es/documents/32143/48244/Solicitud%2BDACI_DGRCC.pdf/fbdc5732-1ca6-1051-2416-c58d11bac209"
+        }
+      ]
+    },
+    {
+      "nombre": "Suministro de software",
+      "titulo_oficial": "Suministro de software de sistema, de desarrollo y de aplicación",
+      "expediente": "SDA 25/2022",
+      "expediente_placsp": "2022/48",
+      "tipo": "Suministro",
+      "descripcion": "Sistema Dinámico de Adquisición (SDA) para el suministro de software, incluyendo soluciones de software de sistema, desarrollo y aplicación (p. ej., herramientas de ejecución y desarrollo, gestión de infraestructuras de software, analítica de datos, ciberseguridad, administración digital y productividad/colaboración).",
+      "lotes": [
+        "Lote 1: Software de ejecución y desarrollo",
+        "Lote 2: Gestión de infraestructuras de software",
+        "Lote 3: Analítica y gestión de datos",
+        "Lote 4: Ciberseguridad",
+        "Lote 5: Aplicaciones de administración digital",
+        "Lote 6: Productividad y colaboración"
+      ],
+      "lotes_detail": [
+        {
+          "lote": "1",
+          "tipo_articulo_catalogo": "010000",
+          "ambito": "Software de ejecución y desarrollo",
+          "procurement_mode": "B"
+        },
+        {
+          "lote": "2",
+          "tipo_articulo_catalogo": "020000",
+          "ambito": "Gestión de infraestructuras de software",
+          "procurement_mode": "B"
+        },
+        {
+          "lote": "3",
+          "tipo_articulo_catalogo": "030000",
+          "ambito": "Analítica y gestión de datos",
+          "procurement_mode": "B"
+        },
+        {
+          "lote": "4",
+          "tipo_articulo_catalogo": "040000",
+          "ambito": "Ciberseguridad",
+          "procurement_mode": "B"
+        },
+        {
+          "lote": "5",
+          "tipo_articulo_catalogo": "050000",
+          "ambito": "Aplicaciones de administración digital",
+          "procurement_mode": "B"
+        },
+        {
+          "lote": "6",
+          "tipo_articulo_catalogo": "060000",
+          "ambito": "Productividad y colaboración",
+          "procurement_mode": "B"
+        }
+      ],
+      "duracion": "Vigencia inicial: 30/09/2022 a 29/09/2024. 1ª prórroga: 30/09/2024 a 29/09/2025. 2ª prórroga: 30/09/2025 a 29/09/2026. Duración máxima total: 5 años (prorrogable hasta un máximo de 3 años adicionales sobre la vigencia inicial).",
+      "enlace": "https://contratacioncentralizada.gob.es/es/web/dgrcc/-/ficha-sda-suministro-software",
+      "catalog_search": {
+        "url": "https://contratacioncentralizada.gob.es/web/dgrcc/consulta-de-productos-y-servicios?acuerdo=2",
+        "notas": "El catálogo permite filtrar por lote mediante el campo Tipo de artículo (010000..060000)."
+      },
+      "procurement_modes": {
+        "H": false,
+        "B": true,
+        "default": "B",
+        "notes": "En un SDA, cada contrato específico se adjudica mediante invitación/mini‑concurso entre las empresas admitidas en el lote correspondiente."
+      },
+      "mode_constraints": {
+        "B": {
+          "name": "Contrato específico en SDA (invitación/mini‑concurso)",
+          "conditions": [
+            "Contrato específico siempre mediante invitación a empresas admitidas en el lote",
+            "Invitación obligatoria a todas las empresas admitidas (y con situación activa) en el lote a la fecha de la invitación",
+            "Plazo mínimo de presentación de ofertas: 10 días naturales",
+            "El contrato específico no puede adjudicarse por encima de los precios/condiciones máximas del SDA"
+          ],
+          "exclusions": [
+            "Quedan fuera del SDA los contratos con valor estimado < 15.000 € si pueden tramitarse como contrato menor (art. 118 LCSP) y con duración < 1 año"
+          ],
+          "dgrcc_prior_report": {
+            "when": [
+              "Preceptivo y vinculante cuando el valor estimado del contrato específico supere el umbral SARA vigente"
+            ],
+            "how": "Solicitud del informe previo a través de AUNA, adjuntando el Documento de Invitación (DI) y la documentación preparatoria.",
+            "notes": "En importes no SARA, el informe previo no es obligatorio, pero puede solicitarse para validar la correcta clasificación del lote y del alcance."
+          },
+          "sgad_report": {
+            "when": [
+              "Obligatorio para organismos incluidos en el ámbito del RD 806/2014 (TIC)"
+            ],
+            "how": "Tramitación previa según procedimiento interno del organismo y conforme a instrucciones del SDA."
+          },
+          "invitation_rules": {
+            "companies_to_invite": "Todas las empresas admitidas en el lote.",
+            "addresses_source": "Las direcciones de invitación deben obtenerse desde AUNA.",
+            "evidence": "Conservar el fichero de direcciones/licitadores y el certificado de situación de empresas invitadas (AUNA) en el expediente."
+          },
+          "pre_fiscalization_rule": {
+            "rule": "Antes de remitir la propuesta de adjudicación a la Intervención Delegada, debe incorporarse al expediente la certificación prevista en la Circular IGAE 1/2023 (certificados + declaración responsable de la empresa propuesta).",
+            "how": "Tras registrar en AUNA la propuesta de adjudicación, recordar solicitar los certificados por correo a circular_1_2023.sgcctecnologias@hacienda.gob.es (según Nota informativa SDA 25/2022)."
+          },
+          "documents_required": [
+            "Documento de Invitación (modelo oficial del SDA 25/2022)",
+            "Prescripciones técnicas / alcance del suministro",
+            "Criterios de adjudicación y ponderación",
+            "Acreditación de crédito suficiente",
+            "Invitaciones a empresas admitidas (evidencias)",
+            "Acta/informe de valoración y propuesta de adjudicación",
+            "Certificado situación de empresas invitadas (AUNA)",
+            "En contratos PRTR: solicitud DACI (modelo publicado)",
+            "En fiscalización previa: certificados Circular IGAE 1/2023 + declaración responsable (modelo Nota informativa)"
+          ],
+          "systems": ["AUNA", "PLACSP"],
+          "thresholds": {
+            "minor_contract_exclusion_eur": 15000,
+            "minor_contract_duration_max_months": 12,
+            "offers_min_days_natural": 10,
+            "sara_threshold": "umbral SARA vigente (según normativa aplicable)"
+          },
+          "decision_rules": [
+            "if estimated_value_eur < 15000 and minor_contract_art_118_possible == true and duration_months < 12 then out_of_scope_for_SDA",
+            "else mode 'B' (contrato específico con invitación a admitidos)"
+          ],
+          "source_ids": [
+            "CATALOG_PAGE",
+            "DOC_INSTRUCCIONES",
+            "DOC_DI_MODELO",
+            "DOC_NOTA_IMPORTES_MENORES_15000",
+            "DOC_NOTA_FISCALIZACION_IGAE_1_2023",
+            "DOC_OBTENCION_LICITADORES_AUNA",
+            "DOC_DACI_PRTR",
+            "DOC_MEDIDAS_229_6"
+          ]
+        }
+      },
+      "instrumento": "SDA",
+      "categoria_catalogo": "Sistemas dinámicos de adquisición",
+      "id": "SDA_SUMINISTRO_SOFTWARE",
+      "status": "vigente",
+      "validity": {
+        "raw": "Entrada en vigor 30/09/2022. Vigencia inicial hasta 29/09/2024. Prórrogas publicadas hasta 29/09/2026."
+      },
+      "sources": [
+        {
+          "id": "CATALOG_PAGE",
+          "type": "html",
+          "title": "Ficha en catálogo DGRCC — SDA 25/2022",
+          "url": "https://contratacioncentralizada.gob.es/es/web/dgrcc/-/ficha-sda-suministro-software"
+        },
+        {
+          "id": "DOC_INSTRUCCIONES",
+          "type": "pdf",
+          "title": "Instrucciones para contratos específicos SDA 25/2022 (actualizado 21/01/2025)",
+          "url": "https://contratacioncentralizada.gob.es/documents/32143/48667/01%2B%2BInstrucciones%2BSDA%2B25_2022%2B-%2BEnero%2B2025_F.pdf"
+        },
+        {
+          "id": "DOC_DI_MODELO",
+          "type": "docx",
+          "title": "Modelo de Documento de Invitación (SDA 25/2022) (actualizado 01/06/2025)",
+          "url": "https://contratacioncentralizada.gob.es/documents/32143/48667/02-Modelo%2BDI%2BSDA%2B25_2022.docx"
+        },
+        {
+          "id": "DOC_MEDIDAS_229_6",
+          "type": "pdf",
+          "title": "Medidas para entidades adheridas (art. 229.6 LCSP) — SDA 25/2022",
+          "url": "https://contratacioncentralizada.gob.es/documents/32143/48667/03-Resolucion%2Bmedidas_%2BSDA_25.pdf"
+        },
+        {
+          "id": "DOC_NOTA_IMPORTES_MENORES_15000",
+          "type": "pdf",
+          "title": "Nota informativa — importes inferiores a 15.000 € (SDA 25/2022)",
+          "url": "https://contratacioncentralizada.gob.es/documents/32143/48667/04%2BSDA%2B25%2B-%2B2022%2B-Nota%2Binformativa%2Bimportes%2Bmenores%2B15000%2Beuros.docx.pdf"
+        },
+        {
+          "id": "DOC_NOTA_FISCALIZACION_IGAE_1_2023",
+          "type": "pdf",
+          "title": "Nota — aplicación Circular IGAE 1/2023 en fiscalización de propuestas de adjudicación (SDA 25/2022)",
+          "url": "https://contratacioncentralizada.gob.es/documents/32143/48667/05Nota_Fiscalizaci%C3%B3nPropuestasAdjudicaci%C3%B3nContratosEspec%C3%ADficosSDA25.pdf"
+        },
+        {
+          "id": "DOC_OBTENCION_LICITADORES_AUNA",
+          "type": "pdf",
+          "title": "Instrucciones — obtención de licitadores en AUNA (SDA 25/2022)",
+          "url": "https://contratacioncentralizada.gob.es/documents/32143/48667/OBTENCION%2BLICITADORES%2BDE%2BAUNA%2BSDA%2B25.pdf"
+        },
+        {
+          "id": "DOC_DACI_PRTR",
+          "type": "pdf",
+          "title": "Modelo solicitud DACI (PRTR)",
+          "url": "https://contratacioncentralizada.gob.es/documents/32143/48667/Solicitud%2BDACI_DGRCC.pdf"
+        },
+        {
+          "id": "CATALOG_SEARCH_PAGE",
+          "type": "html",
+          "title": "Consulta de productos y servicios — SDA 25/2022",
+          "url": "https://contratacioncentralizada.gob.es/web/dgrcc/consulta-de-productos-y-servicios?acuerdo=2"
+        },
+        {
+          "id": "PLACSP_SEARCH",
+          "type": "html",
+          "title": "PLACSP — búsqueda por expediente 2022/48",
+          "url": "https://contrataciondelestado.es/wps/portal/plataforma/buscadores/busquedaRapida"
+        }
+      ]
+    },
+    {
+      "nombre": "Servicios postales de cartas certificadas y ordinarias",
+      "titulo_oficial": "Servicios postales de carta certificada y ordinaria, envíos publicitarios y franqueo en destino",
+      "expediente": "2024/15",
+      "expediente_placsp": "2024/15",
+      "tipo": "Servicios",
+      "valor_estimado_sin_iva_eur": 139811932.83,
+      "descripcion": "Contrato centralizado para la prestación de los servicios postales de carta certificada y ordinaria y otros servicios postales complementarios, requeridos por los Ministerios, Entidades Gestoras y Servicios Comunes de la Seguridad Social y organismos públicos del sector público estatal para su funcionamiento y el cumplimiento de sus fines.",
+      "lotes": ["Lote 1", "Lote 2", "Lote 3"],
+      "lotes_detail": [
+        {
+          "lote": "1",
+          "adjudicatario": "SOCIEDAD ESTATAL CORREOS Y TELÉGRAFOS, S.A., S.M.E.",
+          "presupuesto_licitacion_iva_incl_eur": 39206813.52,
+          "importe_adjudicacion_iva_incl_eur": 39206813.52,
+          "entrada_en_vigor": "2024-12-01",
+          "finalizacion": "2027-11-30",
+          "plazo_ejecucion_meses": 36,
+          "ambito_subjetivo_ref": "DOC_AMBITO_SUBJETIVO"
+        },
+        {
+          "lote": "2",
+          "adjudicatario": "SOCIEDAD ESTATAL CORREOS Y TELÉGRAFOS, S.A., S.M.E.",
+          "presupuesto_licitacion_iva_incl_eur": 29459126.19,
+          "importe_adjudicacion_iva_incl_eur": 29459126.19,
+          "entrada_en_vigor": "2024-12-01",
+          "finalizacion": "2027-11-30",
+          "plazo_ejecucion_meses": 36,
+          "ambito_subjetivo_ref": "DOC_AMBITO_SUBJETIVO"
+        },
+        {
+          "lote": "3",
+          "adjudicatario": "SOCIEDAD ESTATAL CORREOS Y TELÉGRAFOS, S.A., S.M.E.",
+          "presupuesto_licitacion_iva_incl_eur": 41663911.62,
+          "importe_adjudicacion_iva_incl_eur": 41663911.62,
+          "entrada_en_vigor": "2024-12-01",
+          "finalizacion": "2027-11-30",
+          "plazo_ejecucion_meses": 36,
+          "ambito_subjetivo_ref": "DOC_AMBITO_SUBJETIVO"
+        }
+      ],
+      "pricing_notes": [
+        "El valor estimado está expresado sin IVA ni otros impuestos.",
+        "El presupuesto de licitación y el importe de adjudicación incluyen IVA y otros impuestos, pero no incluyen prórrogas ni posibles modificaciones."
+      ],
+      "duracion": "Del 01/12/2024 al 30/11/2027. Admite prórroga por un plazo de 12 meses.",
+      "enlace": "https://contratacioncentralizada.gob.es/web/dgrcc/-/ficha-contratos-centralizados-postales-certificadas",
+      "procurement_modes": {
+        "H": false,
+        "B": false,
+        "default": null,
+        "notes": "Contrato centralizado: no aplica Compra Directa (H) / Segunda Licitación (B). El organismo utiliza el contrato vigente conforme a sus pliegos y documentación asociada."
+      },
+      "central_contract_usage": {
+        "how_to_choose_lote": "El lote se determina por el ámbito subjetivo del contrato (documento publicado en la ficha).",
+        "decision_rule": "Buscar el organismo en el documento de ámbito subjetivo y aplicar el lote indicado (1/2/3).",
+        "notes": "Si el organismo no figura en el ámbito subjetivo, el contrato no aplica y deberá tramitarse fuera del contrato centralizado."
+      }
+    },
+    {
+      "nombre": "Telecomunicaciones (fase 2)",
+      "titulo_oficial": "Servicios consolidados de Telecomunicaciones de la Administración General del Estado Fase 2",
+      "expediente": "Contrato centralizado",
+      "expediente_placsp": "11/18",
+      "tipo": "Servicios",
+      "valor_estimado_sin_iva_eur": 378118354.7,
+      "descripcion": "El contrato centralizado de telecomunicaciones unifica los contratos de servicios de telecomunicaciones de los distintos departamentos ministeriales y organismos públicos, consolidando: voz y datos fijos, datos y voz móviles, acceso a Internet y red internacional. Incluye la provisión y gestión de servicios necesarios para las sedes incluidas en el ámbito subjetivo, en territorio español y en el exterior, así como la Red SARA (interconexión de Administraciones Públicas).",
+      "lotes": [
+        "Lote 1: Red corporativa multiservicio y servicio de telefonía fija",
+        "Lote 2: Comunicaciones móviles",
+        "Lote 3: Internet",
+        "Lote 4: Red internacional"
+      ],
+      "lotes_detail": [
+        {
+          "lote": "1",
+          "ambito": "Red corporativa multiservicio y servicio de telefonía fija",
+          "adjudicatario": "TELEFÓNICA DE ESPAÑA, S.A.U.",
+          "presupuesto_licitacion_iva_incl_eur": 171149378.61,
+          "importe_adjudicacion_iva_incl_eur": 148829983.95,
+          "entrada_en_vigor": "2020-03-01",
+          "finalizacion": "2023-09-10",
+          "plazo_ejecucion": "5 años (con prórroga)"
+        },
+        {
+          "lote": "2",
+          "ambito": "Comunicaciones móviles",
+          "adjudicatario": "VODAFONE ESPAÑA, S.A.U.",
+          "presupuesto_licitacion_iva_incl_eur": 31325689.34,
+          "importe_adjudicacion_iva_incl_eur": 12529254.07,
+          "entrada_en_vigor": "2020-03-01",
+          "finalizacion": "2023-09-10",
+          "plazo_ejecucion": "5 años (con prórroga)"
+        },
+        {
+          "lote": "3",
+          "ambito": "Internet",
+          "adjudicatario": "TELEFÓNICA DE ESPAÑA, S.A.U.",
+          "presupuesto_licitacion_iva_incl_eur": 19291361.56,
+          "importe_adjudicacion_iva_incl_eur": 13515699.63,
+          "entrada_en_vigor": "2020-03-01",
+          "finalizacion": "2023-09-10",
+          "plazo_ejecucion": "5 años (con prórroga)"
+        },
+        {
+          "lote": "4",
+          "ambito": "Red internacional",
+          "adjudicatario": "BT ESPAÑA COMPAÑIA DE SERVICIOS GLOBALES DE TELECOMUNICACIONES, S.A.U.",
+          "presupuesto_licitacion_iva_incl_eur": 63252976.61,
+          "importe_adjudicacion_iva_incl_eur": 48364141.49,
+          "entrada_en_vigor": "2020-03-01",
+          "finalizacion": "2023-09-10",
+          "plazo_ejecucion": "5 años (con prórroga)"
+        }
+      ],
+      "pricing_notes": [
+        "El valor estimado está expresado sin IVA ni otros impuestos.",
+        "El presupuesto de licitación y el importe de adjudicación incluyen IVA y otros impuestos, pero no incluyen prórrogas ni posibles modificaciones."
+      ],
+      "duracion": "Duración inicial: 01/03/2020–10/09/2023. Prórroga: hasta un máximo de 5 años. Según la ficha del catálogo, el contrato se encuentra prorrogado hasta 28/02/2025.",
+      "enlace": "https://contratacioncentralizada.gob.es/web/dgrcc/-/ficha-contratos-centralizados-telecomunicaciones",
+      "procurement_modes": {
+        "H": false,
+        "B": false,
+        "default": null,
+        "notes": "Contrato centralizado: no aplica Compra Directa (H) / Segunda Licitación (B). El organismo aplica el contrato vigente conforme a sus pliegos, ámbito subjetivo y documentación asociada."
+      },
+      "central_contract_usage": {
+        "how_to_apply": "Verificar que el organismo está incluido en el ámbito subjetivo del contrato (Anexo II) y aplicar el/los lotes y procedimientos establecidos en los pliegos y documentación del contrato.",
+        "ambito_subjetivo_ref": "DOC_AMBITO_SUBJETIVO"
+      },
+      "mode_constraints": {},
+      "instrumento": "Contrato centralizado",
+      "categoria_catalogo": "Contratos centralizados",
+      "id": "CC_TELECOM_FASE_2",
+      "status": "finalizado",
+      "validity": {
+        "raw": "Prorrogado hasta 28/02/2025 (según ficha del catálogo)."
+      },
+      "integrity_notes": "La ficha no indica prórrogas posteriores al 28/02/2025; a fecha de revisión (25/01/2026) este contrato debería considerarse expirado salvo actualización posterior no reflejada en la ficha.",
+      "sources": [
+        {
+          "id": "CATALOG_PAGE",
+          "type": "html",
+          "title": "Ficha en catálogo DGRCC — Telecomunicaciones AGE Fase 2",
+          "url": "https://contratacioncentralizada.gob.es/web/dgrcc/-/ficha-contratos-centralizados-telecomunicaciones"
+        },
+        {
+          "id": "DOC_AMBITO_SUBJETIVO",
+          "type": "pdf",
+          "title": "Ámbito subjetivo del contrato (Anexo II)",
+          "url": "https://contratacioncentralizada.gob.es/documents/d/dgrcc/anexo_ii_ambito_subjetivo"
+        },
+        {
+          "id": "PLACSP_DETAIL",
+          "type": "html",
+          "title": "PLACSP — Pliegos e información del contrato (Expte. 11/18)",
+          "url": "https://contrataciondelestado.es/wps/poc?idEvl=Mz%2FdJfSnxz%2FrkiGz%2B3xDRw%3D%3D&uri=deeplink%3Adetalle_licitacion"
+        },
+        {
+          "id": "DOC_CNMC",
+          "type": "pdf",
+          "title": "Informe de la CNMC",
+          "url": "https://contratacioncentralizada.gob.es/documents/32143/62985/INFCNMC_014_19_TELECOMUNICACIONES.pdf"
+        },
+        {
+          "id": "DOC_CNMC_NOTA",
+          "type": "pdf",
+          "title": "Nota explicativa sobre observaciones de la CNMC",
+          "url": "https://contratacioncentralizada.gob.es/documents/32143/62985/Nota_explicativa_CNMC_Telecomunicaciones.pdf"
+        }
+      ]
+    },
+    {
+      "nombre": "Control de publicidad institucional",
+      "titulo_oficial": "Servicio de evaluación ex post de la eficacia de las campañas de publicidad institucional",
+      "expediente": "2020/54",
+      "expediente_placsp": "2020/54",
+      "tipo": "Servicios",
+      "valor_estimado_sin_iva_eur": 1027438,
+      "descripcion": "Contrato centralizado para la evaluación ex post de la eficacia de las campañas de publicidad institucional (post-test), incluyendo medición de notoriedad/recuerdo, impacto y cumplimiento de objetivos del plan anual o excepcional conforme a la Ley 29/2005.",
+      "lotes": ["Lote único"],
+      "lotes_detail": [
+        {
+          "lote": "1",
+          "adjudicatario": "MEMORÁNDUM MULTIMEDIA, S.L.",
+          "presupuesto_licitacion_iva_incl_eur": 518000,
+          "importe_adjudicacion_iva_incl_eur": 518000,
+          "entrada_en_vigor": "2021-08-01",
+          "finalizacion": "2023-07-31",
+          "plazo_ejecucion_meses": 24
+        }
+      ],
+      "duracion": "Duración inicial: 01/08/2021–31/07/2023 (24 meses). 1ª prórroga: 01/08/2023–31/07/2024. 2ª prórroga: 01/08/2024–31/07/2025. Sin más prórrogas.",
+      "enlace": "https://contratacioncentralizada.gob.es/web/dgrcc/-/ficha-contratos-centralizados-control-publicidad-institucional",
+      "procurement_modes": {
+        "H": false,
+        "B": false,
+        "default": null,
+        "notes": "Contrato centralizado: no aplica Compra Directa (H) / Segunda Licitación (B). El organismo aplica el contrato vigente conforme a sus pliegos y documentación asociada."
+      },
+      "mode_constraints": {},
+      "central_contract_usage": {
+        "scope": "Campañas de publicidad institucional incluidas en el Plan anual y en el Plan excepcional (Ley 29/2005 y desarrollo reglamentario).",
+        "how_to_apply": "Tramitar la solicitud del servicio conforme a instrucciones y pliegos del contrato centralizado (p. ej., a través de la Oficina de Contratación de la Secretaría de Estado de Comunicación cuando proceda).",
+        "closing_milestones_2025": {
+          "fecha_limite_solicitud": "2025-06-13",
+          "cierre_campanas": "2025-06-30",
+          "entrega_informes": "2025-07-31",
+          "notes": "Hitos de cierre publicados con motivo de la finalización del contrato (prorrogado hasta 31/07/2025)."
+        }
+      },
+      "instrumento": "Contrato centralizado",
+      "categoria_catalogo": "Contratos centralizados",
+      "id": "CC_CONTROL_PUBLICIDAD",
+      "status": "finalizado",
+      "validity": {
+        "raw": "Contrato prorrogado hasta 31/07/2025 (sin más prórrogas). A 25/01/2026 no existe contrato vigente para este servicio; hay una nueva contratación en tramitación (Expte. 2025/77) según PACC 2026."
+      },
+      "successor_procurement": {
+        "expediente_placsp": "2025/77",
+        "notes": "Nueva licitación del servicio en tramitación según el Plan anual de contratación centralizada 2026 (fecha exacta de entrada en vigor a confirmar en PLACSP)."
+      },
+      "responsable_contrato": "Subdirección General de Contratación Centralizada de Servicios y Suministros para la Gestión de Inmuebles",
+      "contacto": {
+        "email": "publicidadinstitucional@hacienda.gob.es"
+      },
+      "last_reviewed": "2026-01-25",
+      "sources": [
+        {
+          "id": "CATALOG_PAGE",
+          "type": "html",
+          "title": "Ficha en catálogo DGRCC — Contrato centralizado 2020/54",
+          "url": "https://contratacioncentralizada.gob.es/web/dgrcc/-/ficha-contratos-centralizados-control-publicidad-institucional"
+        },
+        {
+          "id": "DOC_NOTA_ACLARATORIA_UE",
+          "type": "pdf",
+          "title": "Nota aclaratoria — cumplimiento Reglamento Delegado (UE) 2021/1340",
+          "url": "https://contratacioncentralizada.gob.es/documents/32143/67383/NOTA_ACLARATORIA_PUBLICIDADINSTITUCIONAL.pdf"
+        },
+        {
+          "id": "DOC_NOTA_FIN_CC",
+          "type": "pdf",
+          "title": "Nota informativa — finalización del contrato de Control de publicidad institucional (prorrogado hasta 31/07/2025)",
+          "url": "https://contratacioncentralizada.gob.es/documents/32143/67383/Nota_Fin_CC_Control_Publicidad_Institucional.pdf"
+        },
+        {
+          "id": "PACC_2026",
+          "type": "pdf",
+          "title": "Plan anual de contratación centralizada (PACC) 2026 — referencia a finalización y nueva tramitación",
+          "url": "https://contratacioncentralizada.gob.es/documents/d/dgrcc/acuerdo-pacc-1"
+        },
+        {
+          "id": "PLACSP_DETAIL",
+          "type": "html",
+          "title": "PLACSP — detalle de licitación (Expte. 2020/54)",
+          "url": "https://contrataciondelestado.es/wps/poc?idEvl=%2FV%2FHFUHtwKSrz3GQd5r6SQ%3D%3D&uri=deeplink%3Adetalle_licitacion"
+        }
+      ],
+      "semantic_match": {
+        "include_any": [
+          "control de publicidad",
+          "evaluación de campañas",
+          "evaluacion de campanas",
+          "post-test",
+          "tracking",
+          "notoriedad",
+          "audiencia",
+          "kpi",
+          "medición",
+          "medicion",
+          "impacto publicitario"
+        ],
+        "include_all": [],
+        "exclude_any": [
+          "ordenador",
+          "ordenadores",
+          "impresora",
+          "impresoras",
+          "papel",
+          "mobiliario",
+          "vehículo",
+          "vehiculo",
+          "combustible",
+          "electricidad",
+          "licencia",
+          "software"
+        ],
+        "type_primary": "Servicios",
+        "notes": "Solo seleccionar si el objeto es medición/control/seguimiento de campañas publicitarias institucionales."
+      }
+    },
+    {
+      "mode_constraints": {},
+      "instrumento": "Contrato centralizado",
+      "categoria_catalogo": "Contratos centralizados",
+      "id": "CC_CONTROL_PUBLICIDAD",
+      "status": "vigente",
+      "validity": {
+        "raw": "Vigente / prorrogado. Consultar ficha oficial."
+      },
+      "sources": [
+        {
+          "id": "CATALOG_PAGE",
+          "type": "html",
+          "title": "Ficha en catálogo DGRCC",
+          "url": "https://contratacioncentralizada.gob.es/web/dgrcc/-/ficha-contratos-centralizados-control-publicidad-institucional"
+        }
+      ],
+      "semantic_match": {
+        "include_any": [
+          "control de publicidad",
+          "evaluación de campañas",
+          "evaluacion de campanas",
+          "post-test",
+          "tracking",
+          "notoriedad",
+          "audiencia",
+          "kpi",
+          "medición",
+          "medicion",
+          "impacto publicitario"
+        ],
+        "include_all": [],
+        "exclude_any": [
+          "ordenador",
+          "ordenadores",
+          "impresora",
+          "impresoras",
+          "papel",
+          "mobiliario",
+          "vehículo",
+          "vehiculo",
+          "combustible",
+          "electricidad",
+          "licencia",
+          "software"
+        ],
+        "type_primary": "Servicios",
+        "notes": "Solo seleccionar si el objeto es medición/control/seguimiento de campañas publicitarias institucionales."
+      }
+    },
+    {
+      "nombre": "Servicios postales de paquetería y valija nacional",
+      "titulo_oficial": "Contrato centralizado de servicios postales de paquetería y valija nacional",
+      "expediente": "2022/21",
+      "expediente_placsp": "2022/21",
+      "tipo": "Servicios",
+      "valor_estimado_sin_iva_eur": 8238372.04,
+      "descripcion": "Contrato centralizado para la prestación de servicios postales de paquetería y valija nacional, para los organismos incluidos en el ámbito del contrato.",
+      "lotes": ["Lote 1", "Lote 2", "Lote 3"],
+      "lotes_detail": [
+        {
+          "lote": "1",
+          "adjudicatario": "SOCIEDAD ESTATAL CORREOS Y TELÉGRAFOS, S.A., S.M.E.",
+          "presupuesto_licitacion_iva_incl_eur": 1684627.54,
+          "importe_adjudicacion_iva_incl_eur": 1684627.54,
+          "entrada_en_vigor": "2023-04-01",
+          "finalizacion": "2025-03-31",
+          "plazo_ejecucion_meses": 24
+        },
+        {
+          "lote": "2",
+          "adjudicatario": "SOCIEDAD ESTATAL CORREOS Y TELÉGRAFOS, S.A., S.M.E.",
+          "presupuesto_licitacion_iva_incl_eur": 2156326,
+          "importe_adjudicacion_iva_incl_eur": 2156326,
+          "entrada_en_vigor": "2023-04-01",
+          "finalizacion": "2025-03-31",
+          "plazo_ejecucion_meses": 24
+        },
+        {
+          "lote": "3",
+          "adjudicatario": "SOCIEDAD ESTATAL CORREOS Y TELÉGRAFOS, S.A., S.M.E.",
+          "presupuesto_licitacion_iva_incl_eur": 2022828.92,
+          "importe_adjudicacion_iva_incl_eur": 2022828.92,
+          "entrada_en_vigor": "2023-04-01",
+          "finalizacion": "2025-03-31",
+          "plazo_ejecucion_meses": 24
+        }
+      ],
+      "pricing_notes": [
+        "El valor estimado está expresado sin IVA ni otros impuestos.",
+        "El presupuesto de licitación y el importe de adjudicación incluyen IVA y otros impuestos, pero no incluyen prórrogas ni posibles modificaciones."
+      ],
+      "duracion": "Del 01/04/2023 al 31/03/2025 (24 meses).",
+      "enlace": "https://contratacioncentralizada.gob.es/web/dgrcc/-/ficha-contratos-centralizados-servicios-postales-de-paqueter%C3%ADa-y-valija-nacional",
+      "procurement_modes": {
+        "H": false,
+        "B": false,
+        "default": null,
+        "notes": "Contrato centralizado: no aplica Compra Directa (H) / Segunda Licitación (B). El organismo aplica el contrato conforme a su ámbito subjetivo y pliegos."
+      },
+      "mode_constraints": {},
+      "instrumento": "Contrato centralizado",
+      "categoria_catalogo": "Contratos centralizados",
+      "id": "CC_POSTALES_PAQUETERIA_VALIJA",
+      "status": "finalizado",
+      "validity": {
+        "raw": "Entrada en vigor 01/04/2023. Finalización 31/03/2025 (según ficha oficial)."
+      },
+      "responsable_contrato": "Subdirección General de Contratación Centralizada de Servicios y Suministros para la Gestión de Inmuebles",
+      "contacto": {
+        "email": "postalescentralizado1@hacienda.gob.es"
+      },
+      "sources": [
+        {
+          "id": "CATALOG_PAGE",
+          "type": "html",
+          "title": "Ficha en catálogo DGRCC — Contrato centralizado 2022/21",
+          "url": "https://contratacioncentralizada.gob.es/web/dgrcc/-/ficha-contratos-centralizados-servicios-postales-de-paqueter%C3%ADa-y-valija-nacional"
+        },
+        {
+          "id": "PLACSP_SEARCH",
+          "type": "html",
+          "title": "PLACSP — búsqueda por expediente 2022/21",
+          "url": "https://contrataciondelestado.es/wps/portal/plataforma/buscadores/busquedaRapida"
+        }
+      ]
+    },
+    {
+      "nombre": "Servicios postales de notificación",
+      "titulo_oficial": "Servicios postales de notificaciones administrativas y judiciales",
+      "expediente": "2023/76",
+      "expediente_placsp": "2023/76",
+      "tipo": "Servicios",
+      "valor_estimado_sin_iva_eur": 441499887.79,
+      "presupuesto_licitacion_iva_incl_eur": 445179053.52,
+      "importe_adjudicacion_iva_incl_eur": 445179053.52,
+      "descripcion": "Contrato centralizado para la prestación de servicios postales de notificaciones administrativas y judiciales a los organismos incluidos en su ámbito subjetivo.",
+      "lotes": ["Lote único"],
+      "lotes_detail": [
+        {
+          "lote": "1",
+          "adjudicatario": "SOCIEDAD ESTATAL CORREOS Y TELÉGRAFOS, S.A., S.M.E.",
+          "entrada_en_vigor": "2023-12-01",
+          "finalizacion": "2026-11-30",
+          "plazo_ejecucion_meses": 36
+        }
+      ],
+      "pricing_notes": [
+        "El valor estimado está expresado sin IVA ni otros impuestos.",
+        "El presupuesto de licitación y el importe de adjudicación incluyen IVA y otros impuestos, pero no incluyen prórrogas ni posibles modificaciones."
+      ],
+      "duracion": "Del 01/12/2023 al 30/11/2026 (36 meses). Sin prórrogas.",
+      "enlace": "https://contratacioncentralizada.gob.es/web/dgrcc/-/ficha-contratos-centralizados-servicios-postales-de-notificacion",
+      "procurement_modes": {
+        "H": false,
+        "B": false,
+        "default": null,
+        "notes": "Contrato centralizado: no aplica Compra Directa (H) / Segunda Licitación (B)."
+      },
+      "central_contract_usage": {
+        "how_to_apply": "Comprobar que el organismo está incluido en el ámbito subjetivo del contrato (Anexo I) y aplicar el servicio conforme a los pliegos y documentación publicada.",
+        "ambito_subjetivo_ref": "DOC_AMBITO_SUBJETIVO"
+      },
+      "mode_constraints": {},
+      "instrumento": "Contrato centralizado",
+      "categoria_catalogo": "Contratos centralizados",
+      "id": "CC_POSTALES_NOTIFICACION",
+      "status": "vigente",
+      "validity": {
+        "raw": "Entrada en vigor 01/12/2023. Finalización 30/11/2026. Sin prórrogas."
+      },
+      "responsable_contrato": "Subdirección General de Contratación Centralizada de Servicios y Suministros para la Gestión de Inmuebles",
+      "contacto": {
+        "email": "postalescentralizado1@hacienda.gob.es"
+      },
+      "last_reviewed": "2026-01-25",
+      "sources": [
+        {
+          "id": "CATALOG_PAGE",
+          "type": "html",
+          "title": "Ficha en catálogo DGRCC — Contrato centralizado 2023/76",
+          "url": "https://contratacioncentralizada.gob.es/web/dgrcc/-/ficha-contratos-centralizados-servicios-postales-de-notificacion"
+        },
+        {
+          "id": "DOC_AMBITO_SUBJETIVO",
+          "type": "pdf",
+          "title": "Anexo I — Ámbito subjetivo del contrato (Exp. 2023/76)",
+          "url": "https://contratacioncentralizada.gob.es/documents/d/dgrcc/notificaciones-anexo-i-ambito-subjetivo"
+        },
+        {
+          "id": "PLACSP_DETAIL",
+          "type": "html",
+          "title": "PLACSP — detalle de licitación (Expte. 2023/76)",
+          "url": "https://contrataciondelestado.es/wps/poc/!ut/p/z1/pY_LDoIwEEW_hQ8wCITg0hYjwpGxqqYpI1q2Tqz1wK_vL5bg0mTSzL5zZp6D4E9HnH9o_vLq1uSmQiuUxOUiA8oQYzVgYwDsM4QY0xg1wTt7wMZ7n3FZl6q2cXU8Kcw1rXo3NfQ4K_b8IhhmTNG8cnw2P-8g6bq0b5kqkVrQb3A8Y5nO5O3tDqP9Xc1oX5mEATbD6xAhg4VJr3y1kClp4lRjVCnCzVJxN0!/dz/d5/L2dBISEvZ0FBIS9nQSEh/"
+        }
+      ]
+    },
+    {
+      "nombre": "Agencia de viajes",
+      "titulo_oficial": "Contrato centralizado de servicios de agencia de viajes",
+      "expediente": "2021/70",
+      "expediente_placsp": "2021/70",
+      "tipo": "Servicios",
+      "valor_estimado_sin_iva_eur": 340305271.28,
+      "descripcion": "Contrato centralizado para la prestación del servicio de agencia de viajes al Sector Público Estatal, incluyendo la gestión de desplazamientos (transporte), alojamiento y otros servicios asociados necesarios para el cumplimiento de la actividad oficial.",
+      "lotes": [
+        "Lote 1: Ministerio de Defensa",
+        "Lote 2: Grupo ministerial (AGE)",
+        "Lote 3: Grupo ministerial (AGE)",
+        "Lote 4: Grupo ministerial (AGE)",
+        "Lote 5: Ministerio del Interior"
+      ],
+      "lotes_detail": [
+        {
+          "lote": "1",
+          "adjudicatario": "UTE IAG7 VIAJES, S.A. – NAUTALIA VIAJES, S.L.",
+          "entrada_en_vigor": "2022-04-22"
+        },
+        {
+          "lote": "2",
+          "adjudicatario": "SEKAI CORPORATE TRAVEL, S.L.U.",
+          "entrada_en_vigor": "2022-04-22"
+        },
+        {
+          "lote": "3",
+          "adjudicatario": "VIAJES EL CORTE INGLÉS, S.A.",
+          "entrada_en_vigor": "2022-04-22"
+        },
+        {
+          "lote": "4",
+          "adjudicatario": "VIAJES EL CORTE INGLÉS, S.A.",
+          "entrada_en_vigor": "2022-04-22"
+        },
+        {
+          "lote": "5",
+          "adjudicatario": "UTE IAG7 VIAJES, S.A. – NAUTALIA VIAJES, S.L.",
+          "entrada_en_vigor": "2022-04-22"
+        }
+      ],
+      "duracion": "Vigencia inicial: 22/04/2022–21/04/2024. Prórrogas anuales (vigente, según planificación publicada, hasta 21/04/2026).",
+      "enlace": "https://contratacioncentralizada.gob.es/web/dgrcc/-/ficha-contratos-centralizados-agencia-viajes-1",
+      "procurement_modes": {
+        "H": false,
+        "B": false,
+        "default": null,
+        "notes": "Contrato centralizado por lotes. No aplica Compra Directa (H) / Segunda Licitación (B); los organismos utilizan el contrato vigente conforme a sus pliegos y condiciones de uso."
+      },
+      "mode_constraints": {},
+      "instrumento": "Contrato centralizado",
+      "categoria_catalogo": "Contratos centralizados",
+      "id": "CC_AGENCIA_VIAJES",
+      "status": "vigente",
+      "validity": {
+        "raw": "Contrato 2021/70: vigente con prórroga anual; referencia de continuidad hasta 21/04/2026 (consultar ficha oficial para estado exacto)."
+      },
+      "sources": [
+        {
+          "id": "CATALOG_PAGE",
+          "type": "html",
+          "title": "Ficha en catálogo DGRCC — Contrato centralizado de agencia de viajes (Exp. 2021/70)",
+          "url": "https://contratacioncentralizada.gob.es/web/dgrcc/-/ficha-contratos-centralizados-agencia-viajes-1"
+        },
+        {
+          "id": "PACC_2026",
+          "type": "pdf",
+          "title": "Plan anual de contratación centralizada (PACC) 2026 — referencia a prórrogas/continuidad del contrato",
+          "url": "https://contratacioncentralizada.gob.es/documents/d/dgrcc/acuerdo-pacc-1"
+        }
+      ]
+    },
+    {
+      "nombre": "Seguridad de edificios",
+      "expediente": "2023/122",
+      "tipo": "Servicios",
+      "descripcion": "Servicio de seguridad integral y auxiliares de control en edificios del Sector Público Estatal (Comunidad de Madrid).",
+      "lotes": ["Lote 1 al Lote 10: diez grupos de edificios"],
+      "duracion": "Vigente. Ver ficha oficial.",
+      "enlace": "https://contratacioncentralizada.gob.es/web/dgrcc/-/ficha-contratos-centralizados-seguridad-edificios",
+      "procurement_modes": {
+        "H": false,
+        "B": false,
+        "default": null,
+        "notes": "Contrato centralizado: no aplica Compra Directa (H) / Segunda Licitación (B). El uso se realiza conforme a pliegos y condiciones por lote (organismos incluidos en el ámbito subjetivo)."
+      },
+      "integrity_notes": "Pendiente de verificar en ficha/PLACSP: duración exacta, adjudicatarios por lote y si el ámbito territorial se limita a Comunidad de Madrid o incluye otras sedes según lote.",
+      "mode_constraints": {},
+      "instrumento": "Contrato centralizado",
+      "categoria_catalogo": "Contratos centralizados",
+      "id": "CC_SEGURIDAD_EDIFICIOS",
+      "status": "vigente",
+      "validity": {
+        "raw": "Vigente. Consultar ficha oficial."
+      },
+      "sources": [
+        {
+          "id": "CATALOG_PAGE",
+          "type": "html",
+          "title": "Ficha en catálogo DGRCC",
+          "url": "https://contratacioncentralizada.gob.es/web/dgrcc/-/ficha-contratos-centralizados-seguridad-edificios"
+        }
+      ]
+    },
+    {
+      "nombre": "Limpieza de edificios",
+      "titulo_oficial": "Servicios de limpieza integral de inmuebles del sector público estatal ubicados en la Comunidad de Madrid",
+      "expediente": "2023/59",
+      "expediente_placsp": "2023/59",
+      "tipo": "Servicios",
+      "valor_estimado_sin_iva_eur": 408740707.2,
+      "descripcion": "Contrato centralizado para la prestación de servicios de limpieza integral de edificios, locales y oficinas del Sector Público Estatal ubicados en la Comunidad de Madrid. Incluye, entre otros, limpieza de superficies interiores/exteriores (incluyendo, según inmueble, fachadas, cerramientos acristalados y cubiertas), recogida y acopio de residuos, servicios de lavandería/tintorería y servicios de desinfección, desinsectación y desratización.",
+      "lotes": ["Lote 1 al Lote 15: lotes por ministerios/agrupaciones"],
+      "lotes_detail": [
+        {
+          "lote": "1",
+          "adjudicatario": "CEJAL LIMPIEZAS S.L.",
+          "presupuesto_licitacion_iva_incl_eur": 6039864.32,
+          "importe_adjudicacion_iva_incl_eur": 5496276.52,
+          "entrada_en_vigor": "2024-01-01",
+          "finalizacion": "2025-12-31",
+          "plazo_ejecucion_meses": 24
+        },
+        {
+          "lote": "2",
+          "adjudicatario": "UTE SENIOR-INTEGRA",
+          "presupuesto_licitacion_iva_incl_eur": 8283016.14,
+          "importe_adjudicacion_iva_incl_eur": 7037416.82,
+          "entrada_en_vigor": "2024-01-01",
+          "finalizacion": "2025-12-31",
+          "plazo_ejecucion_meses": 24
+        },
+        {
+          "lote": "3",
+          "adjudicatario": "OPTIMA FACILITY SERVICES, S.L.",
+          "presupuesto_licitacion_iva_incl_eur": 24058231.24,
+          "importe_adjudicacion_iva_incl_eur": 17915839.34,
+          "entrada_en_vigor": "2024-01-01",
+          "finalizacion": "2025-12-31",
+          "plazo_ejecucion_meses": 24
+        },
+        {
+          "lote": "4",
+          "adjudicatario": "LACERA SERVICIOS Y MANTENIMIENTO, S.A.",
+          "presupuesto_licitacion_iva_incl_eur": 26685242.02,
+          "importe_adjudicacion_iva_incl_eur": 20715016.72,
+          "entrada_en_vigor": "2024-01-01",
+          "finalizacion": "2025-12-31",
+          "plazo_ejecucion_meses": 24
+        },
+        {
+          "lote": "5",
+          "adjudicatario": "MITIE FACILITIES SERVICES, S.A.U.",
+          "presupuesto_licitacion_iva_incl_eur": 9009705.94,
+          "importe_adjudicacion_iva_incl_eur": 7932959.05,
+          "entrada_en_vigor": "2024-01-01",
+          "finalizacion": "2025-12-31",
+          "plazo_ejecucion_meses": 24
+        },
+        {
+          "lote": "6",
+          "adjudicatario": "SACYR FACILITIES, S.A. (SERVEO FACILITY MANAGEMENT, S.A.)",
+          "presupuesto_licitacion_iva_incl_eur": 11094052.69,
+          "importe_adjudicacion_iva_incl_eur": 9247370.08,
+          "entrada_en_vigor": "2024-01-01",
+          "finalizacion": "2025-12-31",
+          "plazo_ejecucion_meses": 24
+        },
+        {
+          "lote": "7",
+          "adjudicatario": "LACERA SERVICIOS Y MANTENIMIENTO, S.A.",
+          "presupuesto_licitacion_iva_incl_eur": 8167070.48,
+          "importe_adjudicacion_iva_incl_eur": 6780147.75,
+          "entrada_en_vigor": "2024-01-01",
+          "finalizacion": "2025-12-31",
+          "plazo_ejecucion_meses": 24
+        },
+        {
+          "lote": "8",
+          "adjudicatario": "CEJAL LIMPIEZAS S.L.",
+          "presupuesto_licitacion_iva_incl_eur": 9623122.8,
+          "importe_adjudicacion_iva_incl_eur": 7987191.92,
+          "entrada_en_vigor": "2024-01-01",
+          "finalizacion": "2025-12-31",
+          "plazo_ejecucion_meses": 24
+        },
+        {
+          "lote": "9",
+          "adjudicatario": "CEJAL LIMPIEZAS S.L.",
+          "presupuesto_licitacion_iva_incl_eur": 15658922.22,
+          "importe_adjudicacion_iva_incl_eur": 12840316.21,
+          "entrada_en_vigor": "2024-01-01",
+          "finalizacion": "2025-12-31",
+          "plazo_ejecucion_meses": 24
+        },
+        {
+          "lote": "10",
+          "adjudicatario": "UTE TEAMDIVER",
+          "presupuesto_licitacion_iva_incl_eur": 7215071.38,
+          "importe_adjudicacion_iva_incl_eur": 5704731.34,
+          "entrada_en_vigor": "2024-01-01",
+          "finalizacion": "2025-12-31",
+          "plazo_ejecucion_meses": 24
+        },
+        {
+          "lote": "11",
+          "adjudicatario": "FISSA FINALIDAD SOCIAL, S.L. (ISS FACILITY SERVICES, S.A.U.)",
+          "presupuesto_licitacion_iva_incl_eur": 6332085.66,
+          "importe_adjudicacion_iva_incl_eur": 5271841.52,
+          "entrada_en_vigor": "2024-01-01",
+          "finalizacion": "2025-12-31",
+          "plazo_ejecucion_meses": 24
+        },
+        {
+          "lote": "12",
+          "adjudicatario": "MITIE FACILITIES SERVICES, S.A.U.",
+          "presupuesto_licitacion_iva_incl_eur": 12137014.74,
+          "importe_adjudicacion_iva_incl_eur": 9777528.73,
+          "entrada_en_vigor": "2024-01-01",
+          "finalizacion": "2025-12-31",
+          "plazo_ejecucion_meses": 24
+        },
+        {
+          "lote": "13",
+          "adjudicatario": "LACERA SERVICIOS Y MANTENIMIENTO, S.A.",
+          "presupuesto_licitacion_iva_incl_eur": 13810551.81,
+          "importe_adjudicacion_iva_incl_eur": 10413909.99,
+          "entrada_en_vigor": "2024-01-01",
+          "finalizacion": "2025-12-31",
+          "plazo_ejecucion_meses": 24
+        },
+        {
+          "lote": "14",
+          "adjudicatario": "UTE SENIOR-INTEGRA",
+          "presupuesto_licitacion_iva_incl_eur": 20425778.03,
+          "importe_adjudicacion_iva_incl_eur": 16615495.04,
+          "entrada_en_vigor": "2024-01-01",
+          "finalizacion": "2025-12-31",
+          "plazo_ejecucion_meses": 24
+        },
+        {
+          "lote": "15",
+          "adjudicatario": "OPTIMA FACILITY SERVICES, S.L.",
+          "presupuesto_licitacion_iva_incl_eur": 27533710.42,
+          "importe_adjudicacion_iva_incl_eur": 24081155.55,
+          "entrada_en_vigor": "2024-01-01",
+          "finalizacion": "2025-12-31",
+          "plazo_ejecucion_meses": 24
+        }
+      ],
+      "duracion": "Duración inicial: 24 meses (01/01/2024–31/12/2025). Prórroga posible por un máximo total de 24 meses. Prorrogado para todos los lotes: 01/01/2026–31/12/2027.",
+      "enlace": "https://contratacioncentralizada.gob.es/web/dgrcc/-/ficha-contratos-centralizados-limpieza-edificios",
+      "procurement_modes": {
+        "H": false,
+        "B": false,
+        "default": null,
+        "notes": "Contrato centralizado: no aplica Compra Directa (H) / Segunda Licitación (B)."
+      },
+      "mode_constraints": {},
+      "pricing_notes": [
+        "El valor estimado está expresado sin IVA ni otros impuestos.",
+        "El presupuesto de licitación y el importe de adjudicación incluyen IVA y otros impuestos, pero no incluyen prórrogas ni posibles modificaciones."
+      ],
+      "instrumento": "Contrato centralizado",
+      "categoria_catalogo": "Contratos centralizados",
+      "id": "CC_LIMPIEZA_EDIFICIOS",
+      "status": "vigente",
+      "validity": {
+        "raw": "Inicial 01/01/2024–31/12/2025. Prorrogado 01/01/2026–31/12/2027 (todos los lotes)."
+      },
+      "responsable_contrato": "Subdirección General de Contratación Centralizada de Servicios y Suministros de carácter Operativo",
+      "contacto": {
+        "email": "ctlimpieza@hacienda.gob.es"
+      },
+      "last_reviewed": "2026-01-25",
+      "sources": [
+        {
+          "id": "CATALOG_PAGE",
+          "type": "html",
+          "title": "Ficha en catálogo DGRCC — Contrato centralizado Limpieza de edificios (Exp. 2023/59)",
+          "url": "https://contratacioncentralizada.gob.es/web/dgrcc/-/ficha-contratos-centralizados-limpieza-edificios"
+        }
+      ]
+    },
+    {
+      "nombre": "Servicios electrónicos de confianza",
+      "expediente": "Encargo a medio propio (FNMT-RCM)",
+      "tipo": "Encargo a medio propio",
+      "descripcion": "Encargo a la FNMT‑RCM para la prestación de servicios electrónicos de confianza (certificación, sellado de tiempo, asistencia y servicios relacionados) a la AGE y entidades incluidas.",
+      "lotes": [],
+      "duracion": "Vigente. Ver ficha y documento del encargo.",
+      "enlace": "https://contratacioncentralizada.gob.es/es/web/dgrcc/-/ficha-encomienda-gestion-servicios-electronicos",
+      "procurement_modes": {
+        "H": false,
+        "B": false,
+        "default": null,
+        "notes": "No aplica H/B: se trata de un encargo a medio propio."
+      },
+      "mode_constraints": {},
+      "instrumento": "Encargo",
+      "categoria_catalogo": "Encargos a medios propios",
+      "id": "ENCARGO_SERVICIOS_ELECTRONICOS_CONFIANZA",
+      "status": "vigente",
+      "validity": {
+        "raw": "Vigente. Consultar ficha y documento del encargo."
+      },
+      "sources": [
+        {
+          "id": "CATALOG_PAGE",
+          "type": "html",
+          "title": "Ficha en catálogo DGRCC",
+          "url": "https://contratacioncentralizada.gob.es/es/web/dgrcc/-/ficha-encomienda-gestion-servicios-electronicos"
+        }
+      ]
+    },
+    {
+      "id": "AM_ELECTRICIDAD",
+      "nombre": "Electricidad",
+      "titulo_oficial": "Suministro de energía eléctrica",
+      "expediente": "AM 23/2024",
+      "expediente_placsp": "2024/77",
+      "tipo": "Suministro",
+      "descripcion": "Acuerdo marco para el suministro de energía eléctrica (peajes 2.0TD, 3.0TD, 6.1TD, 6.2TD, 6.3TD) para AGE/entidades adheridas.",
+      "lotes": [
+        "Lote 1: Península",
+        "Lote 2: Islas Baleares",
+        "Lote 3: Islas Canarias",
+        "Lote 4: Ceuta",
+        "Lote 5: Melilla"
+      ],
+      "duracion": "Duración: 2 años desde el 15/08/2025.",
+      "enlace": "https://contratacioncentralizada.gob.es/web/dgrcc/-/ficha-ami-electricidad",
+      "procurement_modes": {
+        "H": false,
+        "B": true,
+        "default": "B",
+        "notes": "Según ficha DGRCC, la contratación del suministro se realiza mediante segundas licitaciones aportando CUPS/consumos."
+      },
+      "instrumento": "AM",
+      "categoria_catalogo": "Acuerdos marco",
+      "status": "vigente",
+      "validity": {
+        "raw": "Duración: 2 años desde el 15/08/2025."
+      },
+      "semantic_match": {
+        "include_any": [
+          "suministro eléctrico",
+          "suministro electrico",
+          "energía eléctrica",
+          "energia electrica",
+          "electricidad",
+          "kwh",
+          "cups",
+          "potencia contratada",
+          "tarifa eléctrica",
+          "tarifa electrica"
+        ],
+        "include_all": [],
+        "exclude_any": [
+          "instalación",
+          "instalacion",
+          "obra",
+          "climatización",
+          "climatizacion",
+          "aire acondicionado",
+          "cuadro eléctrico",
+          "cuadro electrico"
+        ],
+        "type_primary": "Suministro",
+        "notes": "Suministro de energía eléctrica (no incluye obras/instalaciones eléctricas)."
+      }
+    },
+    {
+      "id": "AM_EQUIPOS_AUDIOVISUALES",
+      "nombre": "Equipos audiovisuales",
+      "titulo_oficial": "Suministro de equipos audiovisuales",
+      "expediente": "AM 12/2025",
+      "expediente_placsp": "2025/08",
+      "tipo": "Suministro",
+      "descripcion": "Acuerdo marco para suministro de equipos audiovisuales; no detallado, requiere segunda licitación.",
+      "lotes": [
+        "Lote 1: Sistemas audiovisuales",
+        "Lote 2: Videocámaras y cámaras fotográficas portátiles"
+      ],
+      "duracion": "Duración inicial: 2 años desde el 01/02/2026 (prórroga hasta 2 años).",
+      "enlace": "https://contratacioncentralizada.gob.es/web/dgrcc/-/ficha-ami-equipos-audiovisuales-1",
+      "procurement_modes": {
+        "H": false,
+        "B": true,
+        "default": "B",
+        "notes": "Acuerdo marco no detallado; segunda licitación obligatoria."
+      },
+      "instrumento": "AM",
+      "categoria_catalogo": "Acuerdos marco",
+      "status": "vigente",
+      "validity": {
+        "raw": "Duración inicial: 2 años desde el 01/02/2026 (prórroga hasta 2 años)."
+      },
+      "semantic_match": {
+        "include_any": [
+          "videoconferencia",
+          "proyector",
+          "proyectores",
+          "pantalla led",
+          "pantallas led",
+          "sistema audiovisual",
+          "audio",
+          "sonido",
+          "micrófono",
+          "microfono",
+          "altavoces",
+          "cámara",
+          "camara",
+          "sala de reuniones",
+          "sala de actos"
+        ],
+        "include_all": [],
+        "exclude_any": [
+          "puesto de trabajo",
+          "ordenador",
+          "ordenadores",
+          "pc",
+          "portátil",
+          "portatiles",
+          "laptop"
+        ],
+        "type_primary": "Suministro",
+        "notes": "Suministro/instalación de sistemas audiovisuales y videoconferencia (no monitores de puesto de trabajo)."
+      }
+    },
+    {
+      "id": "AM_IMPRESORAS",
+      "nombre": "Impresoras",
+      "titulo_oficial": "Suministro de impresoras, equipos multifuncionales y escáneres",
+      "expediente": "AM 05/2023",
+      "expediente_placsp": "2023/25",
+      "tipo": "Suministro",
+      "descripcion": "Acuerdo marco para impresoras/multifuncionales/escáneres y consumibles.",
+      "lotes": [
+        "Lote 1: Equipos de impresión y multifuncionales oficina B/N",
+        "Lote 2: Equipos de impresión y multifuncionales oficina color",
+        "Lote 3: Equipos multifuncionales de producción B/N",
+        "Lote 4: Equipos multifuncionales de producción color",
+        "Lote 5: Escáneres",
+        "Lote 6: Otras soluciones de impresión y escaneo"
+      ],
+      "duracion": "Vigencia: 2 años (prorrogable hasta 4). Lotes en vigor desde 06/05/2024–10/10/2024 según lote.",
+      "enlace": "https://contratacioncentralizada.gob.es/web/dgrcc/-/ficha-ami-impresoras",
+      "procurement_modes": {
+        "H": true,
+        "B": true,
+        "default": "B",
+        "notes": "Lotes 1–5: posible adjudicación sin nueva licitación o con segunda licitación; Lote 6: no detallado."
+      },
+      "instrumento": "AM",
+      "categoria_catalogo": "Acuerdos marco",
+      "status": "vigente",
+      "validity": {
+        "raw": "Vigencia: 2 años (prorrogable hasta 4). Lotes en vigor desde 06/05/2024–10/10/2024 según lote."
+      },
+      "semantic_match": {
+        "include_any": [
+          "impresora",
+          "impresoras",
+          "impresión",
+          "impresion",
+          "multifunción",
+          "multifuncion",
+          "mfp",
+          "copiadora",
+          "equipo de impresión",
+          "equipo de impresion",
+          "plotter",
+          "escáner",
+          "escaner",
+          "digitalización",
+          "digitalizacion"
+        ],
+        "include_all": [],
+        "exclude_any": [
+          "licencia",
+          "licencias",
+          "software",
+          "desarrollo",
+          "ordenador",
+          "ordenadores",
+          "puesto de trabajo",
+          "pc",
+          "portátil",
+          "portatiles",
+          "laptop"
+        ],
+        "type_primary": "Suministro",
+        "notes": "Suministro de equipos de impresión y digitalización. Puede incluir entrega, instalación, configuración en red, retirada de equipos obsoletos y mantenimiento durante garantía como accesorio."
+      }
+    },
+    {
+      "id": "AM_ORDENADORES_PUESTO_TRABAJO",
+      "nombre": "Ordenadores de puesto de trabajo",
+      "titulo_oficial": "Suministro de ordenadores de mesa, ordenadores portátiles, monitores y otras soluciones de puesto de trabajo",
+      "expediente": "AM 02/2023",
+      "expediente_placsp": "2023/113",
+      "tipo": "Suministro",
+      "descripcion": "Acuerdo marco para ordenadores, portátiles, monitores y soluciones de puesto de trabajo.",
+      "lotes": [
+        "Lote 1: Ordenadores sobremesa estándar",
+        "Lote 2: Ordenadores sobremesa superior",
+        "Lote 3: Portátiles estándar",
+        "Lote 4: Portátiles superior",
+        "Lote 5: Portátiles ultraligeros estándar",
+        "Lote 6: Portátiles ultraligeros superior",
+        "Lote 7: Portátiles 2 en 1",
+        "Lote 8: Monitores 23,6\"",
+        "Lote 9: Monitores 27\"",
+        "Lote 10: Otras soluciones del puesto de trabajo"
+      ],
+      "duracion": "Entrada en vigor por lotes (15/02/2025–19/06/2025).",
+      "enlace": "https://contratacioncentralizada.gob.es/web/dgrcc/-/ficha-ami-suministro-ordenadores",
+      "procurement_modes": {
+        "H": true,
+        "B": true,
+        "default": "B",
+        "notes": "Acuerdo marco con catálogo por lotes; la modalidad depende de instrucciones/condiciones del AM."
+      },
+      "instrumento": "AM",
+      "categoria_catalogo": "Acuerdos marco",
+      "status": "vigente",
+      "validity": {
+        "raw": "Entrada en vigor por lotes (15/02/2025–19/06/2025)."
+      },
+      "semantic_match": {
+        "include_any": [
+          "ordenador",
+          "ordenadores",
+          "pc",
+          "puesto de trabajo",
+          "workstation",
+          "sobremesa",
+          "torre",
+          "portátil",
+          "portatiles",
+          "laptop",
+          "monitor",
+          "pantalla",
+          "docking",
+          "dock",
+          "estación de acoplamiento",
+          "teclado",
+          "ratón",
+          "raton",
+          "renovación de puestos",
+          "dotación informática",
+          "equipamiento informático",
+          "puesta en marcha",
+          "retirada de equipos"
+        ],
+        "include_all": [],
+        "exclude_any": [
+          "impresora",
+          "multifunción",
+          "mfp",
+          "copiadora",
+          "licencia",
+          "licencias",
+          "software",
+          "desarrollo",
+          "router",
+          "switch",
+          "telecomunic"
+        ],
+        "type_primary": "Suministro",
+        "notes": "Suministro TIC de puesto de trabajo. Puede incluir instalación/configuración en red, retirada de equipos y puesta en marcha como prestaciones accesorias sin dejar de ser suministro."
+      }
+    },
+    {
+      "id": "AM_MUEBLES",
+      "nombre": "Muebles",
+      "titulo_oficial": "Suministro de mobiliario de despacho y complementario, de archivo, de bibliotecas, mamparas, clínico y geriátrico, y de laboratorio",
+      "expediente": "AM 01/2024",
+      "expediente_placsp": "2024/51",
+      "tipo": "Suministro",
+      "descripcion": "Acuerdo marco para suministro de mobiliario; contratos <15.000€ quedan fuera.",
+      "lotes": [
+        "Lote 1: Despachos dirección y mesas estrado",
+        "Lote 2: Mueble de oficina general",
+        "Lote 3: Sillería",
+        "Lote 4: Butacas para salones de actos",
+        "Lote 5: Estanterías",
+        "Lote 6: Biombos, tabiques y mamparas",
+        "Lote 7: Mobiliario técnico de laboratorio",
+        "Lote 8: Mobiliario clínico y geriátrico"
+      ],
+      "duracion": "Duración por lote: 36 meses. Entrada en vigor: 15/01/2026 (salvo Lote 3 más adelante). Prórroga hasta 12 meses.",
+      "enlace": "https://contratacioncentralizada.gob.es/web/dgrcc/-/ficha-ami-muebles",
+      "procurement_modes": {
+        "H": false,
+        "B": true,
+        "default": "B",
+        "notes": "AM no detallado (sin catálogo de precios). Segunda licitación por defecto; existe subcatálogo 'Muebles compra directa' para ciertas categorías."
+      },
+      "instrumento": "AM",
+      "categoria_catalogo": "Acuerdos marco",
+      "status": "vigente",
+      "validity": {
+        "raw": "Duración por lote: 36 meses. Entrada en vigor: 15/01/2026 (salvo Lote 3 más adelante). Prórroga hasta 12 meses."
+      },
+      "semantic_match": {
+        "include_any": [
+          "mobiliario",
+          "muebles",
+          "mesa",
+          "mesas",
+          "silla",
+          "sillas",
+          "armario",
+          "armarios",
+          "archivador",
+          "archivadores",
+          "estantería",
+          "estanteria",
+          "mampara",
+          "puestos de trabajo mobiliario"
+        ],
+        "include_all": [],
+        "exclude_any": [
+          "ordenador",
+          "ordenadores",
+          "impresora",
+          "impresoras",
+          "vehículo",
+          "vehiculo",
+          "combustible",
+          "electricidad"
+        ],
+        "type_primary": "Suministro",
+        "notes": "Suministro/instalación de mobiliario de oficina."
+      }
+    },
+    {
+      "id": "AM_MUEBLES_COMPRA_DIRECTA",
+      "nombre": "Muebles (compra directa)",
+      "titulo_oficial": "Subcatálogo de compra directa del AM 01/2024 (Muebles)",
+      "expediente": "AM 01/2024",
+      "tipo": "Suministro",
+      "descripcion": "Vista/índice para productos/categorías del AM 01/2024 que podrán tramitarse sin segunda licitación cuando se fijen sus términos.",
+      "lotes": [],
+      "duracion": "Subcatálogo asociado al AM 01/2024 (entrada en vigor general 15/01/2026).",
+      "enlace": "https://contratacioncentralizada.gob.es/web/dgrcc/-/ficha-ami-muebles-compra-directa",
+      "procurement_modes": {
+        "H": true,
+        "B": false,
+        "default": "H",
+        "notes": "Compra directa aplicable a ciertas categorías de Lotes 2 y 3 conforme a PCAP/instrucciones; ver ficha oficial."
+      },
+      "instrumento": "AM",
+      "categoria_catalogo": "Acuerdos marco",
+      "status": "vigente",
+      "validity": {
+        "raw": "Subcatálogo asociado al AM 01/2024 (entrada en vigor general 15/01/2026)."
+      },
+      "integrity_notes": "No es un AM independiente: es un subcatálogo/ícono vinculado al AM 01/2024.",
+      "semantic_match": {
+        "include_any": [
+          "reposición",
+          "reposicion",
+          "silla",
+          "sillas",
+          "mesa",
+          "mesas",
+          "armario",
+          "armarios",
+          "mobiliario",
+          "muebles",
+          "catalogo"
+        ],
+        "include_all": [],
+        "exclude_any": [
+          "ordenador",
+          "impresora",
+          "vehículo",
+          "combustible",
+          "electricidad"
+        ],
+        "type_primary": "Suministro",
+        "notes": "Compra directa de mobiliario de catálogo (subcatálogo del AM de muebles)."
+      }
+    },
+    {
+      "id": "AM_PAPEL",
+      "nombre": "Papel",
+      "titulo_oficial": "Suministro de papel de equipos de impresión, fotocopiadoras, copiadoras y multicopiadoras",
+      "expediente": "AM 20/2023",
+      "expediente_placsp": "2023/57",
+      "tipo": "Suministro",
+      "descripcion": "Acuerdo marco para suministro de papel DIN A4/A3.",
+      "lotes": ["Lote 1: Papel de fibra virgen", "Lote 2: Papel reciclado"],
+      "duracion": "Vigencia: 01/04/2024–31/03/2025; prorrogado hasta 31/03/2026.",
+      "enlace": "https://contratacioncentralizada.gob.es/web/dgrcc/-/ficha-ami-papel",
+      "procurement_modes": {
+        "H": true,
+        "B": true,
+        "default": "B",
+        "notes": "Con valor estimado ≥10.000€: segunda licitación; <10.000€: posible adjudicación directa al más económico."
+      },
+      "instrumento": "AM",
+      "categoria_catalogo": "Acuerdos marco",
+      "status": "proximo_vencimiento",
+      "validity": {
+        "raw": "Vigencia: 01/04/2024–31/03/2025; prorrogado hasta 31/03/2026."
+      },
+      "semantic_match": {
+        "include_any": [
+          "papel a4",
+          "papel",
+          "resma",
+          "resmas",
+          "gramaje",
+          "paquetes",
+          "paquete de papel",
+          "folios"
+        ],
+        "include_all": [],
+        "exclude_any": [
+          "impresora",
+          "ordenador",
+          "mobiliario",
+          "vehículo",
+          "combustible",
+          "electricidad"
+        ],
+        "type_primary": "Suministro",
+        "notes": "Suministro de papel de impresión (A4/A3 y similares)."
+      }
+    },
+    {
+      "id": "AM_MATERIAL_OFICINA",
+      "nombre": "Material de oficina",
+      "titulo_oficial": "Suministro de material de oficina no inventariable (no vigente)",
+      "expediente": "AM 07/2016",
+      "expediente_placsp": "45/15",
+      "tipo": "Suministro",
+      "descripcion": "Histórico: material de oficina no inventariable (MONI).",
+      "lotes": [],
+      "duracion": "No vigente (según ficha DGRCC). Última prórroga finalizó el 30/04/2021.",
+      "enlace": "https://contratacioncentralizada.gob.es/web/dgrcc/-/ficha-ami-material-oficina",
+      "procurement_modes": {
+        "H": true,
+        "B": false,
+        "default": "H",
+        "notes": "(Histórico) AM con todos los términos establecidos."
+      },
+      "instrumento": "AM",
+      "categoria_catalogo": "Acuerdos marco",
+      "status": "finalizado",
+      "validity": {
+        "raw": "No vigente (según ficha DGRCC). Última prórroga finalizó el 30/04/2021."
+      },
+      "semantic_match": {
+        "include_any": [
+          "material de oficina",
+          "bolígrafos",
+          "boligrafos",
+          "carpetas",
+          "grapadoras",
+          "post-it",
+          "rotuladores",
+          "papelería",
+          "papeleria"
+        ],
+        "include_all": [],
+        "exclude_any": [],
+        "type_primary": "Suministro",
+        "notes": "Acuerdo marco histórico; no recomendar si status != vigente."
+      }
+    }
+  ],
+  "procurement_flow": {
+    "glossary": {
+      "H": {
+        "name": "Compra Directa",
+        "definition": "Modalidad de adjudicación donde el organismo selecciona los productos o servicios directamente del catálogo del Acuerdo Marco sin necesidad de convocar una nueva competencia entre las empresas.",
+        "functioning": "Se eligen los bienes definidos previamente y se adjudican a la empresa que corresponda según las condiciones fijadas en el acuerdo (precio, disponibilidad, etc.)."
+      },
+      "B": {
+        "name": "Segunda Licitación",
+        "definition": "Modalidad que obliga a realizar una nueva licitación (mini‑concurso) invitando a todas las empresas que forman parte del Acuerdo Marco o Sistema Dinámico para ese lote.",
+        "functioning": "No se puede comprar directamente; es necesario que las empresas homologadas presenten una nueva oferta ajustada a los requerimientos específicos de ese contrato (Documento de Licitación o Invitación)."
+      }
+    }
+  }
+}
