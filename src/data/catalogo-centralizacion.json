@@ -2385,56 +2385,6 @@
       }
     },
     {
-      "mode_constraints": {},
-      "instrumento": "Contrato centralizado",
-      "categoria_catalogo": "Contratos centralizados",
-      "id": "CC_CONTROL_PUBLICIDAD",
-      "status": "vigente",
-      "validity": {
-        "raw": "Vigente / prorrogado. Consultar ficha oficial."
-      },
-      "sources": [
-        {
-          "id": "CATALOG_PAGE",
-          "type": "html",
-          "title": "Ficha en catálogo DGRCC",
-          "url": "https://contratacioncentralizada.gob.es/web/dgrcc/-/ficha-contratos-centralizados-control-publicidad-institucional"
-        }
-      ],
-      "semantic_match": {
-        "include_any": [
-          "control de publicidad",
-          "evaluación de campañas",
-          "evaluacion de campanas",
-          "post-test",
-          "tracking",
-          "notoriedad",
-          "audiencia",
-          "kpi",
-          "medición",
-          "medicion",
-          "impacto publicitario"
-        ],
-        "include_all": [],
-        "exclude_any": [
-          "ordenador",
-          "ordenadores",
-          "impresora",
-          "impresoras",
-          "papel",
-          "mobiliario",
-          "vehículo",
-          "vehiculo",
-          "combustible",
-          "electricidad",
-          "licencia",
-          "software"
-        ],
-        "type_primary": "Servicios",
-        "notes": "Solo seleccionar si el objeto es medición/control/seguimiento de campañas publicitarias institucionales."
-      }
-    },
-    {
       "nombre": "Servicios postales de paquetería y valija nacional",
       "titulo_oficial": "Contrato centralizado de servicios postales de paquetería y valija nacional",
       "expediente": "2022/21",
