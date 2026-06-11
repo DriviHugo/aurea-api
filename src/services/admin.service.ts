@@ -181,7 +181,9 @@ export class AdminService {
     const [total, active, newThisMonth, roleCounts] = await Promise.all([
       this.prisma.profile.count(),
       this.prisma.profile.count({ where: { active: true } }),
-      this.prisma.profile.count({ where: { createdAt: { gte: startOfMonth } } }),
+      this.prisma.profile.count({
+        where: { createdAt: { gte: startOfMonth } },
+      }),
       this.prisma.userRoleAssignment.groupBy({
         by: ["role"],
         _count: { role: true },

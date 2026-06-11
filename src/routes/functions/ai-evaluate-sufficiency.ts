@@ -7,6 +7,7 @@
 import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
 import { getProductionGateway } from "../../services/ai-gateway/production-gateway.js";
 import type { FallbackAIGatewayService } from "../../services/ai-gateway/fallback-gateway.service.js";
+import { logAICall } from "./log-ai-call.js";
 
 let aiGateway: FallbackAIGatewayService | null = null;
 
@@ -187,6 +188,22 @@ ${previousAnswers.map((a) => `P: ${a.question}\nR: ${a.answer}`).join("\n\n")}`;
             }
           }
         }
+
+        // Persist log (fire-and-forget)
+        logAICall({
+          prisma,
+          functionCode: "ai-evaluate-sufficiency",
+          functionName: "AI Evaluate Sufficiency",
+          providerName: result.provider,
+          model: result.model ?? "default",
+          userPrompt,
+          inputVariables: { sectionId, documentId, sectionTitle, sectionDescription },
+          response: parsed,
+          tokensInput: result.usage?.promptTokens ?? null,
+          tokensOutput: result.usage?.completionTokens ?? null,
+          status: "success",
+          userId: request.userId ?? null,
+        });
 
         return reply.status(200).send({
           data: {

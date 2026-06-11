@@ -8,6 +8,7 @@
 
 import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
 import { getProductionGateway } from "../../services/ai-gateway/production-gateway.js";
+import { logAICall } from "./log-ai-call.js";
 
 interface AIContractBody {
   type: "improve_subject" | "propose_budget" | "search_cpv";
@@ -119,6 +120,7 @@ export default async function aiContractRoutes(
       reply: FastifyReply,
     ) => {
       const { type, subject, contractType, unit, department } = request.body;
+      const prisma = request.server.prisma;
 
       try {
         const gateway = getProductionGateway();
@@ -192,6 +194,24 @@ Recuerda responder SOLO con JSON válido.`;
           tokensUsed: aiResponse.usage?.totalTokens ?? 0,
           generationTimeMs,
         };
+
+        // Persist log so AI monitoring tab shows data
+        logAICall({
+          prisma,
+          functionCode: `ai-contract.${type}`,
+          functionName: `AI Contract – ${type}`,
+          providerName: aiResponse.provider,
+          model: aiResponse.model,
+          systemPrompt,
+          userPrompt,
+          inputVariables: { type, subject, contractType, unit, department },
+          response: result,
+          tokensInput: aiResponse.usage?.promptTokens ?? null,
+          tokensOutput: aiResponse.usage?.completionTokens ?? null,
+          durationMs: generationTimeMs,
+          status: "success",
+          userId: request.userId ?? null,
+        });
 
         return reply.send(result);
       } catch (error) {

@@ -90,8 +90,7 @@ export function getProductionGateway(): FallbackAIGatewayService {
     // If not set and AI_CLOUD_FALLBACK_KEY is present (dev or staging) → cloud Mistral.
     // If not set and no cloud key → mirror primary (single-node, no real failover).
     const envModel = process.env["AI_MODEL"] ?? "";
-    const hasMistralFallback =
-      !!process.env["AI_CLOUD_FALLBACK_KEY"]?.trim();
+    const hasMistralFallback = !!process.env["AI_CLOUD_FALLBACK_KEY"]?.trim();
     const fallbackConfig = fallbackUrl
       ? {
           provider: AIProvider.ALIA,

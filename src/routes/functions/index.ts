@@ -12,6 +12,7 @@ import aiProcessRepairRoutes from "./ai-process-repair.js";
 import aiEvaluateSufficiencyRoutes from "./ai-evaluate-sufficiency.js";
 import { getProductionGateway } from "../../services/ai-gateway/production-gateway.js";
 import { createCpvService } from "../../services/cpv.service.js";
+import { createAdminService } from "../../services/admin.service.js";
 
 export default async (fastify: FastifyInstance): Promise<void> => {
   // AI Contract functions (improve_subject, propose_budget, search_cpv)
@@ -75,6 +76,22 @@ export default async (fastify: FastifyInstance): Promise<void> => {
       const gateway = getProductionGateway();
       gateway.swap();
       return reply.send(gateway.getProviderInfo());
+    },
+  });
+
+  // POST /functions/import-cpv-codes - Import CPV codes in batch (admin only)
+  fastify.post("/import-cpv-codes", {
+    preValidation: [fastify.authAccessToken],
+    handler: async (request, reply) => {
+      const userId = (request as unknown as { userId: string }).userId;
+      const adminService = createAdminService(fastify.prisma);
+      if (!(await adminService.isAdmin(userId))) {
+        return reply.status(403).send({ error: "Forbidden" });
+      }
+      const cpvService = createCpvService(fastify.prisma);
+      const body = request.body as { cpvData?: unknown[] };
+      const result = await cpvService.importCodes((body.cpvData || []) as any);
+      return reply.send(result);
     },
   });
 };

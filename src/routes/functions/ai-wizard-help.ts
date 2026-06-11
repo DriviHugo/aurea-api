@@ -5,6 +5,7 @@
 
 import type { FastifyInstance } from "fastify";
 import { getProductionGateway } from "../../services/ai-gateway/production-gateway.js";
+import { logAICall } from "./log-ai-call.js";
 
 interface WizardHelpRequest {
   stepId: string;
@@ -143,6 +144,18 @@ Proporciona ayuda contextual y práctica para este paso.`;
 
         try {
           const parsed = JSON.parse(jsonMatch[0]) as Record<string, unknown>;
+          logAICall({
+            prisma: app.prisma,
+            functionCode: `ai-wizard-help.${stepId}${sectionId ? `.${sectionId}` : ""}`,
+            functionName: "AI Wizard Help",
+            providerName: null,
+            model: "default",
+            userPrompt,
+            inputVariables: { stepId, sectionId, subject, contractType },
+            response: parsed,
+            status: "success",
+            userId: request.userId ?? null,
+          });
           return reply.status(200).send(parsed);
         } catch {
           return reply.status(200).send({

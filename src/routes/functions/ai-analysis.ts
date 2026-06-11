@@ -19,6 +19,8 @@ import { buildCatalogContext } from "../private/centralization.routes.js";
 import type { FallbackAIGatewayService } from "../../services/ai-gateway/fallback-gateway.service.js";
 import type { AICompletionResponse } from "../../services/ai-gateway/types.js";
 import logger from "../../config/logger.js";
+import { logAICall } from "./log-ai-call.js";
+import type { PrismaClient } from "@prisma/client";
 
 let aiGateway: FallbackAIGatewayService | null = null;
 
@@ -113,6 +115,12 @@ Formato exacto de respuesta:
 {"items":[{"lotNumber":1,"concept":"Descripción","quantity":1,"unitPrice":1000.00,"costType":"fijo","periodicity":null}]}`,
 };
 
+interface AnalysisLogContext {
+  prisma: PrismaClient;
+  userId?: string | null;
+  inputVariables?: Record<string, unknown>;
+}
+
 // Generic analysis handler - returns parsed JSON merged with _meta (provider info)
 // The _meta field is added to every analysis response so the frontend can show
 // which AI provider (ALIA, Claude, etc.) generated each analysis step.
@@ -121,6 +129,7 @@ async function handleAnalysis(
   systemPrompt: string,
   userPrompt: string,
   analysisName: string,
+  logCtx?: AnalysisLogContext,
 ): Promise<Record<string, unknown>> {
   const startTime = Date.now();
   const response: AICompletionResponse = await gateway.completeWithMeta(
@@ -128,22 +137,67 @@ async function handleAnalysis(
     userPrompt + JSON_SUFFIX,
   );
 
+  const durationMs = Date.now() - startTime;
+
   const buildMeta = () => ({
     provider: response.provider,
     model: response.model,
     tokensUsed: response.usage.totalTokens,
-    generationTimeMs: Date.now() - startTime,
+    generationTimeMs: durationMs,
   });
 
   try {
     const parsed = extractJson(response.content);
-    return { ...parsed, _meta: buildMeta() };
+    const result = { ...parsed, _meta: buildMeta() };
+
+    // Persist log so the AI monitoring tab shows data (fire-and-forget)
+    if (logCtx) {
+      logAICall({
+        prisma: logCtx.prisma,
+        functionCode: `ai-analysis.${analysisName}`,
+        functionName: `AI Analysis – ${analysisName}`,
+        providerName: response.provider,
+        model: response.model,
+        systemPrompt,
+        userPrompt,
+        inputVariables: logCtx.inputVariables ?? {},
+        response: parsed,
+        tokensInput: response.usage?.promptTokens ?? null,
+        tokensOutput: response.usage?.completionTokens ?? null,
+        durationMs,
+        status: "success",
+        userId: logCtx.userId ?? null,
+      });
+    }
+
+    return result;
   } catch (parseErr) {
     logger.error({
       msg: `[AI-Analysis] Failed to parse ${analysisName} response`,
       error: (parseErr as Error).message,
       responseContent: response.content.substring(0, 500),
     });
+
+    // Log the error too
+    if (logCtx) {
+      logAICall({
+        prisma: logCtx.prisma,
+        functionCode: `ai-analysis.${analysisName}`,
+        functionName: `AI Analysis – ${analysisName}`,
+        providerName: response.provider,
+        model: response.model,
+        systemPrompt,
+        userPrompt,
+        inputVariables: logCtx.inputVariables ?? {},
+        tokensInput: response.usage?.promptTokens ?? null,
+        tokensOutput: response.usage?.completionTokens ?? null,
+        durationMs,
+        status: "error",
+        errorMessage: (parseErr as Error).message,
+        userId: logCtx.userId ?? null,
+      });
+    }
+
     throw new Error(
       `Error al procesar la respuesta de IA para ${analysisName}`,
     );
@@ -305,6 +359,7 @@ ${optionalField(department, "ÓRGANO")}`;
           PROMPTS.cpv,
           userPrompt,
           "CPV",
+          { prisma: app.prisma, userId: req.userId, inputVariables: { subject, unit, department } },
         );
         return reply.send(result);
       } catch (error) {
@@ -336,6 +391,7 @@ ${optionalField(department, "ÓRGANO")}`;
           PROMPTS.tipo,
           userPrompt,
           "Tipo",
+          { prisma: app.prisma, userId: req.userId, inputVariables: { subject, unit, department, mainCpv } },
         );
         return reply.send(result);
       } catch (error) {
@@ -366,6 +422,7 @@ ${optionalField(department, "ÓRGANO")}`;
           PROMPTS.emergencia,
           userPrompt,
           "Emergencia",
+          { prisma: app.prisma, userId: req.userId, inputVariables: { subject, unit, department } },
         );
         return reply.send(result);
       } catch (error) {
@@ -399,6 +456,7 @@ ${optionalField(department, "ÓRGANO")}`;
           PROMPTS.centralizacion,
           userPrompt,
           "Centralización",
+          { prisma: app.prisma, userId: req.userId, inputVariables: { subject, unit, department } },
         );
         return reply.send(result);
       } catch (error) {
@@ -429,6 +487,7 @@ ${optionalField(department, "ÓRGANO")}`;
           PROMPTS.mediopropio,
           userPrompt,
           "Medio Propio",
+          { prisma: app.prisma, userId: req.userId, inputVariables: { subject, unit, department } },
         );
         return reply.send(result);
       } catch (error) {
@@ -460,6 +519,7 @@ ${optionalField(department, "ÓRGANO")}`;
           PROMPTS.subscripcion,
           userPrompt,
           "Subscripción",
+          { prisma: app.prisma, userId: req.userId, inputVariables: { subject, unit, department, mainCpv } },
         );
         return reply.send(result);
       } catch (error) {
@@ -491,6 +551,7 @@ ${optionalField(department, "ÓRGANO")}`;
           PROMPTS.innovacion,
           userPrompt,
           "Innovación",
+          { prisma: app.prisma, userId: req.userId, inputVariables: { subject, unit, department, mainCpv } },
         );
         return reply.send(result);
       } catch (error) {
@@ -521,6 +582,7 @@ ${optionalField(mainCpv, "CPV PRINCIPAL")}`;
           PROMPTS.duracion,
           userPrompt,
           "Duración",
+          { prisma: app.prisma, userId: req.userId, inputVariables: { subject, contractType, mainCpv } },
         );
         return reply.send(result);
       } catch (error) {
@@ -551,6 +613,7 @@ ${optionalField(mainCpv, "CPV PRINCIPAL")}`;
           PROMPTS.lotes,
           userPrompt,
           "Lotes",
+          { prisma: app.prisma, userId: req.userId, inputVariables: { subject, contractType, mainCpv } },
         );
         return reply.send(result);
       } catch (error) {
@@ -587,6 +650,7 @@ ${optionalField(mainCpv, "CPV PRINCIPAL")}`;
           PROMPTS.partidas,
           userPrompt,
           "Partidas",
+          { prisma: app.prisma, userId: req.userId, inputVariables: { subject, contractType, mainCpv, numLots } },
         );
         return reply.send(result);
       } catch (error) {

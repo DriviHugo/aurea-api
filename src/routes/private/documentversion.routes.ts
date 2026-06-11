@@ -325,14 +325,19 @@ const routes: FastifyPluginAsync = async (fastify) => {
     async (request, reply) => {
       try {
         const { id } = request.params as { id: string };
-        const body = (request.body || {}) as { documentId?: string; userId?: string };
+        const body = (request.body || {}) as {
+          documentId?: string;
+          userId?: string;
+        };
 
         const targetVersion = await prisma.documentVersion.findUnique({
           where: { id },
         });
 
         if (!targetVersion) {
-          return reply.status(404).send({ error: "Document version not found" });
+          return reply
+            .status(404)
+            .send({ error: "Document version not found" });
         }
 
         const documentId = body.documentId || targetVersion.documentId;
@@ -365,7 +370,8 @@ const routes: FastifyPluginAsync = async (fastify) => {
             data: {
               documentId,
               version: backupVersionNumber,
-              contentSnapshot: ((currentDocument.content as unknown) || {}) as any,
+              contentSnapshot: ((currentDocument.content as unknown) ||
+                {}) as any,
               sectionsSnapshot: {
                 secciones: currentSections,
               } as any,
@@ -375,8 +381,10 @@ const routes: FastifyPluginAsync = async (fastify) => {
           });
 
           const snapshot =
-            (targetVersion.sectionsSnapshot as Record<string, unknown> | null) ||
-            {};
+            (targetVersion.sectionsSnapshot as Record<
+              string,
+              unknown
+            > | null) || {};
           const restoredSectionsRaw =
             (snapshot["secciones"] as Array<Record<string, unknown>>) || [];
 
@@ -387,41 +395,45 @@ const routes: FastifyPluginAsync = async (fastify) => {
               data: restoredSectionsRaw.map((sectionRaw) => {
                 const section = sectionRaw as any;
                 return {
-                documentId,
-                order: Number(section["order"] ?? section["orden"] ?? 0),
-                title: String(section["title"] ?? section["titulo"] ?? "Untitled"),
-                description: (section["description"] ?? section["descripcion"] ?? null) as
-                  | string
-                  | null,
-                content: (section["content"] ?? section["contenido"] ?? null) as
-                  | string
-                  | null,
-                status: String(section["status"] ?? section["estado"] ?? "edited"),
-                tokensUsed:
-                  section["tokensUsed"] != null
-                    ? Number(section["tokensUsed"])
-                    : section["tokens_usados"] != null
-                      ? Number(section["tokens_usados"])
-                      : null,
-                generationTimeMs:
-                  section["generationTimeMs"] != null
-                    ? Number(section["generationTimeMs"])
-                    : section["tiempo_generacion_ms"] != null
-                      ? Number(section["tiempo_generacion_ms"])
-                      : null,
-                aiProvider: (section["aiProvider"] ?? section["ai_provider"] ?? null) as
-                  | string
-                  | null,
-                aiModel: (section["aiModel"] ?? section["ai_model"] ?? null) as
-                  | string
-                  | null,
-                lcspArticles: Array.isArray(
-                  section["lcspArticles"] ?? section["articulos_lcsp"],
-                )
-                  ? ((section["lcspArticles"] ??
-                      section["articulos_lcsp"]) as string[])
-                  : [],
-              };
+                  documentId,
+                  order: Number(section["order"] ?? section["orden"] ?? 0),
+                  title: String(
+                    section["title"] ?? section["titulo"] ?? "Untitled",
+                  ),
+                  description: (section["description"] ??
+                    section["descripcion"] ??
+                    null) as string | null,
+                  content: (section["content"] ??
+                    section["contenido"] ??
+                    null) as string | null,
+                  status: String(
+                    section["status"] ?? section["estado"] ?? "edited",
+                  ),
+                  tokensUsed:
+                    section["tokensUsed"] != null
+                      ? Number(section["tokensUsed"])
+                      : section["tokens_usados"] != null
+                        ? Number(section["tokens_usados"])
+                        : null,
+                  generationTimeMs:
+                    section["generationTimeMs"] != null
+                      ? Number(section["generationTimeMs"])
+                      : section["tiempo_generacion_ms"] != null
+                        ? Number(section["tiempo_generacion_ms"])
+                        : null,
+                  aiProvider: (section["aiProvider"] ??
+                    section["ai_provider"] ??
+                    null) as string | null,
+                  aiModel: (section["aiModel"] ??
+                    section["ai_model"] ??
+                    null) as string | null,
+                  lcspArticles: Array.isArray(
+                    section["lcspArticles"] ?? section["articulos_lcsp"],
+                  )
+                    ? ((section["lcspArticles"] ??
+                        section["articulos_lcsp"]) as string[])
+                    : [],
+                };
               }),
             });
           }
@@ -431,7 +443,8 @@ const routes: FastifyPluginAsync = async (fastify) => {
           await tx.document.update({
             where: { id: documentId },
             data: {
-              content: ((targetVersion.contentSnapshot as unknown) || {}) as any,
+              content: ((targetVersion.contentSnapshot as unknown) ||
+                {}) as any,
               version: restoredVersionNumber,
             },
           });
@@ -440,7 +453,8 @@ const routes: FastifyPluginAsync = async (fastify) => {
             data: {
               documentId,
               version: restoredVersionNumber,
-              contentSnapshot: ((targetVersion.contentSnapshot as unknown) || {}) as any,
+              contentSnapshot: ((targetVersion.contentSnapshot as unknown) ||
+                {}) as any,
               sectionsSnapshot: ((targetVersion.sectionsSnapshot as unknown) ||
                 {}) as any,
               changeDescription: `Restored from version ${targetVersion.version}`,

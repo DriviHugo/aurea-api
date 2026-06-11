@@ -54,8 +54,8 @@ interface CatalogItem {
  * Only includes vigente/prorrogado instruments to avoid confusing the model.
  */
 export function buildCatalogContext(): string {
-  const items = (catalogData as { items_flat?: CatalogItem[] })
-    ?.items_flat ?? [];
+  const items =
+    (catalogData as { items_flat?: CatalogItem[] })?.items_flat ?? [];
 
   const active = items.filter(
     (i) =>

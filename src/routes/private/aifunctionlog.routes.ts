@@ -63,23 +63,39 @@ const routes: FastifyPluginAsync = async (fastify) => {
     },
     async (request, reply) => {
       try {
-        const { page = 1, limit = 10, search, status, from, to } =
-          request.query as {
-            page?: number;
-            limit?: number;
-            search?: string;
-            status?: string;
-            from?: string;
-            to?: string;
-          };
+        const {
+          page = 1,
+          limit = 10,
+          search,
+          status,
+          from,
+          to,
+        } = request.query as {
+          page?: number;
+          limit?: number;
+          search?: string;
+          status?: string;
+          from?: string;
+          to?: string;
+        };
         const skip = (page - 1) * limit;
 
         const where = {
           ...(search
             ? {
                 OR: [
-                  { functionCode: { contains: search, mode: "insensitive" as const } },
-                  { functionName: { contains: search, mode: "insensitive" as const } },
+                  {
+                    functionCode: {
+                      contains: search,
+                      mode: "insensitive" as const,
+                    },
+                  },
+                  {
+                    functionName: {
+                      contains: search,
+                      mode: "insensitive" as const,
+                    },
+                  },
                   { model: { contains: search, mode: "insensitive" as const } },
                 ],
               }
