@@ -359,7 +359,11 @@ ${optionalField(department, "ÓRGANO")}`;
           PROMPTS.cpv,
           userPrompt,
           "CPV",
-          { prisma: app.prisma, userId: req.userId, inputVariables: { subject, unit, department } },
+          {
+            prisma: app.prisma,
+            userId: req.userId,
+            inputVariables: { subject, unit, department },
+          },
         );
         return reply.send(result);
       } catch (error) {
@@ -391,7 +395,11 @@ ${optionalField(department, "ÓRGANO")}`;
           PROMPTS.tipo,
           userPrompt,
           "Tipo",
-          { prisma: app.prisma, userId: req.userId, inputVariables: { subject, unit, department, mainCpv } },
+          {
+            prisma: app.prisma,
+            userId: req.userId,
+            inputVariables: { subject, unit, department, mainCpv },
+          },
         );
         return reply.send(result);
       } catch (error) {
@@ -422,7 +430,11 @@ ${optionalField(department, "ÓRGANO")}`;
           PROMPTS.emergencia,
           userPrompt,
           "Emergencia",
-          { prisma: app.prisma, userId: req.userId, inputVariables: { subject, unit, department } },
+          {
+            prisma: app.prisma,
+            userId: req.userId,
+            inputVariables: { subject, unit, department },
+          },
         );
         return reply.send(result);
       } catch (error) {
@@ -456,7 +468,11 @@ ${optionalField(department, "ÓRGANO")}`;
           PROMPTS.centralizacion,
           userPrompt,
           "Centralización",
-          { prisma: app.prisma, userId: req.userId, inputVariables: { subject, unit, department } },
+          {
+            prisma: app.prisma,
+            userId: req.userId,
+            inputVariables: { subject, unit, department },
+          },
         );
         return reply.send(result);
       } catch (error) {
@@ -487,7 +503,11 @@ ${optionalField(department, "ÓRGANO")}`;
           PROMPTS.mediopropio,
           userPrompt,
           "Medio Propio",
-          { prisma: app.prisma, userId: req.userId, inputVariables: { subject, unit, department } },
+          {
+            prisma: app.prisma,
+            userId: req.userId,
+            inputVariables: { subject, unit, department },
+          },
         );
         return reply.send(result);
       } catch (error) {
@@ -519,7 +539,11 @@ ${optionalField(department, "ÓRGANO")}`;
           PROMPTS.subscripcion,
           userPrompt,
           "Subscripción",
-          { prisma: app.prisma, userId: req.userId, inputVariables: { subject, unit, department, mainCpv } },
+          {
+            prisma: app.prisma,
+            userId: req.userId,
+            inputVariables: { subject, unit, department, mainCpv },
+          },
         );
         return reply.send(result);
       } catch (error) {
@@ -551,7 +575,11 @@ ${optionalField(department, "ÓRGANO")}`;
           PROMPTS.innovacion,
           userPrompt,
           "Innovación",
-          { prisma: app.prisma, userId: req.userId, inputVariables: { subject, unit, department, mainCpv } },
+          {
+            prisma: app.prisma,
+            userId: req.userId,
+            inputVariables: { subject, unit, department, mainCpv },
+          },
         );
         return reply.send(result);
       } catch (error) {
@@ -582,7 +610,11 @@ ${optionalField(mainCpv, "CPV PRINCIPAL")}`;
           PROMPTS.duracion,
           userPrompt,
           "Duración",
-          { prisma: app.prisma, userId: req.userId, inputVariables: { subject, contractType, mainCpv } },
+          {
+            prisma: app.prisma,
+            userId: req.userId,
+            inputVariables: { subject, contractType, mainCpv },
+          },
         );
         return reply.send(result);
       } catch (error) {
@@ -613,7 +645,11 @@ ${optionalField(mainCpv, "CPV PRINCIPAL")}`;
           PROMPTS.lotes,
           userPrompt,
           "Lotes",
-          { prisma: app.prisma, userId: req.userId, inputVariables: { subject, contractType, mainCpv } },
+          {
+            prisma: app.prisma,
+            userId: req.userId,
+            inputVariables: { subject, contractType, mainCpv },
+          },
         );
         return reply.send(result);
       } catch (error) {
@@ -650,7 +686,11 @@ ${optionalField(mainCpv, "CPV PRINCIPAL")}`;
           PROMPTS.partidas,
           userPrompt,
           "Partidas",
-          { prisma: app.prisma, userId: req.userId, inputVariables: { subject, contractType, mainCpv, numLots } },
+          {
+            prisma: app.prisma,
+            userId: req.userId,
+            inputVariables: { subject, contractType, mainCpv, numLots },
+          },
         );
         return reply.send(result);
       } catch (error) {

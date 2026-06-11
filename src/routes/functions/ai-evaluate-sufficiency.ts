@@ -197,7 +197,12 @@ ${previousAnswers.map((a) => `P: ${a.question}\nR: ${a.answer}`).join("\n\n")}`;
           providerName: result.provider,
           model: result.model ?? "default",
           userPrompt,
-          inputVariables: { sectionId, documentId, sectionTitle, sectionDescription },
+          inputVariables: {
+            sectionId,
+            documentId,
+            sectionTitle,
+            sectionDescription,
+          },
           response: parsed,
           tokensInput: result.usage?.promptTokens ?? null,
           tokensOutput: result.usage?.completionTokens ?? null,
