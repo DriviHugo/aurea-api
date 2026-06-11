@@ -38,10 +38,18 @@ const routes: FastifyPluginAsync = async (fastify) => {
                     functionName: { type: "string", nullable: true },
                     providerName: { type: "string", nullable: true },
                     model: { type: "string" },
-                    inputVariables: { type: "object", nullable: true },
+                    inputVariables: {
+                      type: "object",
+                      additionalProperties: true,
+                      nullable: true,
+                    },
                     systemPrompt: { type: "string", nullable: true },
                     userPrompt: { type: "string", nullable: true },
-                    response: { type: "object", nullable: true },
+                    response: {
+                      type: "object",
+                      additionalProperties: true,
+                      nullable: true,
+                    },
                     tokensInput: { type: "integer", nullable: true },
                     tokensOutput: { type: "integer", nullable: true },
                     durationMs: { type: "integer", nullable: true },
@@ -155,7 +163,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
               functionName: { type: "string", nullable: true },
               providerName: { type: "string", nullable: true },
               model: { type: "string" },
-              inputVariables: { type: "object" },
+              inputVariables: { type: "object", additionalProperties: true },
             },
           },
           404: {
@@ -216,7 +224,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
               functionName: { type: "string", nullable: true },
               providerName: { type: "string", nullable: true },
               model: { type: "string" },
-              inputVariables: { type: "object" },
+              inputVariables: { type: "object", additionalProperties: true },
             },
           },
           400: {
@@ -299,7 +307,7 @@ const routes: FastifyPluginAsync = async (fastify) => {
               functionName: { type: "string", nullable: true },
               providerName: { type: "string", nullable: true },
               model: { type: "string" },
-              inputVariables: { type: "object" },
+              inputVariables: { type: "object", additionalProperties: true },
             },
           },
           404: {

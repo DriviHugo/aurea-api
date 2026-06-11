@@ -5,6 +5,8 @@
 import type { FastifyRequest, FastifyReply } from "fastify";
 import type { UserRole } from "@prisma/client";
 import type { AdminService } from "../services/admin.service.js";
+import prisma from "../config/prisma.js";
+import { writeAuditLog } from "../services/audit.service.js";
 import logger from "../config/logger.js";
 
 interface CreateUserBody {
@@ -56,6 +58,22 @@ export class AdminController {
         roles: req.body.roles,
       });
 
+      await writeAuditLog({
+        prisma,
+        action: "crear_usuario",
+        entity: "profiles",
+        entityId: result.userId,
+        userId: requestUserId,
+        ipAddress: req.ip,
+        newData: {
+          email: req.body.email,
+          name: req.body.name,
+          lastName: req.body.lastName,
+          unit: req.body.unit,
+          roles: req.body.roles,
+        },
+      });
+
       return reply.send({
         data: result,
         error: null,
@@ -103,6 +121,16 @@ export class AdminController {
         req.body.newPassword,
       );
 
+      await writeAuditLog({
+        prisma,
+        action: "cambiar_contraseña",
+        entity: "profiles",
+        entityId: req.body.userId,
+        userId: requestUserId,
+        ipAddress: req.ip,
+        newData: { target_user_id: req.body.userId, action: "password_changed" },
+      });
+
       return reply.send({
         data: { success: true },
         error: null,
@@ -142,6 +170,19 @@ export class AdminController {
         requestUserId,
         req.body.reassignToUserId,
       );
+
+      await writeAuditLog({
+        prisma,
+        action: "eliminar_usuario",
+        entity: "profiles",
+        entityId: req.body.userId,
+        userId: requestUserId,
+        ipAddress: req.ip,
+        previousData: {
+          user_id: req.body.userId,
+          reassigned_to: req.body.reassignToUserId ?? null,
+        },
+      });
 
       return reply.send({
         data: result,

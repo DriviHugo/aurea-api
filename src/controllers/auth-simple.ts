@@ -12,6 +12,7 @@ import {
   REFRESH_TOKEN_EXPIRATION_IN_SECONDS,
 } from "../utils/jwt.js";
 import { blacklistJti } from "../services/tokenBlacklist.js";
+import { writeAuditLog } from "../services/audit.service.js";
 import logger from "../config/logger.js";
 
 interface LoginBody {
@@ -48,6 +49,17 @@ export const login = async (
         error: "Invalid credentials",
       });
     }
+
+    // Audit: record who accessed the system
+    await writeAuditLog({
+      prisma,
+      action: "inicio_sesion",
+      entity: "profiles",
+      entityId: user.id,
+      userId: user.id,
+      ipAddress: req.ip,
+      newData: { email: user.email },
+    });
 
     const sessionId = generateRandomHexToken(32);
     const accessToken = signAccessToken({ sub: user.id, jti: sessionId });
